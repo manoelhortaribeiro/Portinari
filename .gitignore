@@ -1,0 +1,7 @@
+
+.idea/
+neo4jdb/__pycache__/
+opencrab/data/
+parser/__init__.pyc
+parser/__pycache__/
+static/js/bundle.js

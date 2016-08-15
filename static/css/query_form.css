@@ -1,0 +1,40 @@
+/** Query Form Component **/
+
+/* Form */
+
+#query-interface-form {
+    text-align: center;
+    margin: 5px 0 5px 0;
+}
+
+/* Current node info */
+
+#query-interface-current {
+    text-align: center;
+    margin: 5px 0 5px 0;
+
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: inline-block;
+    width: 100px;
+    padding: 10px;
+    background-color: #ffffff;
+    margin: 5px;
+    font-size: 12px;
+    color: #6c5c70;
+    -webkit-box-shadow: 0px 0px 67px 8px rgba(0, 0, 0, 0.10);
+    -moz-box-shadow: 0px 0px 67px 8px rgba(0, 0, 0, 0.10);
+    box-shadow: 0px 0px 67px 8px rgba(0, 0, 0, 0.10);
+}
+
+li:hover {
+    background-color: #aaa;
+}

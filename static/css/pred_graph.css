@@ -1,0 +1,52 @@
+/* Future Graph Component */
+
+#query-results1 {
+    text-align: center;
+    margin: 5px 0 5px 0;
+}
+
+p {
+    color: #413F4A;
+    font-family: 'Consolas', 'Monaco', 'Bitstream Vera Sans Mono', monospace;
+    font-size: 12px;
+}
+
+#query-results2 {
+    text-align: center;
+    margin: 5px 0 5px 0;
+
+}
+
+
+/* nodes */
+
+.sankey_node rect {
+    cursor: move;
+    fill-opacity: .9;
+    shape-rendering: crispEdges;
+}
+
+.sankey_node text {
+    pointer-events: none;
+    text-shadow: 0 1px 0 #fff;
+}
+
+/* edges */
+
+.sankey_link {
+    fill: none;
+    stroke: #000;
+    stroke-opacity: .2;
+}
+
+.sankey_link:hover {
+    stroke-opacity: .5;
+}
+
+/* text */
+
+.sankey_node text {
+    fill: rgba(12, 12, 14, 0.9);
+    font-size: 12px;
+}
+
