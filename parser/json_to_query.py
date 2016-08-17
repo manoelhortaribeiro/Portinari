@@ -89,18 +89,26 @@ def parse_sequence(nodes, edges, pred_attr, future_nodes, id_attr, begin_date, e
             name = node['name']
             for const in node['key_op_value']:
                 if const[1] != "==":
-                    query += "WHERE "
-                    query += "{0}.{1} {2} {3}\n".format(name, const[0], const[1], const[2])
+
+                    query += "{0}.{1} {2} {3}".format(name, const[0], const[1], const[2])
+
+        where_path_const = False
 
         for step1, step2 in zip(path[:-1], path[1:]):
             edge = graph.get_edge(step1, step2)
             name = edge['name']
             for const in edge['key_op_value']:
                 if const[0] != "type":
-                    query += "WHERE "
+
+                    if where_path_const is False:
+                        query += "WHERE "
+                        where_path_const = True
+                    else:
+                        query += "AND "
+
                     query += "{0}.{1} {2} {3}\n".format(name, const[0], const[1], const[2])
 
-        last_spec_node = nodes.pop(-1)['name']
+        last_spec_node = graph.get_node(path[-1])['name']
 
         range_future_nodes = list(range(int(future_nodes)))
 

@@ -1,0 +1,16 @@
+ MATCH ( n0:Event { diagnosis1:12 })
+MATCH ( n1:Event { diagnosis1:0 })
+MATCH (n0)-[e2:Next1]->(n1)
+WHERE e2.sincelast < 90
+MATCH (n1)-[first_future:Next1]->(ft0)
+WHERE first_future.sincelast >= 0 AND first_future.sincelast <= 90
+OPTIONAL MATCH (ft0)-[:Next1]->(ft1)
+RETURN COUNT(distinct n1.ID) as c0, -2 as p0, ft0.diagnosis1 as p1, COUNT(distinct ft0.ID) as c1, ft1.diagnosis1 as p2, COUNT(distinct ft1.ID) as c2
+ MATCH ( n0:Event { diagnosis1:12 })
+MATCH ( n1:Event { diagnosis1:0 })
+MATCH (n0)-[e2:Next1]->(n1)
+WHERE e2.sincelast < 90
+MATCH (n1)-[first_future:Next1]->(ft0)
+WHERE first_future.sincelast >= 0 AND first_future.sincelast <= 90
+OPTIONAL MATCH (ft0)-[:Next1]->(ft1)
+RETURN COUNT(distinct n1.ID) as c0, -2 as p0, ft0.diagnosis1 as p1, COUNT(distinct ft0.ID) as c1, ft1.diagnosis1 as p2, COUNT(distinct ft1.ID) as c2

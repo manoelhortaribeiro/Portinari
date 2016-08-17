@@ -39,15 +39,22 @@ def index():
 
         query = parse_sequence(nodes, edges, pred_attr, future_nodes, id_attr, begin_date, end_date)
 
-        print(query)
-        result = db.make_query(query)
+        split = query.split("UNION")
+        print(split)
 
-        data = pandas.DataFrame(result.data())
+        data = None
+        for i in split:
+            print("acessing the db...\n", i)
+            result = db.make_query(i)
+            print("query done!")
+            if data is None:
+                data = pandas.DataFrame(result.data())
+            else:
+                data.append(pandas.DataFrame(result.data()))
+
         data.fillna(-1, inplace=True)
 
-
         sankey_json = make_sankey(data, future_nodes)
-
 
         return sankey_json
 
