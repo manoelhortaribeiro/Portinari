@@ -35,7 +35,7 @@ def index():
             end_date = json.loads(request.form['end_date'])
         else:
             begin_date = 0
-            end_date = 10000 *365 # 10 thousand years ;)
+            end_date = 10000 * 365 # 10 thousand years ;)
 
         query = parse_sequence(nodes, edges, pred_attr, future_nodes, id_attr, begin_date, end_date)
 

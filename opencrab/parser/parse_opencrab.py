@@ -1,7 +1,7 @@
 import csv
 
-# TODO: document this script better
 
+# TODO: document this script better
 def write_nodes_and_rels(path, nodes, edges, node_values, edge_values):
 
     nodes_writer = csv.writer(open(path + 'events.csv', 'w'))
@@ -99,8 +99,12 @@ def parse_opencrab(path_src, path_out, id_value,
 
     write_nodes_and_rels(path_out, f_nodes, f_edges, node_values, edge_values)
 
-parse_opencrab("./processed_data/opencrabunix.csv", "../data/output/", id_value="ID",
-               event_date="diagnosisdate", start_date=10957, end_date=14610,
+parse_opencrab("../data/processed_data/opencrabunix.csv",
+               "../data/output/",
+               id_value="ID",
+               event_date="diagnosisdate",
+               start_date=0,
+               end_date=1000000000,
                node_values=[("ID", ":int", int),
                             ("birthdate", ":int", int),
                             ("diagnosisnumber", ":int", int),

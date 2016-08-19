@@ -6,8 +6,8 @@
 }
 
 p {
-    color: #413F4A;
-    font-family: 'Consolas', 'Monaco', 'Bitstream Vera Sans Mono', monospace;
+    color: #000000;
+    font-family: 'Helvetica';
     font-size: 12px;
 }
 
@@ -47,6 +47,6 @@ p {
 
 .sankey_node text {
     fill: rgba(12, 12, 14, 0.9);
-    font-size: 12px;
+    font-size: 20px;
 }
 
