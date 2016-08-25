@@ -44,6 +44,7 @@ h2 {
 text {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     pointer-events: none;
+    font-size: 19px;
 }
 
 div {
@@ -77,6 +78,7 @@ button {
     padding : 5px;
 }
 
+
 /* svg background and effects */
 
 .shadow-box{
@@ -88,10 +90,11 @@ button {
     box-shadow: 0 0 67px 8px rgba(0,0,0,0.10);
 }
 
+/*
 .grid-svg {
     background-image: url('../img/noisy_grid.png');
     background-repeat: repeat;
-}
+}*/
 
 /* general form stuff */
 
@@ -115,7 +118,8 @@ input {
     box-shadow: 0px 0px 67px 8px rgba(0, 0, 0, 0.10);
     background: white;
     padding: 10px 20px;
-    font-size: 14px;
+    min-width: 120px;
+    font-size: 18px;
     margin: 20px 10px 20px 0;
     color: #6c5c70;
     text-align: center;

@@ -16,15 +16,15 @@ var display = {
     "20": {text: "Hist: Benign", color: "#5353c6"},
     "21": {text: "Hist: Polyp", color: "#3939ac"},
     "22": {text: "Hist: Benign w/ a", color: "#2d2d86"},
-    "30": {text: "Hist: Unsure Benign", color: "#5c8a8a"},
+    "30": {text: "Hist: Unsure B.", color: "#5c8a8a"},
     "31": {text: "Hist: CIN1", color: "#19194d"},
     "32": {text: "Hist: CIN2", color: "#131339"},
     "33": {text: "Hist: CIN3", color: "#0d0d26"},
-    "34": {text: "Hist: Irregular Cells", color: "#3d0099"},
+    "34": {text: "Hist: Irregular", color: "#3d0099"},
     "99": {text: "Hist: Unknown", color: "#330080"},
     "35": {text: "Hist: ACIS", color: "#330080"},
     "41": {text: "Cancer: SCC", color: "#336600"},
-    "42": {text: "Cancer: Adenocarcinoma", color: "#264d00"},
+    "42": {text: "Adenocarcinoma", color: "#264d00"},
     "43": {text: "Cancer: Other", color: "#1a3300"}
 };
 
@@ -44,15 +44,15 @@ var diagnosis1 = [
     ["20", "Hist: Benign"],
     ["21", "Hist: Polyp"],
     ["22", "Hist: Beningn without atypia"],
-    ["30", "Hist: Unsire benign"],
+    ["30", "Hist: Unsure B."],
     ["31", "Hist: CIN1"],
     ["32", "Hist: CIN2"],
     ["33", "Hist: CIN3"],
-    ["34", "Hist: Irregular Cells"],
+    ["34", "Hist: Irregular"],
     ["35", "Hist: ACIS"],
     ["99", "Hist: Unknown Morphology"],
     ["41", "Canc: Squamous cell carcinoma"],
-    ["42", "Canc: Adenocarcinoma"],
+    ["42", "Adenocarcinoma"],
     ["43", "Canc: Other Cancers"]
 ];
 
@@ -95,8 +95,8 @@ var node_attributes = [
         {name: "birthdate", display: "Birthdate", type: "month"},
         {name: "censordate", display: "Censor Date", type: "month"},
         {name: "diagnosisdate", display: "Diagnosis Date", type: "month"},
-        {name: "diagnosis1", display: "Primary Diagnosis", type: "diagnosis1"},
-        {name: "diagnosis2", display: "Secondary Diagnosis", type: "number"},
+        {name: "diagnosis1", display: "Diagnosis", type: "diagnosis1"},
+        {name: "diagnosis2", display: "Morphology Code", type: "number"},
         {name: "lab_nr", display: "Laboratory Number", type: "number"},
         {name: "reg", display: "Region", type: "region"},
         {name: "stage", display: "Stage", type: "stage"},

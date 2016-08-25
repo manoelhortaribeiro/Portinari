@@ -8,7 +8,7 @@
 p {
     color: #000000;
     font-family: 'Helvetica';
-    font-size: 12px;
+    font-size: 16px;
 }
 
 #query-results2 {
@@ -47,6 +47,6 @@ p {
 
 .sankey_node text {
     fill: rgba(12, 12, 14, 0.9);
-    font-size: 20px;
+    font-size: 16px;
 }
 
