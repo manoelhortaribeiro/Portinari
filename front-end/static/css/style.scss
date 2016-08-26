@@ -1,5 +1,6 @@
 $font-stack: helvetica;
 $bg-color: rgba(255, 255, 255, 0.9);
+$secondary-color : #e8f0ff;
 $header-color: #141a29;
 
 /* General Website */
@@ -11,7 +12,6 @@ body {
   border: 0;
   background-color: $bg-color;
 }
-
 
 h1 {
   color: $header-color;
@@ -28,13 +28,39 @@ button {
 }
 
 #button {
-  text-align: left;
+  text-align: center;
+  margin: 0 0 0 0;
 }
 
 #query-system {
-    border:1px solid #d3d3d3;
-    padding: 7px 7px 7px 7px;
-    margin: 10px 0px 10px 0px;
+  padding: 0;
+  margin: 0px 0px 10px 0px;
 }
 
+#query-interface-graph {
+  padding: 0;
+  margin: 0px 0px 10px 0px;
+  background: $secondary-color;
+}
 
+#nav-menu {
+  margin: 0;
+  padding: 0;
+
+  li.active a {
+    background: $secondary-color;
+  }
+}
+
+.content {
+  display: none;
+}
+
+.tab-content {
+  background: $secondary-color;
+  h3 {
+    margin: 0;
+    padding: 10px 10px 10px 10px;
+  }
+  padding: 0 10px 10px 10px;
+}
