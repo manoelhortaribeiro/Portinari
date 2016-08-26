@@ -149,6 +149,7 @@ module.exports = {
         edgeClass: "Edge",
         edgesClass: "Edges",
         nodeRadius: 45,
+        rectangleWidth:40,
         delete: 68
     },
 

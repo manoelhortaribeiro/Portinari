@@ -7,10 +7,9 @@ function GC(query_interface_selection, reactor) {
 
     var thisGraph = this;
 
-
     // ** Config
     thisGraph.idct = 0;
-    thisGraph.aspect = [0, 0, 2000, 500];
+    thisGraph.aspect = [0, 0, 1600, 600];
 
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
@@ -77,36 +76,20 @@ function GC(query_interface_selection, reactor) {
     // drag
     thisGraph.drag = d3.drag().on("drag", function (d) {
 
-        var can_move = true,
-            tmp_x = d.x + d3.event.dx,
+        var tmp_x = d.x + d3.event.dx,
             tmp_y = d.y + d3.event.dy,
-            radius = thisGraph.config.nodeRadius;
+            radius = thisGraph.config.nodeRadius,
+            aspect = thisGraph.aspect,
+            nodes = thisGraph.graph.nodes,
+            node = d;
 
-        if (radius + tmp_x > thisGraph.aspect[2] ||
-            tmp_x - radius < thisGraph.aspect[0] ||
-            radius + tmp_y > thisGraph.aspect[3] ||
-            tmp_y - radius < thisGraph.aspect[1]) {
-            can_move = false;
-        }
-
-        thisGraph.graph.nodes.forEach(function (n) {
-            var dist = Math.sqrt(Math.pow(tmp_x-n.x,2) + Math.pow(tmp_y-n.y,2));
-            console.log(dist);
-
-            if(dist <= 2*radius &&
-                d.id != n.id){
-                can_move = false;
-            }
-
-        });
+        var can_move = utils.canDo(tmp_x, tmp_y, radius, aspect, nodes, node);
 
         if (can_move) {
             d.x += d3.event.dx;
             d.y += d3.event.dy;
             thisGraph.updateGraph();
         }
-
-
     });
 }
 
@@ -165,7 +148,17 @@ GC.prototype.svgMouseDown = function () {
     if (d3.event.shiftKey) {
         var coordinates = d3.mouse(thisGraph.svg.node());
 
-        thisGraph.addNode(coordinates);
+        var tmp_x = coordinates[0],
+            tmp_y = coordinates[1],
+            radius = thisGraph.config.nodeRadius,
+            aspect = thisGraph.aspect,
+            nodes = thisGraph.graph.nodes;
+
+        var can_create = utils.canDo(tmp_x, tmp_y, radius, aspect, nodes);
+
+        if (can_create) {
+            thisGraph.addNode(coordinates);
+        }
     }
 };
 

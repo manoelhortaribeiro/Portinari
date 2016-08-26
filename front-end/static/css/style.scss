@@ -1,8 +1,10 @@
 $font-stack: helvetica;
 $bg-color: rgba(255, 255, 255, 0.9);
-$secondary-color : #e8f0ff;
+$secondary-color: #e8f0ff;
+$node-color: rgb(42, 171, 210);
+$selected-node-color: rgb(35, 85, 129);
 $header-color: #141a29;
-
+$node-stroke: #141A29;
 /* -- General Website */
 
 body {
@@ -29,6 +31,11 @@ button {
   max-height: 40px;
 }
 
+text {
+  font-family: "Courier";
+  font-size: 25px;
+}
+
 /* - Query Menu */
 
 #button {
@@ -39,12 +46,12 @@ button {
 #query-system {
   padding: 0;
   margin: 0 0 10px 0;
+  border: solid lightgrey 1px;
 }
 
 #query-interface-graph {
   padding: 0;
   margin: 0 0 0 0;
-  border: solid lightgrey 1px;
 }
 
 #nav-menu {
@@ -73,60 +80,65 @@ button {
 
 /* -- Query */
 
+#query-interface-graph svg {
+  display: inline;
+  border: solid lightgrey 1px;
+  margin: 3px 3px 3px 3px;
+  padding: 0;
+}
+
 /* nodes */
 
 .Node {
-    fill: #ABB8D8;
-    -webkit-box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.10);
-    -moz-box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.10);
-    box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.10);
+  fill: $node-color;
+
 }
 
 .Node:hover {
-    stroke: #413F4A;
-    stroke-width: 2px;
-    stroke-dasharray: 5, 5;
+  fill: $selected-node-color;
+  stroke: $node-stroke;
+  stroke-width: 4px;
 }
 
-.Node.selected {
-    fill: #98869C;
-    stroke-width: 2px;
-    stroke: #413F4A;
 
+.Node.selected {
+  fill: $selected-node-color;
+  stroke: $node-stroke;
+  stroke-width: 4px;
 }
 
 /* edges */
 
 .link {
-    stroke: #402D29;
-    stroke-width: 4px;
+  stroke: #402D29;
+  stroke-width: 4px;
 }
 
 .selected path.link {
-    stroke: #413F4A;
-    fill: #413F4A;
-    stroke-width: 6px;
+  stroke: #413F4A;
+  fill: #413F4A;
+  stroke-width: 6px;
 }
 
 #end-arrow {
-    stroke: #413F4A;
-    fill: #413F4A;
+  stroke: #413F4A;
+  fill: #413F4A;
 }
 
 /* text */
 
 .InTextN text {
-    fill: rgba(255, 255, 255, 1);
+  fill: rgba(255, 255, 255, 1);
 }
 
 .OuTextN text {
-    fill: rgba(12, 12, 14, 0.9);
+  fill: rgba(12, 12, 14, 0.9);
 }
 
 .InTextE text {
-    fill: rgba(12, 12, 14, 0.9);
+  fill: rgba(12, 12, 14, 0.9);
 }
 
 .OuTextE text {
-    fill: rgba(12, 12, 14, 0.9);
+  fill: rgba(12, 12, 14, 0.9);
 }

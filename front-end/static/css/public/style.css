@@ -20,6 +20,10 @@ button {
   padding: 0;
   max-height: 40px; }
 
+text {
+  font-family: "Courier";
+  font-size: 25px; }
+
 /* - Query Menu */
 #button {
   text-align: center;
@@ -27,12 +31,12 @@ button {
 
 #query-system {
   padding: 0;
-  margin: 0 0 10px 0; }
+  margin: 0 0 10px 0;
+  border: solid lightgrey 1px; }
 
 #query-interface-graph {
   padding: 0;
-  margin: 0 0 0 0;
-  border: solid lightgrey 1px; }
+  margin: 0 0 0 0; }
 
 #nav-menu {
   margin: 0;
@@ -52,22 +56,25 @@ button {
 
 /* - General */
 /* -- Query */
+#query-interface-graph svg {
+  display: inline;
+  border: solid lightgrey 1px;
+  margin: 3px 3px 3px 3px;
+  padding: 0; }
+
 /* nodes */
 .Node {
-  fill: #ABB8D8;
-  -webkit-box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.1); }
+  fill: #2aabd2; }
 
 .Node:hover {
-  stroke: #413F4A;
-  stroke-width: 2px;
-  stroke-dasharray: 5, 5; }
+  fill: #235581;
+  stroke: #141A29;
+  stroke-width: 4px; }
 
 .Node.selected {
-  fill: #98869C;
-  stroke-width: 2px;
-  stroke: #413F4A; }
+  fill: #235581;
+  stroke: #141A29;
+  stroke-width: 4px; }
 
 /* edges */
 .link {

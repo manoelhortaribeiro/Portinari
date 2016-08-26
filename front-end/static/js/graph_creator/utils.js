@@ -1,6 +1,30 @@
 var json_config = require("../config.js");
 
-function internalCalc(d,consts){
+
+function canDo(tmp_x, tmp_y, radius, aspect, nodes, node) {
+
+    var can = true;
+
+    if (radius + tmp_x > aspect[2] ||
+        tmp_x - radius < aspect[0] ||
+        radius + tmp_y > aspect[3] ||
+        tmp_y - radius < aspect[1]) {
+        can = false;
+    }
+
+    nodes.forEach(function (n) {
+        var dist = Math.sqrt(Math.pow(tmp_x - n.x, 2) + Math.pow(tmp_y - n.y, 2));
+        console.log(dist);
+
+        if (dist <= 2 * radius && (typeof node == "undefined" || node.id != n.id)) {
+            can = false;
+        }
+    });
+
+    return can;
+}
+
+function internalCalc(d, consts) {
     var vx = d.dst.x - d.src.x;
     var vy = d.dst.y - d.src.y;
     var norm = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
@@ -15,7 +39,7 @@ function internalCalc(d,consts){
 
 function calcTextEdgePath(d, consts, mod) {
     var result = internalCalc(d, consts);
-    return [(result[0] + result[1])/2, (result[2] + result[3])/2 + mod];
+    return [(result[0] + result[1]) / 2, (result[2] + result[3]) / 2 + mod];
 }
 
 function calcEdgePath(d, consts) {
@@ -52,5 +76,6 @@ module.exports = {
     Node: Node,
     Edge: Edge,
     calcEdgePath: calcEdgePath,
-    calcTextEdgePath: calcTextEdgePath
+    calcTextEdgePath: calcTextEdgePath,
+    canDo: canDo
 };
