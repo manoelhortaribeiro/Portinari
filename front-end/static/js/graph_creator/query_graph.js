@@ -7,8 +7,11 @@ function GC(query_interface_selection, reactor) {
 
     var thisGraph = this;
 
+
     // ** Config
     thisGraph.idct = 0;
+    thisGraph.aspect = [0, 0, 2000, 500];
+
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
     thisGraph.reactor.addEventListener('constraint_added', this.updateGraph.bind(this));
@@ -25,8 +28,12 @@ function GC(query_interface_selection, reactor) {
     // ** View
     // svg
     thisGraph.svg = query_interface_selection.append("svg")
-        .classed("shadow-box", true)
-        .classed("grid-svg", true);
+        .attr("viewBox", thisGraph.aspect[0] + " " +
+            thisGraph.aspect[1] + " " +
+            thisGraph.aspect[2] + " " +
+            thisGraph.aspect[3])
+        .attr("preserveAspectRatio", "xMinYMin meet");
+
     // graph
     thisGraph.svgG = thisGraph.svg.append("g")
         .classed(thisGraph.config.graphClass, true);
@@ -69,9 +76,36 @@ function GC(query_interface_selection, reactor) {
     });
     // drag
     thisGraph.drag = d3.drag().on("drag", function (d) {
-        d.x += d3.event.dx;
-        d.y += d3.event.dy;
-        thisGraph.updateGraph();
+
+        var can_move = true,
+            tmp_x = d.x + d3.event.dx,
+            tmp_y = d.y + d3.event.dy,
+            radius = thisGraph.config.nodeRadius;
+
+        if (radius + tmp_x > thisGraph.aspect[2] ||
+            tmp_x - radius < thisGraph.aspect[0] ||
+            radius + tmp_y > thisGraph.aspect[3] ||
+            tmp_y - radius < thisGraph.aspect[1]) {
+            can_move = false;
+        }
+
+        thisGraph.graph.nodes.forEach(function (n) {
+            var dist = Math.sqrt(Math.pow(tmp_x-n.x,2) + Math.pow(tmp_y-n.y,2));
+            console.log(dist);
+
+            if(dist <= 2*radius &&
+                d.id != n.id){
+                can_move = false;
+            }
+
+        });
+
+        if (can_move) {
+            d.x += d3.event.dx;
+            d.y += d3.event.dy;
+            thisGraph.updateGraph();
+        }
+
 
     });
 }
@@ -130,6 +164,7 @@ GC.prototype.svgMouseDown = function () {
     var thisGraph = this;
     if (d3.event.shiftKey) {
         var coordinates = d3.mouse(thisGraph.svg.node());
+
         thisGraph.addNode(coordinates);
     }
 };
@@ -204,15 +239,15 @@ GC.prototype.updateGraph = function () {
 
     // - update
     nodes.data(data, function (d) {
-            return d.name;
-        })
+        return d.name;
+    })
         .attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
         });
     // - exit
     nodes.data(data, function (d) {
-            return d.name;
-        })
+        return d.name;
+    })
         .exit()
         .remove();
 
@@ -240,8 +275,8 @@ GC.prototype.updateGraph = function () {
     text.data(data, function (d) {
         return d.name;
     }).attr("x", function (d) {
-            return d.x
-        })
+        return d.x
+    })
         .attr("y", function (d) {
             return d.y
         });
@@ -273,8 +308,8 @@ GC.prototype.updateGraph = function () {
     var aux = text.data(data, function (d) {
         return d.name;
     }).attr("x", function (d) {
-            return d.x
-        })
+        return d.x
+    })
         .attr("y", function (d) {
             return d.y + 50
         })
@@ -314,16 +349,16 @@ GC.prototype.updateGraph = function () {
         .classed("link", true);
     // - update
     edges.data(data, function (d) {
-            return d.name;
-        })
+        return d.name;
+    })
         .selectAll("path")
         .attr("d", function (d) {
             return utils.calcEdgePath(d, thisGraph.config.nodeRadius);
         });
     // - exit
     edges.data(data, function (d) {
-            return d.name;
-        })
+        return d.name;
+    })
         .exit()
         .remove();
 
@@ -353,8 +388,8 @@ GC.prototype.updateGraph = function () {
     text.data(data, function (d) {
         return d.name;
     }).attr("x", function (d) {
-            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
-        })
+        return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
+    })
         .attr("y", function (d) {
             return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
         });
@@ -388,8 +423,8 @@ GC.prototype.updateGraph = function () {
     var aux = text.data(data, function (d) {
         return d.name;
     }).attr("x", function (d) {
-            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
-        })
+        return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
+    })
         .attr("y", function (d) {
             return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
         })

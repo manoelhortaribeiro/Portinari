@@ -3,7 +3,7 @@ $bg-color: rgba(255, 255, 255, 0.9);
 $secondary-color : #e8f0ff;
 $header-color: #141a29;
 
-/* General Website */
+/* -- General Website */
 
 body {
   font-family: $font-stack;
@@ -24,23 +24,27 @@ h1 {
 }
 
 button {
+  margin: 0;
+  padding: 0;
   max-height: 40px;
 }
 
+/* - Query Menu */
+
 #button {
   text-align: center;
-  margin: 0 0 0 0;
+  margin: 0 0 5px 0;
 }
 
 #query-system {
   padding: 0;
-  margin: 0px 0px 10px 0px;
+  margin: 0 0 10px 0;
 }
 
 #query-interface-graph {
   padding: 0;
-  margin: 0px 0px 10px 0px;
-  background: $secondary-color;
+  margin: 0 0 0 0;
+  border: solid lightgrey 1px;
 }
 
 #nav-menu {
@@ -63,4 +67,66 @@ button {
     padding: 10px 10px 10px 10px;
   }
   padding: 0 10px 10px 10px;
+}
+
+/* - General */
+
+/* -- Query */
+
+/* nodes */
+
+.Node {
+    fill: #ABB8D8;
+    -webkit-box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.10);
+    -moz-box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.10);
+    box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.10);
+}
+
+.Node:hover {
+    stroke: #413F4A;
+    stroke-width: 2px;
+    stroke-dasharray: 5, 5;
+}
+
+.Node.selected {
+    fill: #98869C;
+    stroke-width: 2px;
+    stroke: #413F4A;
+
+}
+
+/* edges */
+
+.link {
+    stroke: #402D29;
+    stroke-width: 4px;
+}
+
+.selected path.link {
+    stroke: #413F4A;
+    fill: #413F4A;
+    stroke-width: 6px;
+}
+
+#end-arrow {
+    stroke: #413F4A;
+    fill: #413F4A;
+}
+
+/* text */
+
+.InTextN text {
+    fill: rgba(255, 255, 255, 1);
+}
+
+.OuTextN text {
+    fill: rgba(12, 12, 14, 0.9);
+}
+
+.InTextE text {
+    fill: rgba(12, 12, 14, 0.9);
+}
+
+.OuTextE text {
+    fill: rgba(12, 12, 14, 0.9);
 }

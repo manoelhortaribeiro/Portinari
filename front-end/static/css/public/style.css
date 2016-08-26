@@ -1,4 +1,4 @@
-/* General Website */
+/* -- General Website */
 body {
   font-family: helvetica;
   margin: 0;
@@ -16,20 +16,23 @@ h1 {
   text-align: center; }
 
 button {
+  margin: 0;
+  padding: 0;
   max-height: 40px; }
 
+/* - Query Menu */
 #button {
   text-align: center;
-  margin: 0 0 0 0; }
+  margin: 0 0 5px 0; }
 
 #query-system {
   padding: 0;
-  margin: 0px 0px 10px 0px; }
+  margin: 0 0 10px 0; }
 
 #query-interface-graph {
   padding: 0;
-  margin: 0px 0px 10px 0px;
-  background: #e8f0ff; }
+  margin: 0 0 0 0;
+  border: solid lightgrey 1px; }
 
 #nav-menu {
   margin: 0;
@@ -46,5 +49,51 @@ button {
   .tab-content h3 {
     margin: 0;
     padding: 10px 10px 10px 10px; }
+
+/* - General */
+/* -- Query */
+/* nodes */
+.Node {
+  fill: #ABB8D8;
+  -webkit-box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.1); }
+
+.Node:hover {
+  stroke: #413F4A;
+  stroke-width: 2px;
+  stroke-dasharray: 5, 5; }
+
+.Node.selected {
+  fill: #98869C;
+  stroke-width: 2px;
+  stroke: #413F4A; }
+
+/* edges */
+.link {
+  stroke: #402D29;
+  stroke-width: 4px; }
+
+.selected path.link {
+  stroke: #413F4A;
+  fill: #413F4A;
+  stroke-width: 6px; }
+
+#end-arrow {
+  stroke: #413F4A;
+  fill: #413F4A; }
+
+/* text */
+.InTextN text {
+  fill: white; }
+
+.OuTextN text {
+  fill: rgba(12, 12, 14, 0.9); }
+
+.InTextE text {
+  fill: rgba(12, 12, 14, 0.9); }
+
+.OuTextE text {
+  fill: rgba(12, 12, 14, 0.9); }
 
 /*# sourceMappingURL=style.css.map */
