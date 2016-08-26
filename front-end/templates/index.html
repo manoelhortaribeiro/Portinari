@@ -1,0 +1,88 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title> Portinari </title>
+    <meta name="description" content="Data Visualization Tool for Analyzing Screening Data">
+    <meta name="author" content="Manoel Horta Ribeiro">
+    <script src="../static/js/external/jquery.min.js"></script>
+    <script src="../static/js/external/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../static/css/external/normalize.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/external/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/external/bootstrap-theme.min.css">
+
+    <link rel="stylesheet" type="text/css" href="../static/css/public/style.css">
+
+</head>
+
+<body>
+<div class="container-fluid">
+    <h1>portinari </h1>
+
+
+    <div id="button">
+        <button type="button" class="btn btn-primary btn-xs" id="expand-button">Query Graph &#9651;</button>
+    </div>
+
+
+    <div class="col-md-12 container content" id="query-system">
+
+        <div id="query-interface-graph">
+            <!-- Query graph goes here -->
+            Asd asdas asdas dasd as
+        </div>
+
+    </div>
+
+    <br>
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
+        <li><a data-toggle="tab" href="#menu1">Menu 1</a></li>
+        <li><a data-toggle="tab" href="#menu2">Menu 2</a></li>
+        <li><a data-toggle="tab" href="#menu3">Menu 3</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="Visualize Cohort" class="tab-pane fade in active">
+            <h3>HOME</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+                dolore magna aliqua.</p>
+        </div>
+        <div id="Visualize Prognosis" class="tab-pane fade">
+            <h3>Menu 1</h3>
+            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                consequat.</p>
+        </div>
+        <div id="Compare" class="tab-pane fade">
+            <h3>Menu 2</h3>
+            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam
+                rem aperiam.</p>
+        </div>
+        <div id="Mine" class="tab-pane fade">
+            <h3>Menu 3</h3>
+            <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+        </div>
+    </div>
+    </nav>
+
+</div>
+<script>
+    $("#expand-button").click(function () {
+        $(".content").slideToggle(200);
+
+        if ($("#expand-button").text() == 'Query Graph △') {
+            $("#expand-button").html('Query Graph &#9661');
+        }
+        else {
+            $("#expand-button").html('Query Graph &#9651');
+        }
+    });
+
+</script>
+
+</body>
+</html>

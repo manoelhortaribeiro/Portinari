@@ -1,9 +1,4 @@
 
 .idea/
-neo4jdb/__pycache__/
-opencrab/data/output
-opencrab/data/raw_data
-opencrab/data/processed_data
-parser/__init__.pyc
-parser/__pycache__/
-static/js/bundle.js
+.sass-cache
+

@@ -1,0 +1,40 @@
+$font-stack: helvetica;
+$bg-color: rgba(255, 255, 255, 0.9);
+$header-color: #141a29;
+
+/* General Website */
+
+body {
+  font-family: $font-stack;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: $bg-color;
+}
+
+
+h1 {
+  color: $header-color;
+  font-family: 'Raleway', sans-serif;
+  font-size: 62px;
+  font-weight: 800;
+  line-height: 72px;
+  margin: 0 0 0 0;
+  text-align: center;
+}
+
+button {
+  max-height: 40px;
+}
+
+#button {
+  text-align: left;
+}
+
+#query-system {
+    border:1px solid #d3d3d3;
+    padding: 7px 7px 7px 7px;
+    margin: 10px 0px 10px 0px;
+}
+
+
