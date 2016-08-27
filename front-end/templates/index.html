@@ -25,7 +25,6 @@
         <button type="button" class="btn btn-default btn-xs" id="about-button">About &#9661;</button>
     </div>
 
-
     <div class="col-md-12 content_query content" id="query-system">
         <div class="col-md-8" id="query-interface-graph">
             <!-- query interface goes here goes here -->
@@ -34,14 +33,14 @@
         <div class="col-md-4" id="forms-menu">
             <h2>view</h2>
             <div id="query-interface-current">
-                <ul></ul> <!-- information about the selected node goes here -->
+                <!-- information about the selected node goes here -->
+                <ul></ul>
             </div>
 
             <h2>add</h2>
             <div id="query-interface-form">
+                <!-- the form to add constraints goes here -->
             </div>
-
-
         </div>
     </div>
 
@@ -70,7 +69,6 @@
             <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
         </div>
     </div>
-    </nav>
 
     <script>
 
@@ -85,17 +83,13 @@
                     $(b_id).html(b_desc + ' &#9661');
                 }
             });
-
-
         }
 
         toggle_button("#expand-query-button", ".content_query", "Query");
-
     </script>
-<script src="../static/js/bundle.js"></script>
 
+    <script src="../static/js/bundle.js"></script>
 </div>
-
 
 </body>
 </html>

@@ -868,8 +868,12 @@ function FormHandler(query_interface_form, query_interface_current, reactor) {
     thisForm.reactor.addEventListener('selected_node_changed', this.updateForm.bind(this));
 
     // ** Model
+    thisForm.qif = query_interface_form;
+    thisForm.qif.append("p").text("select a node or edge to add constraints");
+    thisForm.qic = query_interface_current;
+    thisForm.qic.append("p").text("select a node to see its constraints");
+
     thisForm.form = query_interface_form.append("form");
-    thisForm.restrictions = query_interface_current;
 }
 
 FormHandler.prototype.updateForm = function (element) {
@@ -878,9 +882,15 @@ FormHandler.prototype.updateForm = function (element) {
 
     // removes everything in the form
     thisForm.form.selectAll("*").remove();
-
+    thisForm.qif.select("p").remove();
     // in case someone just deleted a node, returns
-    if (element == undefined) return;
+
+    if (element == undefined) {
+        thisForm.qif.append("p").text("select a node or edge to add constraints");
+        thisForm.qic.append("p").text("select a node to see its constraints");
+        thisForm.qic.select("ul").selectAll("li").remove()
+        return;
+    }
 
     // displays all constraints of the element that was selected above the form
     updateConstraints(thisForm, element);
@@ -999,10 +1009,11 @@ FormHandler.prototype.updateForm = function (element) {
         var disp = attr_getter("#attr_name", "#oper_field", "#value_field");
 
 
-        console.log(disp);
-
         element.key_op_value.push(attr);
         element.display_value.push(disp);
+
+        thisForm.qic.select("p").remove();
+
 
         updateConstraints(thisForm, element);
 
@@ -1011,20 +1022,18 @@ FormHandler.prototype.updateForm = function (element) {
     });
 };
 
-function attr_getter(id ,oper, val){
+function attr_getter(id, oper, val) {
     var aux = $(id).val();
     var id_text = d3.select(id + " [value='" + aux + "']").text();
 
     var type_name = d3.select(id + " [value=" + aux + "]").attr("type");
 
-
     aux = $(oper).val();
     var oper_text = d3.select(oper + " [value='" + aux + "']").text();
 
-    if (type_name == "month"  || type_name == "number"){
+    if (type_name == "month" || type_name == "number") {
         return id_text + " " + oper_text + " " + $(val).val();
     }
-
 
     aux = $(val).val();
     var value_text = d3.select(val + " [value='" + aux + "']").text();
@@ -1034,7 +1043,7 @@ function attr_getter(id ,oper, val){
 
 function updateConstraints(form, element) {
 
-    var list = form.restrictions.select("ul");
+    var list = form.qic.select("ul");
 
     list.selectAll("li").remove();
 
