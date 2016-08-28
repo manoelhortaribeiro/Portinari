@@ -888,7 +888,7 @@ FormHandler.prototype.updateForm = function (element) {
     if (element == undefined) {
         thisForm.qif.append("p").text("select a node or edge to add constraints");
         thisForm.qic.append("p").text("select a node to see its constraints");
-        thisForm.qic.select("ul").selectAll("li").remove()
+        thisForm.qic.select("ul").selectAll("li").remove();
         return;
     }
 
@@ -904,12 +904,12 @@ FormHandler.prototype.updateForm = function (element) {
 
     // ** FORM Pt1. attr_name **
     var select_attr = thisForm.form.append("select")
-        .classed("select", true)
+        .classed("styled_form", true)
         .attr("id", "attr_name")
         .attr("name", "attribute");
 
     select_attr.append("option")
-        .classed("selected", true)
+        .classed("styled_form", true)
         .classed("disabled", true)
         .classed("hidden", true)
         .attr("style", true)
@@ -937,7 +937,7 @@ FormHandler.prototype.updateForm = function (element) {
 
         // ** FORM Pt2. oper_field **
         var select_oper = thisForm.form.append("select")
-            .classed("select", true)
+            .classed("styled_form", true)
             .attr("id", "oper_field")
             .attr("name", "operator");
 
@@ -955,7 +955,7 @@ FormHandler.prototype.updateForm = function (element) {
         switch (type_name) {
             case "number":
                 select_value.append("input")
-                    .classed("select", true)
+                    .classed("styled_form", true)
                     .attr("id", "value_field")
                     .attr("name", "value")
                     .attr("type", "text")
@@ -964,7 +964,7 @@ FormHandler.prototype.updateForm = function (element) {
 
             case "month":
                 select_value.append("input")
-                    .classed("select", true)
+                    .classed("styled_form", true)
                     .attr("id", "value_field")
                     .attr("name", "value")
                     .attr("type", "text")
@@ -973,12 +973,12 @@ FormHandler.prototype.updateForm = function (element) {
 
             default:
                 select_value = select_value.append("select")
-                    .classed("select", true)
+                    .classed("styled_form", true)
                     .attr("id", "value_field")
                     .attr("name", "value");
 
                 select_value.append("option")
-                    .classed("selected", true)
+                    .classed("styled_form", true)
                     .classed("disabled", true)
                     .classed("hidden", true)
                     .attr("style", true)
@@ -992,7 +992,7 @@ FormHandler.prototype.updateForm = function (element) {
         }
 
         thisForm.form.append("input")
-            .classed("select", true)
+            .classed("styled_form", true)
             .attr("id", "submit_query_form")
             .attr("type", "submit");
 
