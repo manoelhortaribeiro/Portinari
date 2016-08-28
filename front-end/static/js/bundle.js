@@ -111,7 +111,7 @@ var edge_attributes = [
 
 var constraints = {
     "month": {
-        operators: [[">", "bigger"], ["<", "smaller"]],
+        operators: [[">", "b.t."], ["<", "s.t."]],
         values: "month"
     },
     "diagnosis1": {
@@ -131,7 +131,7 @@ var constraints = {
         values: type
     },
     "number": {
-        operators: [[">", "bigger"], ["<", "smaller"], ["==", "is"]],
+        operators: [[">", "b.t."], ["<", "s.t."], ["==", "is"]],
         values: "number"
     }
 };
@@ -854,6 +854,43 @@ PredictionGraph.prototype.updateResult = function (graph) {
 
 module.exports = PredictionGraph;
 },{"../config.js":1,"../external/d3.min.v4.js":2,"../external/sankey.js":5}],8:[function(require,module,exports){
+var d3 = require("./external/d3.min.v4.js"),
+    QueryForm = require("./query_system/query_form.js"),
+    QueryGraph = require("./query_system/query_graph.js"),
+    PredictionForm = require("./graph_creator/prediction_form.js"),
+    PredictionGraph = require("./graph_creator/prediction_graph.js"),
+    Reactor = require("./external/reactor.js"),
+    $ = require("./external/jquery.min.js");
+
+
+
+// Creates reactor pattern and register events
+var reactor = new Reactor();
+reactor.registerEvent('selected_node_changed');
+reactor.registerEvent('query_successful');
+reactor.registerEvent('constraint_added');
+
+// Create needed selections
+var query_graph_selection = d3.select("#query-interface-graph");
+var query_form_selection = d3.select("#query-interface-form");
+var query_current_selection = d3.select("#query-interface-current");
+// var future_form_selection = d3.select("#form-future-nodes");
+//var prediction_graph_selection1 = d3.select("#query-results1");
+//var prediction_graph_selection2 = d3.select("#query-results2");
+
+// Creates query graph interface
+var query_graph = new QueryGraph(query_graph_selection, reactor);
+
+// Creates query form interface
+var query_form = new QueryForm(query_form_selection, query_current_selection, reactor);
+
+// Creates prediction form interface
+//var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
+
+// Append the svg canvas to the page
+// var prediction_graph = new PredictionGraph(prediction_graph_selection1, prediction_graph_selection2, reactor);
+
+},{"./external/d3.min.v4.js":2,"./external/jquery.min.js":3,"./external/reactor.js":4,"./graph_creator/prediction_form.js":6,"./graph_creator/prediction_graph.js":7,"./query_system/query_form.js":9,"./query_system/query_graph.js":10}],9:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
     json_config = require("../config.js");
@@ -882,12 +919,16 @@ FormHandler.prototype.updateForm = function (element) {
 
     // removes everything in the form
     thisForm.form.selectAll("*").remove();
-    thisForm.qif.select("p").remove();
+    thisForm.qif.selectAll("p").remove();
     // in case someone just deleted a node, returns
 
     if (element == undefined) {
+
+        if (thisForm.qic.select("p").empty()) {
+            thisForm.qic.append("p").text("select a node to see its constraints");
+
+        }
         thisForm.qif.append("p").text("select a node or edge to add constraints");
-        thisForm.qic.append("p").text("select a node to see its constraints");
         thisForm.qic.select("ul").selectAll("li").remove();
         return;
     }
@@ -1012,7 +1053,7 @@ FormHandler.prototype.updateForm = function (element) {
         element.key_op_value.push(attr);
         element.display_value.push(disp);
 
-        thisForm.qic.select("p").remove();
+        thisForm.qic.selectAll("p").remove();
 
 
         updateConstraints(thisForm, element);
@@ -1067,7 +1108,7 @@ function updateConstraints(form, element) {
 
 module.exports = FormHandler;
 
-},{"../config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":3}],9:[function(require,module,exports){
+},{"../config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":3}],10:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     utils = require("./utils.js"),
     json_config = require("../config.js");
@@ -1077,16 +1118,15 @@ function GC(query_interface_selection, reactor) {
 
     var thisGraph = this;
 
-    // ** Config
+    // -- Config
     thisGraph.idct = 0;
     thisGraph.aspect = [0, 0, 1600, 600];
-
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
     thisGraph.reactor.addEventListener('constraint_added', this.updateGraph.bind(this));
     thisGraph.config = json_config.VIEW_QUERY_GRAPH;
 
-    // ** Model
+    // -- Model
     thisGraph.graph = {};
     thisGraph.graph.nodes = [];
     thisGraph.graph.edges = [];
@@ -1094,7 +1134,7 @@ function GC(query_interface_selection, reactor) {
     thisGraph.graph.prediction_attr = "None";
     thisGraph.graph.id_attr = "None";
 
-    // ** View
+    // -- View
     // svg
     thisGraph.svg = query_interface_selection.append("svg")
         .attr("viewBox", thisGraph.aspect[0] + " " +
@@ -1137,7 +1177,7 @@ function GC(query_interface_selection, reactor) {
     thisGraph.svg.on("mousedown", function (d) {
         GC.prototype.svgMouseDown.call(thisGraph);
     });
-    // keydown on window
+    // key down on window
     d3.select(window).on("keydown", function () {
         if (d3.event.shiftKey) {
             thisGraph.svgKeyDown.call(thisGraph);
@@ -1179,7 +1219,7 @@ GC.prototype.nodeMouseDown = function (svg_element) {
     var p_selected = d3.select(".selected").data();
 
     if (d3.event.shiftKey && p_selected.length != 0) {
-        var n_selected = d3.select(svg_element).data()
+        var n_selected = d3.select(svg_element).data();
 
         var aux = thisGraph.graph.edges.filter(function (a) {
             return ((a.source == p_selected[0].name) &&
@@ -1189,7 +1229,13 @@ GC.prototype.nodeMouseDown = function (svg_element) {
         });
 
         if (aux.length == 0) {
-            thisGraph.addEdge(p_selected[0], n_selected[0]);
+            if (d3.event.ctrlKey) {
+                console.log("adsfaad");
+                thisGraph.addEdge(p_selected[0], n_selected[0], "undirected");
+            }
+            else {
+                thisGraph.addEdge(p_selected[0], n_selected[0], "directed");
+            }
         }
     }
     else {
@@ -1198,9 +1244,9 @@ GC.prototype.nodeMouseDown = function (svg_element) {
 };
 
 // - Edge behaviour -
-GC.prototype.addEdge = function (src, dst) {
+GC.prototype.addEdge = function (src, dst, kind) {
     var thisGraph = this;
-    var edge = new utils.Edge(src, dst, thisGraph.idct);
+    var edge = new utils.Edge(src, dst, thisGraph.idct, kind);
     thisGraph.graph.edges.push(edge);
     thisGraph.idct += 1;
     thisGraph.updateGraph();
@@ -1405,7 +1451,12 @@ GC.prototype.updateGraph = function () {
             thisGraph.edgeMouseDown(this)
         });
     aux.append("path")
-        .style('marker-end', 'url(#end-arrow)')
+        .style('marker-end', function (d) {
+            if (d.kind == "directed") {
+                return 'url(#end-arrow)'
+            }
+            else return 'none';
+        })
         .attr("d", function (d) {
             return utils.calcEdgePath(d, thisGraph.config.nodeRadius);
         })
@@ -1508,9 +1559,8 @@ GC.prototype.updateGraph = function () {
 
 module.exports = GC;
 
-},{"../config.js":1,"../external/d3.min.v4.js":2,"./utils.js":10}],10:[function(require,module,exports){
+},{"../config.js":1,"../external/d3.min.v4.js":2,"./utils.js":11}],11:[function(require,module,exports){
 var json_config = require("../config.js");
-
 
 function canDo(tmp_x, tmp_y, radius, aspect, nodes, node) {
 
@@ -1569,7 +1619,7 @@ function Node(coordinates, id) {
     this.id = id;
 }
 
-function Edge(src, dst, id) {
+function Edge(src, dst, id, kind) {
     var thisEdge = this;
     this.className = "Edge";
     this.name = "e" + id;
@@ -1578,6 +1628,7 @@ function Edge(src, dst, id) {
     this.destination = dst.name;
     this.key_op_value = [];
     this.display_value = [];
+    this.kind = kind;
     this.src = src;
     this.dst = dst;
     this.id = id;
@@ -1590,41 +1641,4 @@ module.exports = {
     calcTextEdgePath: calcTextEdgePath,
     canDo: canDo
 };
-},{"../config.js":1}],11:[function(require,module,exports){
-var d3 = require("./external/d3.min.v4.js"),
-    QueryForm = require("./graph_creator/query_form.js"),
-    QueryGraph = require("./graph_creator/query_graph.js"),
-    PredictionForm = require("./graph_creator/prediction_form.js"),
-    PredictionGraph = require("./graph_creator/prediction_graph.js"),
-    Reactor = require("./external/reactor.js"),
-    $ = require("./external/jquery.min.js");
-
-
-
-// Creates reactor pattern and register events
-var reactor = new Reactor();
-reactor.registerEvent('selected_node_changed');
-reactor.registerEvent('query_successful');
-reactor.registerEvent('constraint_added');
-
-// Create needed selections
-var query_graph_selection = d3.select("#query-interface-graph");
-var query_form_selection = d3.select("#query-interface-form");
-var query_current_selection = d3.select("#query-interface-current");
-// var future_form_selection = d3.select("#form-future-nodes");
-//var prediction_graph_selection1 = d3.select("#query-results1");
-//var prediction_graph_selection2 = d3.select("#query-results2");
-
-// Creates query graph interface
-var query_graph = new QueryGraph(query_graph_selection, reactor);
-
-// Creates query form interface
-var query_form = new QueryForm(query_form_selection, query_current_selection, reactor);
-
-// Creates prediction form interface
-//var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
-
-// Append the svg canvas to the page
-// var prediction_graph = new PredictionGraph(prediction_graph_selection1, prediction_graph_selection2, reactor);
-
-},{"./external/d3.min.v4.js":2,"./external/jquery.min.js":3,"./external/reactor.js":4,"./graph_creator/prediction_form.js":6,"./graph_creator/prediction_graph.js":7,"./graph_creator/query_form.js":8,"./graph_creator/query_graph.js":9}]},{},[11]);
+},{"../config.js":1}]},{},[8]);

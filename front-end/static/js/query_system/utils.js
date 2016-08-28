@@ -1,6 +1,5 @@
 var json_config = require("../config.js");
 
-
 function canDo(tmp_x, tmp_y, radius, aspect, nodes, node) {
 
     var can = true;
@@ -58,7 +57,7 @@ function Node(coordinates, id) {
     this.id = id;
 }
 
-function Edge(src, dst, id) {
+function Edge(src, dst, id, kind) {
     var thisEdge = this;
     this.className = "Edge";
     this.name = "e" + id;
@@ -67,6 +66,7 @@ function Edge(src, dst, id) {
     this.destination = dst.name;
     this.key_op_value = [];
     this.display_value = [];
+    this.kind = kind;
     this.src = src;
     this.dst = dst;
     this.id = id;

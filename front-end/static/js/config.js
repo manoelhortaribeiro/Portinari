@@ -110,7 +110,7 @@ var edge_attributes = [
 
 var constraints = {
     "month": {
-        operators: [[">", "bigger"], ["<", "smaller"]],
+        operators: [[">", "b.t."], ["<", "s.t."]],
         values: "month"
     },
     "diagnosis1": {
@@ -130,7 +130,7 @@ var constraints = {
         values: type
     },
     "number": {
-        operators: [[">", "bigger"], ["<", "smaller"], ["==", "is"]],
+        operators: [[">", "b.t."], ["<", "s.t."], ["==", "is"]],
         values: "number"
     }
 };

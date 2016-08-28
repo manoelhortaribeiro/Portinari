@@ -26,12 +26,16 @@ FormHandler.prototype.updateForm = function (element) {
 
     // removes everything in the form
     thisForm.form.selectAll("*").remove();
-    thisForm.qif.select("p").remove();
+    thisForm.qif.selectAll("p").remove();
     // in case someone just deleted a node, returns
 
     if (element == undefined) {
+
+        if (thisForm.qic.select("p").empty()) {
+            thisForm.qic.append("p").text("select a node to see its constraints");
+
+        }
         thisForm.qif.append("p").text("select a node or edge to add constraints");
-        thisForm.qic.append("p").text("select a node to see its constraints");
         thisForm.qic.select("ul").selectAll("li").remove();
         return;
     }
@@ -156,7 +160,7 @@ FormHandler.prototype.updateForm = function (element) {
         element.key_op_value.push(attr);
         element.display_value.push(disp);
 
-        thisForm.qic.select("p").remove();
+        thisForm.qic.selectAll("p").remove();
 
 
         updateConstraints(thisForm, element);

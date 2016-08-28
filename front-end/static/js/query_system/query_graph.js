@@ -7,16 +7,15 @@ function GC(query_interface_selection, reactor) {
 
     var thisGraph = this;
 
-    // ** Config
+    // -- Config
     thisGraph.idct = 0;
     thisGraph.aspect = [0, 0, 1600, 600];
-
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
     thisGraph.reactor.addEventListener('constraint_added', this.updateGraph.bind(this));
     thisGraph.config = json_config.VIEW_QUERY_GRAPH;
 
-    // ** Model
+    // -- Model
     thisGraph.graph = {};
     thisGraph.graph.nodes = [];
     thisGraph.graph.edges = [];
@@ -24,7 +23,7 @@ function GC(query_interface_selection, reactor) {
     thisGraph.graph.prediction_attr = "None";
     thisGraph.graph.id_attr = "None";
 
-    // ** View
+    // -- View
     // svg
     thisGraph.svg = query_interface_selection.append("svg")
         .attr("viewBox", thisGraph.aspect[0] + " " +
@@ -67,7 +66,7 @@ function GC(query_interface_selection, reactor) {
     thisGraph.svg.on("mousedown", function (d) {
         GC.prototype.svgMouseDown.call(thisGraph);
     });
-    // keydown on window
+    // key down on window
     d3.select(window).on("keydown", function () {
         if (d3.event.shiftKey) {
             thisGraph.svgKeyDown.call(thisGraph);
@@ -109,7 +108,7 @@ GC.prototype.nodeMouseDown = function (svg_element) {
     var p_selected = d3.select(".selected").data();
 
     if (d3.event.shiftKey && p_selected.length != 0) {
-        var n_selected = d3.select(svg_element).data()
+        var n_selected = d3.select(svg_element).data();
 
         var aux = thisGraph.graph.edges.filter(function (a) {
             return ((a.source == p_selected[0].name) &&
@@ -119,7 +118,13 @@ GC.prototype.nodeMouseDown = function (svg_element) {
         });
 
         if (aux.length == 0) {
-            thisGraph.addEdge(p_selected[0], n_selected[0]);
+            if (d3.event.ctrlKey) {
+                console.log("adsfaad");
+                thisGraph.addEdge(p_selected[0], n_selected[0], "undirected");
+            }
+            else {
+                thisGraph.addEdge(p_selected[0], n_selected[0], "directed");
+            }
         }
     }
     else {
@@ -128,9 +133,9 @@ GC.prototype.nodeMouseDown = function (svg_element) {
 };
 
 // - Edge behaviour -
-GC.prototype.addEdge = function (src, dst) {
+GC.prototype.addEdge = function (src, dst, kind) {
     var thisGraph = this;
-    var edge = new utils.Edge(src, dst, thisGraph.idct);
+    var edge = new utils.Edge(src, dst, thisGraph.idct, kind);
     thisGraph.graph.edges.push(edge);
     thisGraph.idct += 1;
     thisGraph.updateGraph();
@@ -335,7 +340,12 @@ GC.prototype.updateGraph = function () {
             thisGraph.edgeMouseDown(this)
         });
     aux.append("path")
-        .style('marker-end', 'url(#end-arrow)')
+        .style('marker-end', function (d) {
+            if (d.kind == "directed") {
+                return 'url(#end-arrow)'
+            }
+            else return 'none';
+        })
         .attr("d", function (d) {
             return utils.calcEdgePath(d, thisGraph.config.nodeRadius);
         })
