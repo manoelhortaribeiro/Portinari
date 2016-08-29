@@ -2,7 +2,6 @@ var d3 = require("../external/d3.min.v4.js"),
     utils = require("./utils.js"),
     json_config = require("../config.js");
 
-
 function GC(query_interface_selection, reactor) {
 
     var thisGraph = this;
@@ -95,7 +94,6 @@ function GC(query_interface_selection, reactor) {
         }
     });
 }
-
 
 //- Node behaviour -
 GC.prototype.addNode = function (coordinates) {
@@ -453,6 +451,6 @@ GC.prototype.updateGraph = function () {
 GC.prototype.getGraph = function () {
     var thisGraph = this;
     return thisGraph.graph;
-}
+};
 
 module.exports = GC;

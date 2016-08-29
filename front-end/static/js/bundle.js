@@ -1168,7 +1168,7 @@ FormHandler.prototype.updateForm = function (element) {
     }
 
     // displays all constraints of the element that was selected above the form
-    updateConstraints(thisForm, thisForm.qif, element);
+    updateConstraints(thisForm, thisForm.qic, element);
 
     // get the attributes
     var attributes;
@@ -1333,8 +1333,6 @@ function outcome_form_callback(attr, disp, current, thisForm){
             graph.outcome_key_op_value.splice(index, 1);
             graph.outcome_display_value.splice(index, 1);
             d3.select(this).remove();
-            thisForm.reactor.dispatchEvent("constraint_added");
-
         });
 }
 
@@ -1397,7 +1395,6 @@ module.exports = FormHandler;
 var d3 = require("../external/d3.min.v4.js"),
     utils = require("./utils.js"),
     json_config = require("../config.js");
-
 
 function GC(query_interface_selection, reactor) {
 
@@ -1491,7 +1488,6 @@ function GC(query_interface_selection, reactor) {
         }
     });
 }
-
 
 //- Node behaviour -
 GC.prototype.addNode = function (coordinates) {
@@ -1849,7 +1845,7 @@ GC.prototype.updateGraph = function () {
 GC.prototype.getGraph = function () {
     var thisGraph = this;
     return thisGraph.graph;
-}
+};
 
 module.exports = GC;
 

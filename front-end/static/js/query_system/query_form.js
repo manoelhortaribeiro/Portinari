@@ -49,7 +49,7 @@ FormHandler.prototype.updateForm = function (element) {
     }
 
     // displays all constraints of the element that was selected above the form
-    updateConstraints(thisForm, thisForm.qif, element);
+    updateConstraints(thisForm, thisForm.qic, element);
 
     // get the attributes
     var attributes;
@@ -214,8 +214,6 @@ function outcome_form_callback(attr, disp, current, thisForm){
             graph.outcome_key_op_value.splice(index, 1);
             graph.outcome_display_value.splice(index, 1);
             d3.select(this).remove();
-            thisForm.reactor.dispatchEvent("constraint_added");
-
         });
 }
 
