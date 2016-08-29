@@ -2,7 +2,7 @@
 $font-stack: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
 $secondary-font: "Raleway", sans-serif;
 $p-font-size: 10px;
-$li-font-size: 14px;
+$li-font-size: 10px;
 $node-font-size: 16px;
 
 /* Colors */
@@ -276,15 +276,13 @@ body {
     }
 
     input {
-      margin: 3px;
+      margin: $three-px;
       display: inline;
-      width: 80px;
-    }
-
-    input {
       background-color: $secondary-color;
 
     }
+
+
 
     .styled_form {
       background: $bg-color;

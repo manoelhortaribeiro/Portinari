@@ -139,7 +139,7 @@ body {
         text-align: center; }
       #query-system #forms-menu #query-interface-current li {
         background-color: #e8f0ff;
-        font-size: 14px;
+        font-size: 10px;
         font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
         display: inline-block;
         border: solid lightgrey 1px;
@@ -163,10 +163,8 @@ body {
       #query-system #forms-menu #query-interface-form select:hover {
         background-color: #e8f0ff; }
       #query-system #forms-menu #query-interface-form input {
-        margin: 3px;
+        margin: 3px 3px 3px 3px;
         display: inline;
-        width: 80px; }
-      #query-system #forms-menu #query-interface-form input {
         background-color: #e8f0ff; }
       #query-system #forms-menu #query-interface-form .styled_form {
         background: rgba(255, 255, 255, 0.9);

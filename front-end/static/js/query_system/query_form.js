@@ -7,7 +7,7 @@ function FormHandler(query_interface_form, query_interface_current, reactor) {
     var thisForm = this;
 
     // ** Config
-    thisForm.config = json_config.VIEW_QUERY_FORM;
+    thisForm.config = json_config.QUERY_SYSTEM;
     thisForm.reactor = reactor;
     thisForm.reactor.addEventListener('selected_node_changed', this.updateForm.bind(this));
 
@@ -44,7 +44,13 @@ FormHandler.prototype.updateForm = function (element) {
     updateConstraints(thisForm, element);
 
     // get the attributes
-    var attributes = thisForm.config[element.className];
+    var attributes;
+    if(element.className == thisForm.config.nodeClass){
+        attributes = thisForm.config.nodeAttributes;
+    }
+    else {
+        attributes = thisForm.config.edgeAttributes;
+    }
 
     // form
     thisForm.form.classed("query_form", true)
@@ -89,7 +95,7 @@ FormHandler.prototype.updateForm = function (element) {
             .attr("id", "oper_field")
             .attr("name", "operator");
 
-        types.operators.forEach(function (op) {
+        types.constraints.forEach(function (op) {
             select_oper.append("option").attr("value", op[0]).text(op[1]);
         });
 
@@ -97,8 +103,6 @@ FormHandler.prototype.updateForm = function (element) {
         // ** FORM Pt3 value_field **
 
         var select_value = thisForm.form;
-
-        console.log(type_name);
 
         switch (type_name) {
             case "number":
@@ -111,6 +115,15 @@ FormHandler.prototype.updateForm = function (element) {
                 break;
 
             case "month":
+                select_value.append("input")
+                    .classed("styled_form", true)
+                    .attr("id", "value_field")
+                    .attr("name", "value")
+                    .attr("type", "date")
+                    .attr("placeholder", "month");
+                break;
+
+            case "time_interval":
                 select_value.append("input")
                     .classed("styled_form", true)
                     .attr("id", "value_field")
@@ -132,7 +145,11 @@ FormHandler.prototype.updateForm = function (element) {
                     .attr("style", true)
                     .attr("value", "Value");
 
-                types.values.forEach(function (op) {
+                console.log(types.values);
+                var keys = Object.keys(types.values);
+                var keys_values = keys.map(function(v) { return [v, types.values[v]]; });
+                console.log(keys_values);
+                keys_values.forEach(function (op) {
                     select_value.append("option")
                         .attr("value", op[0])
                         .text(op[1]);

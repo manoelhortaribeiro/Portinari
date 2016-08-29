@@ -13,7 +13,7 @@ function GC(query_interface_selection, reactor) {
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
     thisGraph.reactor.addEventListener('constraint_added', this.updateGraph.bind(this));
-    thisGraph.config = json_config.VIEW_QUERY_GRAPH;
+    thisGraph.config = json_config.QUERY_SYSTEM;
 
     // -- Model
     thisGraph.graph = {};

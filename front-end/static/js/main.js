@@ -3,8 +3,7 @@ var d3 = require("./external/d3.min.v4.js"),
     QueryGraph = require("./query_system/query_graph.js"),
     PredictionForm = require("./graph_creator/prediction_form.js"),
     PredictionGraph = require("./graph_creator/prediction_graph.js"),
-    Reactor = require("./external/reactor.js"),
-    $ = require("./external/jquery.min.js");
+    Reactor = require("./external/reactor.js");
 
 
 
@@ -18,6 +17,8 @@ reactor.registerEvent('constraint_added');
 var query_graph_selection = d3.select("#query-interface-graph");
 var query_form_selection = d3.select("#query-interface-form");
 var query_current_selection = d3.select("#query-interface-current");
+
+
 // var future_form_selection = d3.select("#form-future-nodes");
 //var prediction_graph_selection1 = d3.select("#query-results1");
 //var prediction_graph_selection2 = d3.select("#query-results2");
