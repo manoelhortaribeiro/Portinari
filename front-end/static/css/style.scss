@@ -216,85 +216,82 @@ body {
 
   #forms-menu {
 
-  height: 100%;
-  background-color: $secondary-color;
+    height: 100%;
+    background-color: $secondary-color;
 
-  p {
-    line-height: $form-height;
-    text-align: center;
-    opacity: 0.3;
-  }
-
-  #query-interface-current {
-    min-height: $form-height;
-    background-color: $bg-color;
-    border: $light-border;
-    margin: $three-px;
-
-    ul {
-      list-style: none;
+    p {
+      line-height: $form-height;
       text-align: center;
+      opacity: 0.5;
+
     }
 
-    li {
-      background-color: $secondary-color;
-      font-size: $li-font-size;
-      font-family: $font-stack;
-      display: inline-block;
+    .current {
+      min-height: $form-height;
+      background-color: $bg-color;
       border: $light-border;
-      color: $header-color;
-      max-width: $li-width;
-      padding: $li-margin;
-      margin: $li-padding;
-      text-align: center;
-
-    }
-
-    li:hover {
-      background-color: $node-color;
-    }
-
-  }
-
-  #query-interface-form {
-    min-height: $form-height;
-    background-color: $bg-color;
-    border: $light-border;
-    margin: $three-px;
-
-    form {
-      text-align: center;
       margin: $three-px;
+      ul {
+        list-style: none;
+        text-align: center;
+      }
+
+      li {
+        background-color: $secondary-color;
+        font-size: $li-font-size;
+        font-family: $font-stack;
+        display: inline-block;
+        border: $light-border;
+        color: $header-color;
+        max-width: $li-width;
+        padding: $li-margin;
+        margin: $li-padding;
+        text-align: center;
+
+      }
+
+      li:hover {
+        background-color: $node-color;
+      }
+
     }
 
-    select {
-      margin: $three-px;
-    }
-
-    select:hover {
-      background-color: $secondary-color;
-    }
-
-    input {
-      margin: $three-px;
-      display: inline;
-      background-color: $secondary-color;
-
-    }
-
-
-
-    .styled_form {
-      background: $bg-color;
-      padding: 10px 20px;
-      font-size: 10px;
-      margin: $three-px;
-      color: #6c5c70;
-      text-align: center;
+    .form {
+      min-height: $form-height;
+      background-color: $bg-color;
       border: $light-border;
-    }
-  }
+      margin: $three-px;
+      form {
+        text-align: center;
+        margin: $three-px;
+      }
 
-}
+      select {
+        margin: $three-px;
+      }
+
+      select:hover {
+        background-color: $secondary-color;
+      }
+
+      input {
+        margin: $three-px;
+        display: inline;
+        background-color: $secondary-color;
+
+      }
+
+      .styled_form {
+        background: $bg-color;
+        padding: 10px 20px;
+        font-size: 10px;
+        margin: $three-px;
+        color: #6c5c70;
+        text-align: center;
+        border: $light-border;
+      }
+    }
+
+  }
 
 }

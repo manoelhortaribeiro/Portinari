@@ -128,16 +128,16 @@ body {
     #query-system #forms-menu p {
       line-height: 40px;
       text-align: center;
-      opacity: 0.3; }
-    #query-system #forms-menu #query-interface-current {
+      opacity: 0.5; }
+    #query-system #forms-menu .current {
       min-height: 40px;
       background-color: rgba(255, 255, 255, 0.9);
       border: solid lightgrey 1px;
       margin: 3px 3px 3px 3px; }
-      #query-system #forms-menu #query-interface-current ul {
+      #query-system #forms-menu .current ul {
         list-style: none;
         text-align: center; }
-      #query-system #forms-menu #query-interface-current li {
+      #query-system #forms-menu .current li {
         background-color: #e8f0ff;
         font-size: 10px;
         font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
@@ -148,25 +148,25 @@ body {
         padding: 7px;
         margin: 10px;
         text-align: center; }
-      #query-system #forms-menu #query-interface-current li:hover {
+      #query-system #forms-menu .current li:hover {
         background-color: #2aabd2; }
-    #query-system #forms-menu #query-interface-form {
+    #query-system #forms-menu .form {
       min-height: 40px;
       background-color: rgba(255, 255, 255, 0.9);
       border: solid lightgrey 1px;
       margin: 3px 3px 3px 3px; }
-      #query-system #forms-menu #query-interface-form form {
+      #query-system #forms-menu .form form {
         text-align: center;
         margin: 3px 3px 3px 3px; }
-      #query-system #forms-menu #query-interface-form select {
+      #query-system #forms-menu .form select {
         margin: 3px 3px 3px 3px; }
-      #query-system #forms-menu #query-interface-form select:hover {
+      #query-system #forms-menu .form select:hover {
         background-color: #e8f0ff; }
-      #query-system #forms-menu #query-interface-form input {
+      #query-system #forms-menu .form input {
         margin: 3px 3px 3px 3px;
         display: inline;
         background-color: #e8f0ff; }
-      #query-system #forms-menu #query-interface-form .styled_form {
+      #query-system #forms-menu .form .styled_form {
         background: rgba(255, 255, 255, 0.9);
         padding: 10px 20px;
         font-size: 10px;

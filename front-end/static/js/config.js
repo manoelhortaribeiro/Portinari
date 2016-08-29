@@ -1,8 +1,5 @@
 var databaseinfo = require("./databaseinfo.json");
 
-
-
-
 module.exports = {
 
     QUERY_SYSTEM: {
@@ -19,21 +16,10 @@ module.exports = {
         nodeRadius: 45,
         rectangleWidth:40,
         delete: 68,
+        outcomeAttributes: databaseinfo.outcome_attributes,
         nodeAttributes: databaseinfo.node_attributes,
         edgeAttributes: databaseinfo.edge_attributes,
         types: databaseinfo.types
     },
-
-    VIEW_QUERY_FORM: {
-
-        //"Node": node_attributes,
-
-        //"Edge": edge_attributes,
-
-        //types: constraints
-
-    }
-
-
 
 };

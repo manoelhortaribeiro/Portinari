@@ -17,9 +17,11 @@ Reactor.prototype.registerEvent = function (eventName) {
 };
 
 Reactor.prototype.dispatchEvent = function (eventName, eventArgs) {
+    var return_events = []
     this.events[eventName].callbacks.forEach(function (callback) {
-        callback(eventArgs);
+        return_events.push(callback(eventArgs));
     });
+    return return_events
 };
 
 Reactor.prototype.addEventListener = function (eventName, callback) {

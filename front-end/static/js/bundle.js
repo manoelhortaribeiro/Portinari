@@ -1,9 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var databaseinfo = require("./databaseinfo.json");
 
-
-
-
 module.exports = {
 
     QUERY_SYSTEM: {
@@ -20,26 +17,47 @@ module.exports = {
         nodeRadius: 45,
         rectangleWidth:40,
         delete: 68,
+        outcomeAttributes: databaseinfo.outcome_attributes,
         nodeAttributes: databaseinfo.node_attributes,
         edgeAttributes: databaseinfo.edge_attributes,
         types: databaseinfo.types
     },
 
-    VIEW_QUERY_FORM: {
-
-        //"Node": node_attributes,
-
-        //"Edge": edge_attributes,
-
-        //types: constraints
-
-    }
-
-
-
 };
 },{"./databaseinfo.json":2}],2:[function(require,module,exports){
 module.exports={
+  "outcome_attributes": [
+    {
+      "name": "diagnosis1",
+      "display": "Diagnosis",
+      "type": "diagnosis1"
+    },
+    {
+      "name": "diagnosis2",
+      "display": "Morphology Code",
+      "type": "number"
+    },
+    {
+      "name": "lab_nr",
+      "display": "Laboratory Number",
+      "type": "number"
+    },
+    {
+      "name": "reg",
+      "display": "Region",
+      "type": "region"
+    },
+    {
+      "name": "stage",
+      "display": "Stage",
+      "type": "stage"
+    },
+    {
+      "name": "type",
+      "display": "Type of Exam",
+      "type": "type"
+    }
+  ],
   "node_attributes": [
     {
       "name": "age",
@@ -412,9 +430,11 @@ Reactor.prototype.registerEvent = function (eventName) {
 };
 
 Reactor.prototype.dispatchEvent = function (eventName, eventArgs) {
+    var return_events = []
     this.events[eventName].callbacks.forEach(function (callback) {
-        callback(eventArgs);
+        return_events.push(callback(eventArgs));
     });
+    return return_events
 };
 
 Reactor.prototype.addEventListener = function (eventName, callback) {
@@ -1061,18 +1081,19 @@ var d3 = require("./external/d3.min.v4.js"),
     Reactor = require("./external/reactor.js");
 
 
-
 // Creates reactor pattern and register events
 var reactor = new Reactor();
 reactor.registerEvent('selected_node_changed');
-reactor.registerEvent('query_successful');
 reactor.registerEvent('constraint_added');
+reactor.registerEvent('outcome_added');
+reactor.registerEvent('query_successful');
 
 // Create needed selections
 var query_graph_selection = d3.select("#query-interface-graph");
 var query_form_selection = d3.select("#query-interface-form");
 var query_current_selection = d3.select("#query-interface-current");
-
+var outcomes_form_selection = d3.select("#query-outcomes-form");
+var outcomes_current_selection = d3.select("#query-outcomes-current");
 
 // var future_form_selection = d3.select("#form-future-nodes");
 //var prediction_graph_selection1 = d3.select("#query-results1");
@@ -1082,7 +1103,12 @@ var query_current_selection = d3.select("#query-interface-current");
 var query_graph = new QueryGraph(query_graph_selection, reactor);
 
 // Creates query form interface
-var query_form = new QueryForm(query_form_selection, query_current_selection, reactor);
+var query_form = new QueryForm(query_form_selection,
+    query_current_selection,
+    outcomes_form_selection,
+    outcomes_current_selection,
+    reactor)
+
 
 // Creates prediction form interface
 //var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
@@ -1095,7 +1121,7 @@ var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
     json_config = require("../config.js");
 
-function FormHandler(query_interface_form, query_interface_current, reactor) {
+function FormHandler(qif, qic, qcf, qcc, reactor) {
 
     var thisForm = this;
 
@@ -1105,12 +1131,22 @@ function FormHandler(query_interface_form, query_interface_current, reactor) {
     thisForm.reactor.addEventListener('selected_node_changed', this.updateForm.bind(this));
 
     // ** Model
-    thisForm.qif = query_interface_form;
+    // constraints forms
+    thisForm.qif = qif;
     thisForm.qif.append("p").text("select a node or edge to add constraints");
-    thisForm.qic = query_interface_current;
+    thisForm.qic = qic;
     thisForm.qic.append("p").text("select a node to see its constraints");
+    thisForm.form = qif.append("form");
 
-    thisForm.form = query_interface_form.append("form");
+    // outcome forms
+    thisForm.qcf = qcf;
+    thisForm.qcc = qcc;
+    thisForm.qcc.append("p").text("outcomes to be inspected will appear here");
+    thisForm.outcome = qcf.append("form");
+    // get the attributes
+    var attributes =thisForm.config.outcomeAttributes;
+    make_form(thisForm.outcome, thisForm.qcc, "outcomes", attributes, thisForm, outcome_form_callback)
+
 }
 
 FormHandler.prototype.updateForm = function (element) {
@@ -1120,13 +1156,11 @@ FormHandler.prototype.updateForm = function (element) {
     // removes everything in the form
     thisForm.form.selectAll("*").remove();
     thisForm.qif.selectAll("p").remove();
+
     // in case someone just deleted a node, returns
-
     if (element == undefined) {
-
         if (thisForm.qic.select("p").empty()) {
             thisForm.qic.append("p").text("select a node to see its constraints");
-
         }
         thisForm.qif.append("p").text("select a node or edge to add constraints");
         thisForm.qic.select("ul").selectAll("li").remove();
@@ -1134,25 +1168,29 @@ FormHandler.prototype.updateForm = function (element) {
     }
 
     // displays all constraints of the element that was selected above the form
-    updateConstraints(thisForm, element);
+    updateConstraints(thisForm, thisForm.qif, element);
 
     // get the attributes
     var attributes;
-    if(element.className == thisForm.config.nodeClass){
+    if (element.className == thisForm.config.nodeClass) {
         attributes = thisForm.config.nodeAttributes;
     }
     else {
         attributes = thisForm.config.edgeAttributes;
     }
 
+    make_form(thisForm.form, thisForm.qic, "constraints", attributes, thisForm, constraints_form_callback)
+};
+
+function make_form(form, current, name, attributes, thisForm, callback) {
     // form
-    thisForm.form.classed("query_form", true)
-        .attr("id", "new_constraint");
+    form.classed("query_" + name, true)
+        .attr("id", "new_" + name);
 
     // ** FORM Pt1. attr_name **
-    var select_attr = thisForm.form.append("select")
+    var select_attr = form.append("select")
         .classed("styled_form", true)
-        .attr("id", "attr_name")
+        .attr("id", "attr_name_" + name)
         .attr("name", "attribute");
 
     select_attr.append("option")
@@ -1170,22 +1208,21 @@ FormHandler.prototype.updateForm = function (element) {
     });
 
     // Dynamic Fields
-
-    $("#attr_name").change(function () {
+    $("#attr_name_" + name).change(function () {
 
         // cleans rest of the form
-        d3.select("#oper_field").remove();
-        d3.select("#value_field").remove();
-        d3.select("#submit_query_form").remove();
+        d3.select("#oper_field_" + name).remove();
+        d3.select("#value_field_" + name).remove();
+        d3.select("#submit_query_form_" + name).remove();
 
-        var sel = $("#attr_name").val();
-        var type_name = d3.select("#attr_name [value=" + sel + "]").attr("type");
+        var sel = $("#attr_name_" + name).val();
+        var type_name = d3.select("#attr_name_" + name + " [value=" + sel + "]").attr("type");
         var types = thisForm.config.types[type_name];
 
         // ** FORM Pt2. oper_field **
-        var select_oper = thisForm.form.append("select")
+        var select_oper = form.append("select")
             .classed("styled_form", true)
-            .attr("id", "oper_field")
+            .attr("id", "oper_field_" + name)
             .attr("name", "operator");
 
         types.constraints.forEach(function (op) {
@@ -1195,13 +1232,13 @@ FormHandler.prototype.updateForm = function (element) {
 
         // ** FORM Pt3 value_field **
 
-        var select_value = thisForm.form;
+        var select_value = form;
 
         switch (type_name) {
             case "number":
                 select_value.append("input")
                     .classed("styled_form", true)
-                    .attr("id", "value_field")
+                    .attr("id", "value_field_" + name)
                     .attr("name", "value")
                     .attr("type", "text")
                     .attr("placeholder", "Value");
@@ -1210,7 +1247,7 @@ FormHandler.prototype.updateForm = function (element) {
             case "month":
                 select_value.append("input")
                     .classed("styled_form", true)
-                    .attr("id", "value_field")
+                    .attr("id", "value_field_" + name)
                     .attr("name", "value")
                     .attr("type", "date")
                     .attr("placeholder", "month");
@@ -1219,7 +1256,7 @@ FormHandler.prototype.updateForm = function (element) {
             case "time_interval":
                 select_value.append("input")
                     .classed("styled_form", true)
-                    .attr("id", "value_field")
+                    .attr("id", "value_field_" + name)
                     .attr("name", "value")
                     .attr("type", "text")
                     .attr("placeholder", "Value");
@@ -1228,7 +1265,7 @@ FormHandler.prototype.updateForm = function (element) {
             default:
                 select_value = select_value.append("select")
                     .classed("styled_form", true)
-                    .attr("id", "value_field")
+                    .attr("id", "value_field_" + name)
                     .attr("name", "value");
 
                 select_value.append("option")
@@ -1238,9 +1275,10 @@ FormHandler.prototype.updateForm = function (element) {
                     .attr("style", true)
                     .attr("value", "Value");
 
-                console.log(types.values);
                 var keys = Object.keys(types.values);
-                var keys_values = keys.map(function(v) { return [v, types.values[v]]; });
+                var keys_values = keys.map(function (v) {
+                    return [v, types.values[v]];
+                });
                 console.log(keys_values);
                 keys_values.forEach(function (op) {
                     select_value.append("option")
@@ -1249,59 +1287,69 @@ FormHandler.prototype.updateForm = function (element) {
                 });
         }
 
-        thisForm.form.append("input")
+        form.append("input")
             .classed("styled_form", true)
-            .attr("id", "submit_query_form")
+            .attr("id", "submit_query_form_" + name)
             .attr("type", "submit");
 
     });
 
-    $(".query_form").unbind();
+    $(".query_" + name).unbind();
 
-    $(".query_form").bind("submit", function (event) {
+    $(".query_" + name).bind("submit", function (event) {
         event.preventDefault();
 
-        var element = d3.select(".selected").data()[0];
-        var data = $("#new_constraint").serializeArray();
+        var data = $("#new_" + name).serializeArray();
         var attr = [data[0].value, data[1].value, data[2].value];
-        var disp = attr_getter("#attr_name", "#oper_field", "#value_field");
+        var disp = attr_getter("#attr_name_" + name, "#oper_field_" + name, "#value_field_" + name);
 
 
-        element.key_op_value.push(attr);
-        element.display_value.push(disp);
-
-        thisForm.qic.selectAll("p").remove();
-
-
-        updateConstraints(thisForm, element);
-
-        thisForm.reactor.dispatchEvent("constraint_added");
+        callback(attr, disp, current, thisForm)
 
     });
-};
-
-function attr_getter(id, oper, val) {
-    var aux = $(id).val();
-    var id_text = d3.select(id + " [value='" + aux + "']").text();
-
-    var type_name = d3.select(id + " [value=" + aux + "]").attr("type");
-
-    aux = $(oper).val();
-    var oper_text = d3.select(oper + " [value='" + aux + "']").text();
-
-    if (type_name == "month" || type_name == "number") {
-        return id_text + " " + oper_text + " " + $(val).val();
-    }
-
-    aux = $(val).val();
-    var value_text = d3.select(val + " [value='" + aux + "']").text();
-
-    return id_text + " " + oper_text + " " + value_text;
 }
 
-function updateConstraints(form, element) {
+function outcome_form_callback(attr, disp, current, thisForm){
 
-    var list = form.qic.select("ul");
+    var element = thisForm.reactor.dispatchEvent("outcome_added")[0];
+    element.outcome_key_op_value.push(attr);
+    element.outcome_display_value.push(disp);
+    current.selectAll("p").remove();
+    var list = current.select("ul");
+
+    list.selectAll("li").remove();
+
+    list.selectAll("li")
+        .data(element.outcome_display_value)
+        .enter()
+        .append("li")
+        .text(function (d, i) {
+            return d;
+        })
+        .on("click", function () {
+            var value = d3.select(this).data()[0];
+            var graph = element;
+            var index = graph.outcome_display_value.indexOf(value);
+            graph.outcome_key_op_value.splice(index, 1);
+            graph.outcome_display_value.splice(index, 1);
+            d3.select(this).remove();
+            thisForm.reactor.dispatchEvent("constraint_added");
+
+        });
+}
+
+function constraints_form_callback(attr, disp, current, thisForm) {
+    var element = d3.select(".selected").data()[0];
+    element.key_op_value.push(attr);
+    element.display_value.push(disp);
+    current.selectAll("p").remove();
+    updateConstraints(thisForm, current, element);
+    thisForm.reactor.dispatchEvent("constraint_added");
+}
+
+function updateConstraints(form, current, element) {
+
+    var list = current.select("ul");
 
     list.selectAll("li").remove();
 
@@ -1323,6 +1371,26 @@ function updateConstraints(form, element) {
         });
 }
 
+
+function attr_getter(id, oper, val) {
+    var aux = $(id).val();
+    var id_text = d3.select(id + " [value='" + aux + "']").text();
+
+    var type_name = d3.select(id + " [value=" + aux + "]").attr("type");
+
+    aux = $(oper).val();
+    var oper_text = d3.select(oper + " [value='" + aux + "']").text();
+
+    if (type_name == "month" || type_name == "number") {
+        return id_text + " " + oper_text + " " + $(val).val();
+    }
+
+    aux = $(val).val();
+    var value_text = d3.select(val + " [value='" + aux + "']").text();
+
+    return id_text + " " + oper_text + " " + value_text;
+}
+
 module.exports = FormHandler;
 
 },{"../config.js":1,"../external/d3.min.v4.js":3,"../external/jquery.min.js":4}],11:[function(require,module,exports){
@@ -1341,6 +1409,7 @@ function GC(query_interface_selection, reactor) {
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
     thisGraph.reactor.addEventListener('constraint_added', this.updateGraph.bind(this));
+    thisGraph.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
     thisGraph.config = json_config.QUERY_SYSTEM;
 
     // -- Model
@@ -1350,6 +1419,9 @@ function GC(query_interface_selection, reactor) {
     thisGraph.graph.future_nodes = 0;
     thisGraph.graph.prediction_attr = "None";
     thisGraph.graph.id_attr = "None";
+    thisGraph.graph.outcome_key_op_value = []
+    thisGraph.graph.outcome_display_value = []
+
 
     // -- View
     // svg
@@ -1773,6 +1845,11 @@ GC.prototype.updateGraph = function () {
     }).exit()
         .remove();
 };
+
+GC.prototype.getGraph = function () {
+    var thisGraph = this;
+    return thisGraph.graph;
+}
 
 module.exports = GC;
 

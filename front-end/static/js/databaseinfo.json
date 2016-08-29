@@ -1,4 +1,36 @@
 {
+  "outcome_attributes": [
+    {
+      "name": "diagnosis1",
+      "display": "Diagnosis",
+      "type": "diagnosis1"
+    },
+    {
+      "name": "diagnosis2",
+      "display": "Morphology Code",
+      "type": "number"
+    },
+    {
+      "name": "lab_nr",
+      "display": "Laboratory Number",
+      "type": "number"
+    },
+    {
+      "name": "reg",
+      "display": "Region",
+      "type": "region"
+    },
+    {
+      "name": "stage",
+      "display": "Stage",
+      "type": "stage"
+    },
+    {
+      "name": "type",
+      "display": "Type of Exam",
+      "type": "type"
+    }
+  ],
   "node_attributes": [
     {
       "name": "age",
