@@ -13,11 +13,11 @@ def index():
         print("query started")
         nodes = json.loads(request.form['nodes'])
         edges = json.loads(request.form['edges'])
-        pred_attr = json.loads(request.form['pred_attr'])
+        prediction_attr = json.loads(request.form['prediction_attr'])
         future_nodes = json.loads(request.form['future_nodes'])
         id_attr = json.loads(request.form['id'])
 
-        print(nodes, edges, pred_attr, future_nodes, id_attr)
+        print(nodes, edges, prediction_attr, future_nodes, id_attr)
 
     return "Hello World!"
 

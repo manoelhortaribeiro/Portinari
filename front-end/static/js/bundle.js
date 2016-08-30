@@ -816,7 +816,7 @@ function PredictionForm(future_form_selection, graph, reactor) {
         var posted_data = {
             'nodes': JSON.stringify(thisForm.graph.nodes),
             'edges': JSON.stringify(thisForm.graph.edges),
-            'pred_attr': JSON.stringify(attr[0]),
+            'prediction_attr': JSON.stringify(attr[0]),
             'future_nodes': JSON.stringify(attr[1]),
             'begin_date': JSON.stringify(attr[2]),
             'end_date': JSON.stringify(attr[3]),
