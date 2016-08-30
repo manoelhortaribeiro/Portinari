@@ -1081,12 +1081,16 @@ var d3 = require("./external/d3.min.v4.js"),
     Reactor = require("./external/reactor.js");
 
 
-// Creates reactor pattern and register events
+// Creates reactor pattern
 var reactor = new Reactor();
+
+
+/* ---  Query System --- */
+
+// Register events
 reactor.registerEvent('selected_node_changed');
 reactor.registerEvent('constraint_added');
 reactor.registerEvent('outcome_added');
-reactor.registerEvent('query_successful');
 
 // Create needed selections
 var query_graph_selection = d3.select("#query-interface-graph");
@@ -1094,10 +1098,6 @@ var query_form_selection = d3.select("#query-interface-form");
 var query_current_selection = d3.select("#query-interface-current");
 var outcomes_form_selection = d3.select("#query-outcomes-form");
 var outcomes_current_selection = d3.select("#query-outcomes-current");
-
-// var future_form_selection = d3.select("#form-future-nodes");
-//var prediction_graph_selection1 = d3.select("#query-results1");
-//var prediction_graph_selection2 = d3.select("#query-results2");
 
 // Creates query graph interface
 var query_graph = new QueryGraph(query_graph_selection, reactor);
@@ -1107,7 +1107,16 @@ var query_form = new QueryForm(query_form_selection,
     query_current_selection,
     outcomes_form_selection,
     outcomes_current_selection,
-    reactor)
+    reactor);
+
+
+//reactor.registerEvent('query_successful');
+
+// var future_form_selection = d3.select("#form-future-nodes");
+//var prediction_graph_selection1 = d3.select("#query-results1");
+//var prediction_graph_selection2 = d3.select("#query-results2");
+
+
 
 
 // Creates prediction form interface
@@ -1416,8 +1425,8 @@ function GC(query_interface_selection, reactor) {
     thisGraph.graph.future_nodes = 0;
     thisGraph.graph.prediction_attr = "None";
     thisGraph.graph.id_attr = "None";
-    thisGraph.graph.outcome_key_op_value = []
-    thisGraph.graph.outcome_display_value = []
+    thisGraph.graph.outcome_key_op_value = [];
+    thisGraph.graph.outcome_display_value = [];
 
 
     // -- View
