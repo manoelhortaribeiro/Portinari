@@ -1083,8 +1083,8 @@ module.exports = PredictionGraph;
 var d3 = require("./external/d3.min.v4.js"),
     QueryForm = require("./query_system/query_form.js"),
     QueryGraph = require("./query_system/query_graph.js"),
-    PredictionForm = require("./graph_creator/prediction_form.js"),
-    PredictionGraph = require("./graph_creator/prediction_graph.js"),
+    PredictionForm = require("./sankey_visualization/prediction_form.js"),
+    PredictionGraph = require("./sankey_visualization/prediction_graph.js"),
     Reactor = require("./external/reactor.js");
 
 
