@@ -9,7 +9,6 @@ var d3 = require("./external/d3.min.v4.js"),
 // Creates reactor pattern
 var reactor = new Reactor();
 
-
 /* ---  Query System --- */
 
 // Register events
@@ -34,6 +33,13 @@ var query_form = new QueryForm(query_form_selection,
     outcomes_current_selection,
     reactor);
 
+/* ---  Prediction System --- */
+
+var future_form_selection = d3.select("#form-future-nodes");
+
+// Creates prediction form interface
+var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
+
 
 //reactor.registerEvent('query_successful');
 
@@ -44,8 +50,6 @@ var query_form = new QueryForm(query_form_selection,
 
 
 
-// Creates prediction form interface
-//var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
 
 // Append the svg canvas to the page
 // var prediction_graph = new PredictionGraph(prediction_graph_selection1, prediction_graph_selection2, reactor);

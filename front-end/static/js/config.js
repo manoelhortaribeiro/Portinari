@@ -22,4 +22,9 @@ module.exports = {
         types: databaseinfo.types
     },
 
+    QUERY_FORM:{
+        nodeAttributes: databaseinfo.outcome_attributes,
+        ID: "ID"
+    }
+
 };

@@ -8,14 +8,13 @@ function PredictionForm(future_form_selection, graph, reactor) {
     var thisForm = this;
     thisForm.graph = graph;
     thisForm.reactor = reactor;
-    thisForm.config = json_config.VIEW_PREDICTION_FORM;
+    thisForm.config = json_config.QUERY_FORM;
 
     // ** Model
     thisForm.futureNodes = [1, 2, 3, 4, 5];
 
-
     var values = [];
-    thisForm.config["Node"].forEach(function (attr) {
+    thisForm.config.nodeAttributes.forEach(function (attr) {
         values.push([attr.name, attr.display]);
     });
 
@@ -26,7 +25,7 @@ function PredictionForm(future_form_selection, graph, reactor) {
         .attr("id", "queryval");
 
     var select_attr = dataInput.append("select")
-        .classed("select", true)
+        .classed("styled_form", true)
         .attr("name", "attribute");
 
     values.forEach(function (value) {
@@ -36,7 +35,7 @@ function PredictionForm(future_form_selection, graph, reactor) {
     });
 
     var future_nodes = dataInput.append("select")
-        .classed("select", true)
+        .classed("styled_form", true)
         .attr("name", "operator");
 
     thisForm.futureNodes.forEach(function (op) {
@@ -46,19 +45,19 @@ function PredictionForm(future_form_selection, graph, reactor) {
     });
 
     dataInput.append("input")
-        .classed("select", true)
+        .classed("styled_form", true)
         .attr("name", "begin_date")
         .attr("type", "text")
         .attr("placeholder", "Start");
 
     dataInput.append("input")
-        .classed("select", true)
+        .classed("styled_form", true)
         .attr("name", "end_date")
         .attr("type", "text")
         .attr("placeholder", "End");
 
     dataInput.append("input")
-        .classed("select", true)
+        .classed("styled_form", true)
         .attr("type", "submit");
 
     $(".triggerquery").bind("submit", function (event) {
@@ -73,28 +72,31 @@ function PredictionForm(future_form_selection, graph, reactor) {
             'future_nodes': JSON.stringify(attr[1]),
             'begin_date': JSON.stringify(attr[2]),
             'end_date': JSON.stringify(attr[3]),
-            'id': JSON.stringify(json_config.ID)
+            'id': JSON.stringify(thisForm.config.ID)
         };
 
+        console.log(posted_data);
+
         $(".content").slideToggle(200);
-        $("#spinner").show();
 
-        $.post("/", posted_data, function (data) {
 
+
+        $.post("http://localhost:5000/", posted_data, function (data) {
+
+            /***
             var graph = JSON.parse(data);
 
             graph.pred_attr = attr[0];
             graph.future_nodes = attr[1];
             graph.begin_date = attr[2];
             graph.end_date = attr[3];
-            $("#spinner").hide();
 
             thisForm.reactor.dispatchEvent("query_successful", graph);
+            ***/
         });
 
         event.preventDefault();
     });
-
 }
 
 module.exports = PredictionForm;
