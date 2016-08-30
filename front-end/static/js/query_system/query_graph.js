@@ -22,8 +22,8 @@ function GC(query_interface_selection, reactor) {
     thisGraph.graph.future_nodes = 0;
     thisGraph.graph.prediction_attr = "None";
     thisGraph.graph.id_attr = "None";
-    thisGraph.graph.outcome_key_op_value = []
-    thisGraph.graph.outcome_display_value = []
+    thisGraph.graph.outcome_key_op_value = [];
+    thisGraph.graph.outcome_display_value = [];
 
 
     // -- View
