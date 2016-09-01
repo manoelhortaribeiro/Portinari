@@ -119,9 +119,8 @@ GC.prototype.nodeMouseDown = function (svg_element) {
                 (a.destination == p_selected[0].name))
         });
 
-        if (aux.length == 0) {
+        if (aux.length == 0 && p_selected[0].name != n_selected[0].name) {
             if (d3.event.ctrlKey) {
-                console.log("adsfaad");
                 thisGraph.addEdge(p_selected[0], n_selected[0], "undirected");
             }
             else {

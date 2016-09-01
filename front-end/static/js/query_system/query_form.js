@@ -252,15 +252,18 @@ function updateConstraints(form, current, element) {
 
 
 function attr_getter(id, oper, val) {
+
     var aux = $(id).val();
+
     var id_text = d3.select(id + " [value='" + aux + "']").text();
 
     var type_name = d3.select(id + " [value=" + aux + "]").attr("type");
 
     aux = $(oper).val();
+
     var oper_text = d3.select(oper + " [value='" + aux + "']").text();
 
-    if (type_name == "month" || type_name == "number") {
+    if (type_name == "month" || type_name == "number" || type_name == "time_interval") {
         return id_text + " " + oper_text + " " + $(val).val();
     }
 

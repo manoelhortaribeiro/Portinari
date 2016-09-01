@@ -746,340 +746,6 @@ d3.sankey = function() {
 };
 
 },{"./d3.min.v4.js":3}],7:[function(require,module,exports){
-var d3 = require("../external/d3.min.v4.js"),
-    $ = require("../external/jquery.min.js"),
-    json_config = require("../config.js");
-
-function PredictionForm(future_form_selection, graph, reactor) {
-
-    // ** Config
-    var thisForm = this;
-    thisForm.graph = graph;
-    thisForm.reactor = reactor;
-    thisForm.config = json_config.QUERY_FORM;
-
-    // ** Model
-    thisForm.futureNodes = [1, 2, 3, 4, 5];
-
-    var values = [];
-    thisForm.config.nodeAttributes.forEach(function (attr) {
-        values.push([attr.name, attr.display]);
-    });
-
-    var dataInput = future_form_selection.append("form");
-
-    //- builds form! -
-    dataInput.classed("triggerquery", true)
-        .attr("id", "queryval");
-
-    var select_attr = dataInput.append("select")
-        .classed("styled_form", true)
-        .attr("name", "attribute");
-
-    values.forEach(function (value) {
-        select_attr.append("option")
-            .attr("value", value[0])
-            .text(value[1]);
-    });
-
-    var future_nodes = dataInput.append("select")
-        .classed("styled_form", true)
-        .attr("name", "operator");
-
-    thisForm.futureNodes.forEach(function (op) {
-        future_nodes.append("option")
-            .attr("value", op)
-            .text(op);
-    });
-
-    dataInput.append("input")
-        .classed("styled_form", true)
-        .attr("name", "begin_date")
-        .attr("type", "text")
-        .attr("placeholder", "Start");
-
-    dataInput.append("input")
-        .classed("styled_form", true)
-        .attr("name", "end_date")
-        .attr("type", "text")
-        .attr("placeholder", "End");
-
-    dataInput.append("input")
-        .classed("styled_form", true)
-        .attr("type", "submit");
-
-    $(".triggerquery").bind("submit", function (event) {
-        var data = $("#queryval").serializeArray();
-
-        var attr = [data[0].value, data[1].value, data[2].value, data[3].value];
-
-        var posted_data = {
-            'nodes': JSON.stringify(thisForm.graph.nodes),
-            'edges': JSON.stringify(thisForm.graph.edges),
-            'prediction_attr': JSON.stringify(attr[0]),
-            'future_nodes': JSON.stringify(attr[1]),
-            'begin_date': JSON.stringify(attr[2]),
-            'end_date': JSON.stringify(attr[3]),
-            'id': JSON.stringify(thisForm.config.ID)
-        };
-
-        console.log(posted_data);
-
-        $(".content").slideToggle(200);
-
-
-
-        $.post("http://localhost:5000/", posted_data, function (data) {
-
-            /***
-            var graph = JSON.parse(data);
-
-            graph.pred_attr = attr[0];
-            graph.future_nodes = attr[1];
-            graph.begin_date = attr[2];
-            graph.end_date = attr[3];
-
-            thisForm.reactor.dispatchEvent("query_successful", graph);
-            ***/
-        });
-
-        event.preventDefault();
-    });
-}
-
-module.exports = PredictionForm;
-
-},{"../config.js":1,"../external/d3.min.v4.js":3,"../external/jquery.min.js":4}],8:[function(require,module,exports){
-var d3 = require("../external/d3.min.v4.js"),
-    json_config = require("../config.js");
-
-require("../external/sankey.js");
-
-function PredictionGraph(svg1, svg2, reactor) {
-
-    var thisResult = this;
-
-    thisResult.config = json_config.VIEW_PREDICTION_GRAPH;
-
-    thisResult.svg1text = svg1;
-    thisResult.svg2text = svg2;
-
-    thisResult.svg1 = svg1.append("svg")
-        .classed("shadow-box", true)
-        .classed("grid-svg", true)
-        .attr("width", "600px")
-        .attr("height", "825px")
-        .attr("visibility", "hidden");
-
-    thisResult.svg2 = svg2.append("svg")
-        .classed("shadow-box", true)
-        .classed("grid-svg", true)
-        .attr("width", "600px")
-        .attr("height", "825px")
-        .attr("visibility", "hidden");
-
-    thisResult.svg = null;
-    thisResult.svgtext = null;
-
-    thisResult.start = 0;
-    thisResult.queryNumber = 1;
-
-    thisResult.reactor = reactor;
-    thisResult.reactor.addEventListener('query_successful', thisResult.updateResult.bind(this));
-}
-
-PredictionGraph.prototype.updateResult = function (graph) {
-
-    var thisResult = this;
-
-    var width = parseInt(d3.select("#query-results1 svg").attr("width")) - 10;
-    var height = parseInt(d3.select("#query-results1 svg").attr("height")) - 10;
-
-    if (thisResult.start == 0) {
-        this.svg = this.svg1;
-        this.svgtext = this.svg1text;
-    }
-    else {
-        this.svg = this.svg2;
-        this.svgtext = this.svg2text;
-    }
-
-
-    this.svgtext.select("p").remove();
-
-    this.svgtext.insert("p", ":first-child")
-        .text("query: " + this.queryNumber.toString() +
-              ", attr: "  + graph.pred_attr.toString() +
-              ", steps: " + graph.future_nodes.toString() +
-              ", time range: [" + graph.begin_date.toString() + "," + graph.end_date.toString() + "]");
-
-    this.svg.attr("visibility","visible");
-    this.svg.select("*").remove();
-
-    var svg = this.svg.append("g");
-
-    var sankey = d3.sankey()
-        .nodeWidth(25)
-        .nodePadding(20)
-        .size([width, height]);
-
-    var path = sankey.link();
-
-    sankey.nodes(graph.nodes)
-        .links(graph.links)
-        .layout(32);
-
-    var units = "individuals";
-
-    var formatNumber = d3.format(",.0f"),    // zero decimal places
-        format = function (d) {
-            return formatNumber(d) + " " + units;
-        };
-
-    // add in the links
-    var link = svg.append("g").selectAll(".sankey_link")
-        .data(graph.links)
-        .enter()
-        .append("path")
-        .attr("class", "sankey_link")
-        .attr("d", path)
-        .style("stroke-width", function (d) {
-            return Math.max(1, d.dy);
-        }).sort(function (a, b) {
-            if (a.target.name == -1 || a.source.name == -1) {
-                return -1;
-            }
-            else if (b.target.name == -1 || b.source.name == -1) {
-                return 1;
-            }
-            else {
-                return b.dy - a.dy;
-            }
-        });
-
-    link.each(function (p) {
-        if (p.target.name == -1) {
-            d3.select(this)
-                .attr("visibility", "hidden");
-        }
-    });
-
-    // add the link titles
-    link.append("title")
-        .text(function (d) {
-            var array = d.source.sourceLinks;
-            var value = 0;
-            var last = 0;
-            array.forEach(function (p) {
-                value += p.value;
-                if (p.target.name == -1) {
-                    last += p.value;
-                }
-            });
-            console.log(d.source.sourceLinks);
-            console.log(value);
-            console.log(last);
-
-            var round_abs = Math.round((d.value / value) * 10000) / 100;
-            var round_rel = Math.round((d.value / (value - last)) * 10000) / 100;
-
-
-            return thisResult.config.display[d.source.name.toString()].text + " → " +
-                thisResult.config.display[d.target.name.toString()].text + "\n" + format(d.value) + "\n" +
-                "(" + round_abs + "% of total) \n" +
-                "(" + round_rel + "% of taken exams)";
-        });
-
-    // add in the nodes
-    var node = svg.append("g").selectAll(".sankey_node")
-        .data(graph.nodes)
-        .enter().append("g")
-        .attr("class", "sankey_node")
-        .attr("transform", function (d) {
-            return "translate(" + d.x + "," + d.y + ")";
-        });
-
-    // add the rectangles for the nodes
-    node.append("rect")
-        .attr("height", function (d) {
-            return d.dy;
-        })
-        .attr("width", sankey.nodeWidth())
-        .style("fill", function (d) {
-            return d.color = thisResult.config.display[d.name.toString()].color;
-        })
-        .style("stroke", function (d) {
-            return d3.rgb(d.color).darker(2);
-        })
-        .append("title")
-        .text(function (d) {
-            var value = 0;
-            var last = 0;
-            var array = [];
-            var aux = false;
-            if (d.sourceLinks.length == 0) {
-                array = d.targetLinks;
-            }
-            else {
-                array = d.sourceLinks;
-                aux = true;
-            }
-
-            if (d.name == -2){
-                aux = false;
-            }
-
-            array.forEach(function (p) {
-                value += p.value;
-                if (p.target.name == -1) {
-                    last += p.value;
-                }
-            });
-
-            var round = Math.round((last / value) * 10000) / 100;
-            var title = "";
-
-            title += thisResult.config.display[d.name.toString()].text;
-            title += "\n";
-            title += value.toString() + " Individuals \n";
-            if (aux == true) {
-                title += last.toString() + " didn't follow up (" + round.toString() + "%)";
-            }
-
-            return title;
-        });
-
-    // add in the title for the nodes
-    node.append("text")
-        .attr("x", -6)
-        .attr("y", function (d) {
-            return d.dy / 2;
-        })
-        .attr("dy", ".35em")
-        .attr("text-anchor", "end")
-        .attr("transform", null)
-        .text(function (d) {
-            return thisResult.config.display[d.name.toString()].text;
-        })
-        .filter(function (d) {
-            return d.x < width / 2;
-        })
-        .attr("x", 6 + sankey.nodeWidth())
-        .attr("text-anchor", "start");
-
-    node.each(function (p) {
-        if (p.name == -1) {
-            d3.select(this)
-                .attr("visibility", "hidden");
-        }
-    });
-
-    this.start = (this.start + 1) % 2;
-    this.queryNumber += 1;
-};
-
-module.exports = PredictionGraph;
-},{"../config.js":1,"../external/d3.min.v4.js":3,"../external/sankey.js":6}],9:[function(require,module,exports){
 var d3 = require("./external/d3.min.v4.js"),
     QueryForm = require("./query_system/query_form.js"),
     QueryGraph = require("./query_system/query_graph.js"),
@@ -1136,7 +802,7 @@ var prediction_form = new PredictionForm(future_form_selection, query_graph.grap
 // Append the svg canvas to the page
 // var prediction_graph = new PredictionGraph(prediction_graph_selection1, prediction_graph_selection2, reactor);
 
-},{"./external/d3.min.v4.js":3,"./external/reactor.js":5,"./graph_creator/prediction_form.js":7,"./graph_creator/prediction_graph.js":8,"./query_system/query_form.js":10,"./query_system/query_graph.js":11}],10:[function(require,module,exports){
+},{"./external/d3.min.v4.js":3,"./external/reactor.js":5,"./query_system/query_form.js":8,"./query_system/query_graph.js":9,"./sankey_visualization/prediction_form.js":11,"./sankey_visualization/prediction_graph.js":12}],8:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
     json_config = require("../config.js");
@@ -1391,15 +1057,18 @@ function updateConstraints(form, current, element) {
 
 
 function attr_getter(id, oper, val) {
+
     var aux = $(id).val();
+
     var id_text = d3.select(id + " [value='" + aux + "']").text();
 
     var type_name = d3.select(id + " [value=" + aux + "]").attr("type");
 
     aux = $(oper).val();
+
     var oper_text = d3.select(oper + " [value='" + aux + "']").text();
 
-    if (type_name == "month" || type_name == "number") {
+    if (type_name == "month" || type_name == "number" || type_name == "time_interval") {
         return id_text + " " + oper_text + " " + $(val).val();
     }
 
@@ -1411,7 +1080,7 @@ function attr_getter(id, oper, val) {
 
 module.exports = FormHandler;
 
-},{"../config.js":1,"../external/d3.min.v4.js":3,"../external/jquery.min.js":4}],11:[function(require,module,exports){
+},{"../config.js":1,"../external/d3.min.v4.js":3,"../external/jquery.min.js":4}],9:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     utils = require("./utils.js"),
     json_config = require("../config.js");
@@ -1533,9 +1202,8 @@ GC.prototype.nodeMouseDown = function (svg_element) {
                 (a.destination == p_selected[0].name))
         });
 
-        if (aux.length == 0) {
+        if (aux.length == 0 && p_selected[0].name != n_selected[0].name) {
             if (d3.event.ctrlKey) {
-                console.log("adsfaad");
                 thisGraph.addEdge(p_selected[0], n_selected[0], "undirected");
             }
             else {
@@ -1869,7 +1537,7 @@ GC.prototype.getGraph = function () {
 
 module.exports = GC;
 
-},{"../config.js":1,"../external/d3.min.v4.js":3,"./utils.js":12}],12:[function(require,module,exports){
+},{"../config.js":1,"../external/d3.min.v4.js":3,"./utils.js":10}],10:[function(require,module,exports){
 var json_config = require("../config.js");
 
 function canDo(tmp_x, tmp_y, radius, aspect, nodes, node) {
@@ -1951,4 +1619,339 @@ module.exports = {
     calcTextEdgePath: calcTextEdgePath,
     canDo: canDo
 };
-},{"../config.js":1}]},{},[9]);
+},{"../config.js":1}],11:[function(require,module,exports){
+var d3 = require("../external/d3.min.v4.js"),
+    $ = require("../external/jquery.min.js"),
+    json_config = require("../config.js");
+
+function PredictionForm(future_form_selection, graph, reactor) {
+
+    // ** Config
+    var thisForm = this;
+    thisForm.graph = graph;
+    thisForm.reactor = reactor;
+    thisForm.config = json_config.QUERY_FORM;
+
+    // ** Model
+    thisForm.futureNodes = [1, 2, 3, 4, 5];
+
+    var values = [];
+    thisForm.config.nodeAttributes.forEach(function (attr) {
+        values.push([attr.name, attr.display]);
+    });
+
+    var dataInput = future_form_selection.append("form");
+
+    //- builds form! -
+    dataInput.classed("triggerquery", true)
+        .attr("id", "queryval");
+
+    var select_attr = dataInput.append("select")
+        .classed("styled_form", true)
+        .attr("name", "attribute");
+
+    values.forEach(function (value) {
+        select_attr.append("option")
+            .attr("value", value[0])
+            .text(value[1]);
+    });
+
+    var future_nodes = dataInput.append("select")
+        .classed("styled_form", true)
+        .attr("name", "operator");
+
+    thisForm.futureNodes.forEach(function (op) {
+        future_nodes.append("option")
+            .attr("value", op)
+            .text(op);
+    });
+
+    dataInput.append("input")
+        .classed("styled_form", true)
+        .attr("name", "begin_date")
+        .attr("type", "text")
+        .attr("placeholder", "Start");
+
+    dataInput.append("input")
+        .classed("styled_form", true)
+        .attr("name", "end_date")
+        .attr("type", "text")
+        .attr("placeholder", "End");
+
+    dataInput.append("input")
+        .classed("styled_form", true)
+        .attr("type", "submit");
+
+    $(".triggerquery").bind("submit", function (event) {
+        var data = $("#queryval").serializeArray();
+
+        var attr = [data[0].value, data[1].value, data[2].value, data[3].value];
+
+        var posted_data = {
+            'nodes': JSON.stringify(thisForm.graph.nodes),
+            'edges': JSON.stringify(thisForm.graph.edges),
+            'outcomes': JSON.stringify(thisForm.graph.outcome_key_op_value),
+            'prediction_attr': JSON.stringify(attr[0]),
+            'future_nodes': JSON.stringify(attr[1]),
+            'begin_date': JSON.stringify(attr[2]),
+            'end_date': JSON.stringify(attr[3]),
+            'id': JSON.stringify(thisForm.config.ID)
+        };
+
+        console.log(posted_data);
+
+        $(".content").slideToggle(200);
+
+
+
+        $.post("http://localhost:5000/", posted_data, function (data) {
+
+            /***
+            var graph = JSON.parse(data);
+
+            graph.pred_attr = attr[0];
+            graph.future_nodes = attr[1];
+            graph.begin_date = attr[2];
+            graph.end_date = attr[3];
+
+            thisForm.reactor.dispatchEvent("query_successful", graph);
+            ***/
+        });
+
+        event.preventDefault();
+    });
+}
+
+module.exports = PredictionForm;
+
+},{"../config.js":1,"../external/d3.min.v4.js":3,"../external/jquery.min.js":4}],12:[function(require,module,exports){
+var d3 = require("../external/d3.min.v4.js"),
+    json_config = require("../config.js");
+
+require("../external/sankey.js");
+
+function PredictionGraph(svg1, svg2, reactor) {
+
+    var thisResult = this;
+
+    thisResult.config = json_config.VIEW_PREDICTION_GRAPH;
+
+    thisResult.svg1text = svg1;
+    thisResult.svg2text = svg2;
+
+    thisResult.svg1 = svg1.append("svg")
+        .classed("shadow-box", true)
+        .classed("grid-svg", true)
+        .attr("width", "600px")
+        .attr("height", "825px")
+        .attr("visibility", "hidden");
+
+    thisResult.svg2 = svg2.append("svg")
+        .classed("shadow-box", true)
+        .classed("grid-svg", true)
+        .attr("width", "600px")
+        .attr("height", "825px")
+        .attr("visibility", "hidden");
+
+    thisResult.svg = null;
+    thisResult.svgtext = null;
+
+    thisResult.start = 0;
+    thisResult.queryNumber = 1;
+
+    thisResult.reactor = reactor;
+    thisResult.reactor.addEventListener('query_successful', thisResult.updateResult.bind(this));
+}
+
+PredictionGraph.prototype.updateResult = function (graph) {
+
+    var thisResult = this;
+
+    var width = parseInt(d3.select("#query-results1 svg").attr("width")) - 10;
+    var height = parseInt(d3.select("#query-results1 svg").attr("height")) - 10;
+
+    if (thisResult.start == 0) {
+        this.svg = this.svg1;
+        this.svgtext = this.svg1text;
+    }
+    else {
+        this.svg = this.svg2;
+        this.svgtext = this.svg2text;
+    }
+
+
+    this.svgtext.select("p").remove();
+
+    this.svgtext.insert("p", ":first-child")
+        .text("query: " + this.queryNumber.toString() +
+              ", attr: "  + graph.pred_attr.toString() +
+              ", steps: " + graph.future_nodes.toString() +
+              ", time range: [" + graph.begin_date.toString() + "," + graph.end_date.toString() + "]");
+
+    this.svg.attr("visibility","visible");
+    this.svg.select("*").remove();
+
+    var svg = this.svg.append("g");
+
+    var sankey = d3.sankey()
+        .nodeWidth(25)
+        .nodePadding(20)
+        .size([width, height]);
+
+    var path = sankey.link();
+
+    sankey.nodes(graph.nodes)
+        .links(graph.links)
+        .layout(32);
+
+    var units = "individuals";
+
+    var formatNumber = d3.format(",.0f"),    // zero decimal places
+        format = function (d) {
+            return formatNumber(d) + " " + units;
+        };
+
+    // add in the links
+    var link = svg.append("g").selectAll(".sankey_link")
+        .data(graph.links)
+        .enter()
+        .append("path")
+        .attr("class", "sankey_link")
+        .attr("d", path)
+        .style("stroke-width", function (d) {
+            return Math.max(1, d.dy);
+        }).sort(function (a, b) {
+            if (a.target.name == -1 || a.source.name == -1) {
+                return -1;
+            }
+            else if (b.target.name == -1 || b.source.name == -1) {
+                return 1;
+            }
+            else {
+                return b.dy - a.dy;
+            }
+        });
+
+    link.each(function (p) {
+        if (p.target.name == -1) {
+            d3.select(this)
+                .attr("visibility", "hidden");
+        }
+    });
+
+    // add the link titles
+    link.append("title")
+        .text(function (d) {
+            var array = d.source.sourceLinks;
+            var value = 0;
+            var last = 0;
+            array.forEach(function (p) {
+                value += p.value;
+                if (p.target.name == -1) {
+                    last += p.value;
+                }
+            });
+            console.log(d.source.sourceLinks);
+            console.log(value);
+            console.log(last);
+
+            var round_abs = Math.round((d.value / value) * 10000) / 100;
+            var round_rel = Math.round((d.value / (value - last)) * 10000) / 100;
+
+
+            return thisResult.config.display[d.source.name.toString()].text + " → " +
+                thisResult.config.display[d.target.name.toString()].text + "\n" + format(d.value) + "\n" +
+                "(" + round_abs + "% of total) \n" +
+                "(" + round_rel + "% of taken exams)";
+        });
+
+    // add in the nodes
+    var node = svg.append("g").selectAll(".sankey_node")
+        .data(graph.nodes)
+        .enter().append("g")
+        .attr("class", "sankey_node")
+        .attr("transform", function (d) {
+            return "translate(" + d.x + "," + d.y + ")";
+        });
+
+    // add the rectangles for the nodes
+    node.append("rect")
+        .attr("height", function (d) {
+            return d.dy;
+        })
+        .attr("width", sankey.nodeWidth())
+        .style("fill", function (d) {
+            return d.color = thisResult.config.display[d.name.toString()].color;
+        })
+        .style("stroke", function (d) {
+            return d3.rgb(d.color).darker(2);
+        })
+        .append("title")
+        .text(function (d) {
+            var value = 0;
+            var last = 0;
+            var array = [];
+            var aux = false;
+            if (d.sourceLinks.length == 0) {
+                array = d.targetLinks;
+            }
+            else {
+                array = d.sourceLinks;
+                aux = true;
+            }
+
+            if (d.name == -2){
+                aux = false;
+            }
+
+            array.forEach(function (p) {
+                value += p.value;
+                if (p.target.name == -1) {
+                    last += p.value;
+                }
+            });
+
+            var round = Math.round((last / value) * 10000) / 100;
+            var title = "";
+
+            title += thisResult.config.display[d.name.toString()].text;
+            title += "\n";
+            title += value.toString() + " Individuals \n";
+            if (aux == true) {
+                title += last.toString() + " didn't follow up (" + round.toString() + "%)";
+            }
+
+            return title;
+        });
+
+    // add in the title for the nodes
+    node.append("text")
+        .attr("x", -6)
+        .attr("y", function (d) {
+            return d.dy / 2;
+        })
+        .attr("dy", ".35em")
+        .attr("text-anchor", "end")
+        .attr("transform", null)
+        .text(function (d) {
+            return thisResult.config.display[d.name.toString()].text;
+        })
+        .filter(function (d) {
+            return d.x < width / 2;
+        })
+        .attr("x", 6 + sankey.nodeWidth())
+        .attr("text-anchor", "start");
+
+    node.each(function (p) {
+        if (p.name == -1) {
+            d3.select(this)
+                .attr("visibility", "hidden");
+        }
+    });
+
+    this.start = (this.start + 1) % 2;
+    this.queryNumber += 1;
+};
+
+module.exports = PredictionGraph;
+},{"../config.js":1,"../external/d3.min.v4.js":3,"../external/sankey.js":6}]},{},[7]);
