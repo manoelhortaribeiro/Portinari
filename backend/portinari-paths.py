@@ -39,7 +39,7 @@ def index():
                         else:
                             individuals = np.intersect1d(tmp, individuals, assume_unique=True)
 
-        print(individuals, len(individuals))
+        print(df[df.ID.isin(individuals)])
 
     return "Hello World!"
 
