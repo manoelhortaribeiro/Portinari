@@ -50,13 +50,19 @@ def make_patient_tables(ran, df, dest):
     patients_table_raw.to_csv(dest + 'r' + str(ran[0]) + str(ran[1]), mode='w', index=False)
 
 
+def make_exams_tables(rows_to_drop, df, dest):
+    df.drop(rows_to_drop, axis=1, inplace=True)
+    df.to_csv(dest, mode='w', index=False)
+
 if __name__ == '__main__':
+    source = "./preprocessed/opencrab_processede.csv"
+    patient_dest = "./final/patients.csv"
+    exams_dest = "./final/exams.csv"
 
-    source = "./preprocessed/opencrab_processed_sample.csv"
-    patient_dest = "./final/patients_sample.csv"
-    exams_dest = "./final/exams_sample.csv"
+    main_df = pd.read_csv("./preprocessed/opencrab_processed.csv")
 
-    main_df = pd.read_csv("./preprocessed/opencrab_processed_sample.csv")
+    # - Patients Table
+    """
     f = functools.partial(make_patient_tables, df=main_df, dest=patient_dest)
 
     range_of = list(zip(list(range(0, 1000000, 100000)), list(range(100000, 1100000, 100000))))
@@ -65,3 +71,8 @@ if __name__ == '__main__':
 
     os.system('cat ' + patient_dest + 'r* > ' + patient_dest)
     os.system('rm ' + patient_dest + 'r*')
+    """
+
+    # - Exams Table
+    make_exams_tables(['birthdate', 'censordate'], main_df, exams_dest)
+

@@ -1,7 +1,8 @@
-from make_tables import get_first_pdseries, make_individual_table, make_patient_tables
+from make_tables import get_first_pdseries, make_individual_table, make_patient_tables, make_exams_tables
 import unittest
 import pandas
 import os
+
 
 class TestFormatRows(unittest.TestCase):
 
@@ -32,6 +33,7 @@ class TestFormatRows(unittest.TestCase):
 
     def test_make_patient_tables(self):
 
+        # auxiliary variables
         ran = (0, 3)
         rel_p = "./test_pre-processing/files/"
         input_file, output_file = rel_p + "make_patient_tables_input.csv", rel_p + "make_patient_tables_output.csv"
@@ -40,7 +42,7 @@ class TestFormatRows(unittest.TestCase):
         # read data frames
         dataframe = pandas.read_csv(input_file)
 
-        # make tables
+        # make table
         make_patient_tables(ran, dataframe, output_file)
 
         # clean tmp files
@@ -55,3 +57,27 @@ class TestFormatRows(unittest.TestCase):
         os.system('rm ' + output_file + '*')
 
         print(">> preprocessing.make_tables.make_patient_tables - OK")
+
+    def test_make_exam_tables(self):
+
+        # auxiliary variables
+        rel_p = "./test_pre-processing/files/"
+        input_file, output_file = rel_p + "make_exam_tables_input.csv", rel_p + "make_exam_tables_output.csv"
+        expected_output_file = rel_p + "make_exam_tables_expected_output.csv"
+
+        # read data frames
+        dataframe = pandas.read_csv(input_file)
+
+        # make table
+        make_exams_tables(['birthdate', 'censordate'], dataframe, output_file)
+
+        # compare expected and actual output
+        output_dataframe = pandas.read_csv(output_file)
+        expected_dataframe = pandas.read_csv(expected_output_file)
+        self.assertEqual(output_dataframe.to_dict(), expected_dataframe.to_dict())
+
+        # clean out files
+        os.system('rm ' + output_file)
+
+        print(">> preprocessing.make_tables.make_exam_tables - OK")
+
