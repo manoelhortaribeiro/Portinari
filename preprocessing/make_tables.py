@@ -55,14 +55,13 @@ def make_exams_tables(rows_to_drop, df, dest):
     df.to_csv(dest, mode='w', index=False)
 
 if __name__ == '__main__':
-    source = "./preprocessed/opencrab_processede.csv"
+    source = "./preprocessed/opencrab_processed.csv"
     patient_dest = "./final/patients.csv"
     exams_dest = "./final/exams.csv"
 
     main_df = pd.read_csv("./preprocessed/opencrab_processed.csv")
 
     # - Patients Table
-    """
     f = functools.partial(make_patient_tables, df=main_df, dest=patient_dest)
 
     range_of = list(zip(list(range(0, 1000000, 100000)), list(range(100000, 1100000, 100000))))
@@ -71,7 +70,6 @@ if __name__ == '__main__':
 
     os.system('cat ' + patient_dest + 'r* > ' + patient_dest)
     os.system('rm ' + patient_dest + 'r*')
-    """
 
     # - Exams Table
     make_exams_tables(['birthdate', 'censordate'], main_df, exams_dest)
