@@ -1,4 +1,4 @@
-
 .idea/
 .sass-cache
-
+/backend/data/exams.csv
+/backend/data/patients.csv

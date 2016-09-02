@@ -1,14 +1,17 @@
-import json
+from query_interpreter.graph_maker import Graph
+from flask_cors import cross_origin
+from flask import Flask, request
 import numpy as np
 import pandas
-from flask import Flask, request
-from flask_cors import cross_origin
-from query_interpreter.graph_maker import Graph
+import json
 
 app = Flask(__name__)
 
-df = pandas.read_csv('opencrab.csv')
-df.set_index(keys=['diagnosis1'], drop=False, inplace=True)
+exams = pandas.read_csv('./data/exams.csv')
+patients = pandas.read_csv('./data/patients.csv')
+
+exams.set_index(keys=['Diagnosis'], drop=False, inplace=True)
+patients.set_index(keys=['PatientID'], drop=False, inplace=True)
 
 
 @app.route('/', methods=['POST'])
@@ -33,13 +36,13 @@ def index():
                 json_node = graph.get_node(node)
                 for constraint in json_node['key_op_value']:
                     if constraint[0] == 'diagnosis1' and constraint[1] == '==':
-                        tmp = df.query("diagnosis1 == " + constraint[2])['ID'].unique()
+                        tmp = exams.query("diagnosis1 == " + constraint[2])['ID'].unique()
                         if individuals is None:
                             individuals = tmp
                         else:
                             individuals = np.intersect1d(tmp, individuals, assume_unique=True)
 
-        print(df[df.ID.isin(individuals)])
+        print(exams[exams.ID.isin(individuals)])
 
     return "Hello World!"
 

@@ -139,6 +139,42 @@ body {
     padding: 0;
   }
 
+  .form {
+    min-height: $form-height;
+    background-color: $bg-color;
+    border: $light-border;
+    margin: $three-px;
+    form {
+      text-align: center;
+      margin: $three-px;
+    }
+
+    select {
+      margin: $three-px;
+    }
+
+    select:hover {
+      background-color: $secondary-color;
+    }
+
+    input {
+      margin: $three-px;
+      display: inline;
+      background-color: $secondary-color;
+
+    }
+
+    .styled_form {
+      background: $bg-color;
+      padding: 10px 20px;
+      font-size: 10px;
+      margin: $three-px;
+      color: #6c5c70;
+      text-align: center;
+      border: $light-border;
+    }
+  }
+
 }
 
 /* - Query Menu */
@@ -258,40 +294,4 @@ body {
 
   }
 
-}
-
-.form {
-  min-height: $form-height;
-  background-color: $bg-color;
-  border: $light-border;
-  margin: $three-px;
-  form {
-    text-align: center;
-    margin: $three-px;
-  }
-
-  select {
-    margin: $three-px;
-  }
-
-  select:hover {
-    background-color: $secondary-color;
-  }
-
-  input {
-    margin: $three-px;
-    display: inline;
-    background-color: $secondary-color;
-
-  }
-
-  .styled_form {
-    background: $bg-color;
-    padding: 10px 20px;
-    font-size: 10px;
-    margin: $three-px;
-    color: #6c5c70;
-    text-align: center;
-    border: $light-border;
-  }
 }

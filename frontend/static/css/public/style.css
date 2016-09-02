@@ -80,6 +80,30 @@ body {
   body .col-md-8 {
     margin: 0;
     padding: 0; }
+  body .form {
+    min-height: 40px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: solid lightgrey 1px;
+    margin: 3px 3px 3px 3px; }
+    body .form form {
+      text-align: center;
+      margin: 3px 3px 3px 3px; }
+    body .form select {
+      margin: 3px 3px 3px 3px; }
+    body .form select:hover {
+      background-color: #e8f0ff; }
+    body .form input {
+      margin: 3px 3px 3px 3px;
+      display: inline;
+      background-color: #e8f0ff; }
+    body .form .styled_form {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px 20px;
+      font-size: 10px;
+      margin: 3px 3px 3px 3px;
+      color: #6c5c70;
+      text-align: center;
+      border: solid lightgrey 1px; }
 
 /* - Query Menu */
 #query-system {
@@ -150,30 +174,5 @@ body {
         text-align: center; }
       #query-system #forms-menu .current li:hover {
         background-color: #2aabd2; }
-
-.form {
-  min-height: 40px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border: solid lightgrey 1px;
-  margin: 3px 3px 3px 3px; }
-  .form form {
-    text-align: center;
-    margin: 3px 3px 3px 3px; }
-  .form select {
-    margin: 3px 3px 3px 3px; }
-  .form select:hover {
-    background-color: #e8f0ff; }
-  .form input {
-    margin: 3px 3px 3px 3px;
-    display: inline;
-    background-color: #e8f0ff; }
-  .form .styled_form {
-    background: rgba(255, 255, 255, 0.9);
-    padding: 10px 20px;
-    font-size: 10px;
-    margin: 3px 3px 3px 3px;
-    color: #6c5c70;
-    text-align: center;
-    border: solid lightgrey 1px; }
 
 /*# sourceMappingURL=style.css.map */

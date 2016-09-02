@@ -51,26 +51,35 @@ def make_patient_tables(ran, df, dest):
 
 
 def make_exams_tables(rows_to_drop, df, dest):
+    """
+    This function drops the rows used in the patients tables and creates a table just with the exams.
+    :param rows_to_drop: Rows that will be dropped in dataframe.
+    :param df: Dataframe.
+    :param dest: destination of the file.
+    :return: Nothing.
+    """
     df.drop(rows_to_drop, axis=1, inplace=True)
+    df.rename(columns={'ID': 'PatientID',
+                       'diagnosisdate': 'DiagnosisDate',
+                       'diagnosisnumber': 'DiagnosisNbr',
+                       'type': 'ExamType',
+                       'diagnosis1': 'Diagnosis',
+                       'diagnosis2': 'MorphologyCode',
+                       'stage': 'Stage',
+                       'lab_nr': 'LaboratoryNbr',
+                       'reg': 'Region',
+                       'sincelast': 'TimeSinceLast'
+                       }, inplace=True)
+
     df.to_csv(dest, mode='w', index=False)
+
 
 if __name__ == '__main__':
     source = "./preprocessed/opencrab_processed.csv"
     patient_dest = "./final/patients.csv"
     exams_dest = "./final/exams.csv"
 
-    main_df = pd.read_csv("./preprocessed/opencrab_processed.csv")
-
-    # - Patients Table
-    f = functools.partial(make_patient_tables, df=main_df, dest=patient_dest)
-
-    range_of = list(zip(list(range(0, 1000000, 100000)), list(range(100000, 1100000, 100000))))
-    with Pool(3) as p:
-        ret_list = p.map(f, range_of)
-
-    os.system('cat ' + patient_dest + 'r* > ' + patient_dest)
-    os.system('rm ' + patient_dest + 'r*')
+    main_df = pd.read_csv(source)
 
     # - Exams Table
     make_exams_tables(['birthdate', 'censordate'], main_df, exams_dest)
-
