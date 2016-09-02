@@ -25,9 +25,10 @@ class TestFormatRows(unittest.TestCase):
     def test_pre_process(self):
 
         # declare file locations
-        input_file, output_file = "./files/pre_process_input.csv", "./files/pre_process_output.csv"
-        expected_output_file = "./files/pre_process_expected_output.csv"
-        wrong_output_file = "./files/pre_process_wrong_output.csv"
+
+        rel_p = "./test_pre-processing/files/"
+        input_file, output_file = rel_p + "pre_process_input.csv", rel_p + "pre_process_output.csv"
+        expected_output_file = rel_p + "pre_process_expected_output.csv"
 
         # does preprocessing
         pre_process(input_file, output_file)
