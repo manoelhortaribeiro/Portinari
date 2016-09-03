@@ -44,8 +44,6 @@ def make_patient_tables(ran, df, dest):
     :return: Nothing.
     """
 
-    print('started:', ran[0], ran[1])
-
     has_header = False
     if ran[0] == 0:
         has_header = True
