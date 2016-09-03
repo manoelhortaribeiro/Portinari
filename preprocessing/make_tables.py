@@ -25,7 +25,7 @@ def make_individual_table(x):
     for i, j in zip(x['sincelast'].values, x['diagnosis1'].values):
         string_rep += 't{0}d{1}'.format(i, j)
 
-    if get_first_pdseries(x['ID']) % 50000 == 0:
+    if get_first_pdseries(x['ID']) % 10000 == 0:
         print(get_first_pdseries(x['ID']))
         gc.collect()
 
@@ -44,10 +44,16 @@ def make_patient_tables(ran, df, dest):
     :return: Nothing.
     """
 
+    print('started:', ran[0], ran[1])
+
+    has_header = False
+    if ran[0] == 0:
+        has_header = True
+
     df = df.query('ID >= ' + str(ran[0]))
     df = df.query('ID < ' + str(ran[1]))
     patients_table_raw = df.groupby('ID').apply(make_individual_table)
-    patients_table_raw.to_csv(dest + 'r' + str(ran[0]) + str(ran[1]), mode='w', index=False)
+    patients_table_raw.to_csv(dest + 'r' + str(ran[0]) + str(ran[1]), mode='w', index=False, header=has_header)
 
 
 def make_exams_tables(rows_to_drop, df, dest):
@@ -80,6 +86,16 @@ if __name__ == '__main__':
     exams_dest = "./final/exams.csv"
 
     main_df = pd.read_csv(source)
+
+    # - Patients Table
+    f = functools.partial(make_patient_tables, df=main_df, dest=patient_dest)
+
+    range_of = list(zip(list(range(0, 1000000, 100000)), list(range(100000, 1100000, 100000))))
+    with Pool(2) as p:
+        ret_list = p.map(f, range_of)
+
+    os.system('cat ' + patient_dest + 'r* > ' + patient_dest)
+    os.system('rm ' + patient_dest + 'r*')
 
     # - Exams Table
     make_exams_tables(['birthdate', 'censordate'], main_df, exams_dest)

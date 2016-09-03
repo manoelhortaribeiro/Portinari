@@ -2,3 +2,7 @@
 .sass-cache
 /backend/data/exams.csv
 /backend/data/patients.csv
+/preprocessing/preprocessed/opencrab_processed.csv
+/preprocessing/raw/opencrab.csv
+/preprocessing/final/exams.csv
+/preprocessing/final/patients.csv

@@ -116,7 +116,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
         var select_value = form;
 
         switch (type_name) {
-            case "number":
+            case "Number":
                 select_value.append("input")
                     .classed("styled_form", true)
                     .attr("id", "value_field_" + name)
@@ -125,7 +125,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
                     .attr("placeholder", "Value");
                 break;
 
-            case "month":
+            case "Month":
                 select_value.append("input")
                     .classed("styled_form", true)
                     .attr("id", "value_field_" + name)
@@ -134,7 +134,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
                     .attr("placeholder", "month");
                 break;
 
-            case "time_interval":
+            case "TimeInterval":
                 select_value.append("input")
                     .classed("styled_form", true)
                     .attr("id", "value_field_" + name)
@@ -250,7 +250,6 @@ function updateConstraints(form, current, element) {
         });
 }
 
-
 function attr_getter(id, oper, val) {
 
     var aux = $(id).val();
@@ -263,7 +262,7 @@ function attr_getter(id, oper, val) {
 
     var oper_text = d3.select(oper + " [value='" + aux + "']").text();
 
-    if (type_name == "month" || type_name == "number" || type_name == "time_interval") {
+    if (type_name == "Month" || type_name == "Number" || type_name == "TimeInterval") {
         return id_text + " " + oper_text + " " + $(val).val();
     }
 

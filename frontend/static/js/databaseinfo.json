@@ -1,102 +1,72 @@
 {
   "outcome_attributes": [
     {
-      "name": "diagnosis1",
+      "name": "Diagnosis",
       "display": "Diagnosis",
-      "type": "diagnosis1"
-    },
-    {
-      "name": "diagnosis2",
-      "display": "Morphology Code",
-      "type": "number"
-    },
-    {
-      "name": "lab_nr",
-      "display": "Laboratory Number",
-      "type": "number"
-    },
-    {
-      "name": "reg",
-      "display": "Region",
-      "type": "region"
-    },
-    {
-      "name": "stage",
-      "display": "Stage",
-      "type": "stage"
-    },
-    {
-      "name": "type",
-      "display": "Type of Exam",
-      "type": "type"
+      "type": "Diagnosis"
     }
   ],
   "node_attributes": [
     {
-      "name": "age",
-      "display": "Age",
-      "type": "month"
-    },
-    {
-      "name": "birthdate",
+      "name": "Birthdate",
       "display": "Birthdate",
-      "type": "month"
+      "type": "Month"
     },
     {
-      "name": "censordate",
+      "name": "CensorDate",
       "display": "Censor Date",
-      "type": "month"
+      "type": "Month"
     },
     {
-      "name": "diagnosisdate",
+      "name": "DiagnosisDate",
       "display": "Diagnosis Date",
-      "type": "month"
+      "type": "Month"
     },
     {
-      "name": "diagnosis1",
+      "name": "Diagnosis",
       "display": "Diagnosis",
-      "type": "diagnosis1"
+      "type": "Diagnosis"
     },
     {
-      "name": "diagnosis2",
+      "name": "MorphologyCode",
       "display": "Morphology Code",
-      "type": "number"
+      "type": "Number"
     },
     {
-      "name": "lab_nr",
+      "name": "LaboratoryNbr",
       "display": "Laboratory Number",
-      "type": "number"
+      "type": "Number"
     },
     {
-      "name": "reg",
+      "name": "Region",
       "display": "Region",
-      "type": "region"
+      "type": "Region"
     },
     {
-      "name": "stage",
+      "name": "Stage",
       "display": "Stage",
-      "type": "stage"
+      "type": "Stage"
     },
     {
-      "name": "type",
+      "name": "ExamType",
       "display": "Type of Exam",
-      "type": "type"
+      "type": "ExamType"
     }
   ],
   "edge_attributes": [
     {
-      "name": "sincelast",
+      "name": "TimeSinceLast",
       "display": "Time Interval",
-      "type": "time_interval"
+      "type": "TimeInterval"
     },
     {
-      "name": "type",
+      "name": "ExamType",
       "display": "Exam Interval",
-      "type": "number"
+      "type": "Number"
     }
   ],
   "types": {
-    "month": {
+    "Month": {
       "constraints": [
         [
           ">",
@@ -110,7 +80,7 @@
       "values": "months",
       "display": "months"
     },
-    "diagnosis1": {
+    "Diagnosis": {
       "constraints": [
         [
           "==",
@@ -259,7 +229,7 @@
         }
       }
     },
-    "region": {
+    "Region": {
       "constraints": [
         [
           "==",
@@ -279,7 +249,7 @@
       },
       "display": "std"
     },
-    "stage": {
+    "Stage": {
       "constraints": [
         [
           "==",
@@ -305,12 +275,12 @@
         "400": "Stage 4",
         "410": "Stage 4a",
         "420": "Stage 4b",
-        "900": "Unknown stage",
-        "999": "Unspecified stage"
+        "900": "Unknown Stage",
+        "999": "Unspecified Stage"
       },
       "display": "std"
     },
-    "type": {
+    "ExamType": {
       "constraints": [
         [
           "==",
@@ -329,7 +299,7 @@
       },
       "display": "std"
     },
-    "number": {
+    "Number": {
       "constraints": [
         [
           ">",
@@ -347,7 +317,7 @@
       "values": "number",
       "display": "none"
     },
-    "time_interval": {
+    "TimeInterval": {
       "constraints": [
         [
           ">",

@@ -5,13 +5,26 @@ import numpy as np
 import pandas
 import json
 
+
 app = Flask(__name__)
 
-exams = pandas.read_csv('./data/exams.csv')
-patients = pandas.read_csv('./data/patients.csv')
+exams = pandas.read_csv('./data/exams.csv', sep=',', index_col=False,
+                        dtype={'PatientID': np.uint32,
+                               'DiagnosisDate': str,
+                               'DiagnosisNbr': np.uint8,
+                               'ExamType': str,
+                               'Diagnosis': np.uint8,
+                               'MorphologyCode': str,
+                               'Stage': str,
+                               'LaboratoryNbr': np.uint8,
+                               'Region':  np.uint8,
+                               'TimeSinceLast': np.int16}, engine='c')
 
-exams.set_index(keys=['Diagnosis'], drop=False, inplace=True)
-patients.set_index(keys=['PatientID'], drop=False, inplace=True)
+patients = pandas.read_csv('./data/patients.csv', sep=',', index_col=False,
+                           dtype={'Birthdate': str,
+                                  'CensorDate': str,
+                                  'PatientID': np.uint32,
+                                  'StringRep': str}, engine='c')
 
 
 @app.route('/', methods=['POST'])
@@ -35,14 +48,16 @@ def index():
             for node in path:
                 json_node = graph.get_node(node)
                 for constraint in json_node['key_op_value']:
-                    if constraint[0] == 'diagnosis1' and constraint[1] == '==':
-                        tmp = exams.query("diagnosis1 == " + constraint[2])['ID'].unique()
+                    if constraint[0] == 'Diagnosis' and constraint[1] == '==':
+                        tmp = exams.query("Diagnosis == " + constraint[2]).PatientID
                         if individuals is None:
                             individuals = tmp
                         else:
-                            individuals = np.intersect1d(tmp, individuals, assume_unique=True)
+                            individuals = np.intersect1d(tmp, individuals)
 
-        print(exams[exams.ID.isin(individuals)])
+        print(len(individuals), individuals) 
+
+        print(patients[patients['PatientID'].isin(individuals)])
 
     return "Hello World!"
 

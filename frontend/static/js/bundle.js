@@ -33,102 +33,72 @@ module.exports = {
 module.exports={
   "outcome_attributes": [
     {
-      "name": "diagnosis1",
+      "name": "Diagnosis",
       "display": "Diagnosis",
-      "type": "diagnosis1"
-    },
-    {
-      "name": "diagnosis2",
-      "display": "Morphology Code",
-      "type": "number"
-    },
-    {
-      "name": "lab_nr",
-      "display": "Laboratory Number",
-      "type": "number"
-    },
-    {
-      "name": "reg",
-      "display": "Region",
-      "type": "region"
-    },
-    {
-      "name": "stage",
-      "display": "Stage",
-      "type": "stage"
-    },
-    {
-      "name": "type",
-      "display": "Type of Exam",
-      "type": "type"
+      "type": "Diagnosis"
     }
   ],
   "node_attributes": [
     {
-      "name": "age",
-      "display": "Age",
-      "type": "month"
-    },
-    {
-      "name": "birthdate",
+      "name": "Birthdate",
       "display": "Birthdate",
-      "type": "month"
+      "type": "Month"
     },
     {
-      "name": "censordate",
+      "name": "CensorDate",
       "display": "Censor Date",
-      "type": "month"
+      "type": "Month"
     },
     {
-      "name": "diagnosisdate",
+      "name": "DiagnosisDate",
       "display": "Diagnosis Date",
-      "type": "month"
+      "type": "Month"
     },
     {
-      "name": "diagnosis1",
+      "name": "Diagnosis",
       "display": "Diagnosis",
-      "type": "diagnosis1"
+      "type": "Diagnosis"
     },
     {
-      "name": "diagnosis2",
+      "name": "MorphologyCode",
       "display": "Morphology Code",
-      "type": "number"
+      "type": "Number"
     },
     {
-      "name": "lab_nr",
+      "name": "LaboratoryNbr",
       "display": "Laboratory Number",
-      "type": "number"
+      "type": "Number"
     },
     {
-      "name": "reg",
+      "name": "Region",
       "display": "Region",
-      "type": "region"
+      "type": "Region"
     },
     {
-      "name": "stage",
+      "name": "Stage",
       "display": "Stage",
-      "type": "stage"
+      "type": "Stage"
     },
     {
-      "name": "type",
+      "name": "ExamType",
       "display": "Type of Exam",
-      "type": "type"
+      "type": "ExamType"
     }
   ],
   "edge_attributes": [
     {
-      "name": "sincelast",
+      "name": "TimeSinceLast",
       "display": "Time Interval",
-      "type": "time_interval"
+      "type": "TimeInterval"
     },
     {
-      "name": "type",
+      "name": "ExamType",
       "display": "Exam Interval",
-      "type": "number"
+      "type": "Number"
     }
   ],
   "types": {
-    "month": {
+    "Month": {
       "constraints": [
         [
           ">",
@@ -142,7 +112,7 @@ module.exports={
       "values": "months",
       "display": "months"
     },
-    "diagnosis1": {
+    "Diagnosis": {
       "constraints": [
         [
           "==",
@@ -291,7 +261,7 @@ module.exports={
         }
       }
     },
-    "region": {
+    "Region": {
       "constraints": [
         [
           "==",
@@ -311,7 +281,7 @@ module.exports={
       },
       "display": "std"
     },
-    "stage": {
+    "Stage": {
       "constraints": [
         [
           "==",
@@ -337,12 +307,12 @@ module.exports={
         "400": "Stage 4",
         "410": "Stage 4a",
         "420": "Stage 4b",
-        "900": "Unknown stage",
-        "999": "Unspecified stage"
+        "900": "Unknown Stage",
+        "999": "Unspecified Stage"
       },
       "display": "std"
     },
-    "type": {
+    "ExamType": {
       "constraints": [
         [
           "==",
@@ -361,7 +331,7 @@ module.exports={
       },
       "display": "std"
     },
-    "number": {
+    "Number": {
       "constraints": [
         [
           ">",
@@ -379,7 +349,7 @@ module.exports={
       "values": "number",
       "display": "none"
     },
-    "time_interval": {
+    "TimeInterval": {
       "constraints": [
         [
           ">",
@@ -788,16 +758,11 @@ var future_form_selection = d3.select("#form-future-nodes");
 // Creates prediction form interface
 var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
 
-
 //reactor.registerEvent('query_successful');
 
 // var future_form_selection = d3.select("#form-future-nodes");
 //var prediction_graph_selection1 = d3.select("#query-results1");
 //var prediction_graph_selection2 = d3.select("#query-results2");
-
-
-
-
 
 // Append the svg canvas to the page
 // var prediction_graph = new PredictionGraph(prediction_graph_selection1, prediction_graph_selection2, reactor);
@@ -921,7 +886,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
         var select_value = form;
 
         switch (type_name) {
-            case "number":
+            case "Number":
                 select_value.append("input")
                     .classed("styled_form", true)
                     .attr("id", "value_field_" + name)
@@ -930,7 +895,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
                     .attr("placeholder", "Value");
                 break;
 
-            case "month":
+            case "Month":
                 select_value.append("input")
                     .classed("styled_form", true)
                     .attr("id", "value_field_" + name)
@@ -939,7 +904,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
                     .attr("placeholder", "month");
                 break;
 
-            case "time_interval":
+            case "TimeInterval":
                 select_value.append("input")
                     .classed("styled_form", true)
                     .attr("id", "value_field_" + name)
@@ -1055,7 +1020,6 @@ function updateConstraints(form, current, element) {
         });
 }
 
-
 function attr_getter(id, oper, val) {
 
     var aux = $(id).val();
@@ -1068,7 +1032,7 @@ function attr_getter(id, oper, val) {
 
     var oper_text = d3.select(oper + " [value='" + aux + "']").text();
 
-    if (type_name == "month" || type_name == "number" || type_name == "time_interval") {
+    if (type_name == "Month" || type_name == "Number" || type_name == "TimeInterval") {
         return id_text + " " + oper_text + " " + $(val).val();
     }
 
@@ -1107,7 +1071,6 @@ function GC(query_interface_selection, reactor) {
     thisGraph.graph.id_attr = "None";
     thisGraph.graph.outcome_key_op_value = [];
     thisGraph.graph.outcome_display_value = [];
-
 
     // -- View
     // svg
@@ -1349,19 +1312,33 @@ GC.prototype.updateGraph = function () {
         .attr("y", function (d) {
             return d.y
         })
-        .attr("text-anchor", "middle")
-        .text(function (d) {
-            return d.name;
-        });
+        .attr("text-anchor", "middle");
     // -- update
     text.data(data, function (d) {
         return d.name;
     }).attr("x", function (d) {
         return d.x
-    })
-        .attr("y", function (d) {
-            return d.y
+    }).attr("y", function (d) {
+        return d.y
+    }).text(function (d) {
+        var isStart = true;
+        var isEnd = true;
+
+        thisGraph.graph.edges.forEach(function (edge) {
+            if (d.name == edge.destination) {
+                isStart = false;
+            }
+            if (d.name == edge.source) {
+                isEnd = false;
+            }
         });
+
+        if (isStart && isEnd) return ' ';
+        else if (isStart) return 'start';
+        else if(isEnd) return 'end';
+        else return ' ';
+
+    });
     // -- exit
     text.data(data, function (d) {
         return d.name;
@@ -1450,41 +1427,43 @@ GC.prototype.updateGraph = function () {
         .remove();
 
 
-    // -- InText/Edges--
-    var text = thisGraph.svg
-        .select("g." + thisGraph.config.innerTextEdgeClass)
-        .selectAll("text");
-    var data = thisGraph.graph.edges;
-    var modifier = -10;
-    // -- enter
-    var aux = text.data(data, function (d) {
-        return d.name;
-    }).enter()
-        .append("text")
-        .attr("x", function (d) {
-            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
-        })
-        .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
-        })
-        .attr("text-anchor", "middle")
-        .text(function (d) {
-            return " " + d.name + " ";
-        });
-    // -- update
-    text.data(data, function (d) {
-        return d.name;
-    }).attr("x", function (d) {
-        return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
-    })
-        .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
-        });
-    // -- exit
-    text.data(data, function (d) {
-        return d.name;
-    }).exit()
-        .remove();
+    /*
+     // -- InText/Edges--
+     var text = thisGraph.svg
+     .select("g." + thisGraph.config.innerTextEdgeClass)
+     .selectAll("text");
+     var data = thisGraph.graph.edges;
+     var modifier = -10;
+     // -- enter
+     var aux = text.data(data, function (d) {
+     return d.name;
+     }).enter()
+     .append("text")
+     .attr("x", function (d) {
+     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
+     })
+     .attr("y", function (d) {
+     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
+     })
+     .attr("text-anchor", "middle")
+     .text(function (d) {
+     return " " + d.name + " ";
+     });
+     // -- update
+     text.data(data, function (d) {
+     return d.name;
+     }).attr("x", function (d) {
+     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
+     })
+     .attr("y", function (d) {
+     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
+     });
+     // -- exit
+     text.data(data, function (d) {
+     return d.name;
+     }).exit()
+     .remove();
+     */
 
 
     // -- OutText/Edges --
@@ -1619,6 +1598,7 @@ module.exports = {
     calcTextEdgePath: calcTextEdgePath,
     canDo: canDo
 };
+
 },{"../config.js":1}],11:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
@@ -1701,7 +1681,6 @@ function PredictionForm(future_form_selection, graph, reactor) {
         console.log(posted_data);
 
         $(".content").slideToggle(200);
-
 
 
         $.post("http://localhost:5000/", posted_data, function (data) {
