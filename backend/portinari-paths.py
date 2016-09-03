@@ -8,7 +8,7 @@ import json
 
 app = Flask(__name__)
 
-exams = pandas.read_csv('./data/exams.csv', sep=',', index_col=False,
+exams = pandas.read_csv('./data/exams_table.csv', sep=',', index_col=False,
                         dtype={'PatientID': np.uint32,
                                'DiagnosisDate': str,
                                'DiagnosisNbr': np.uint8,
@@ -20,7 +20,7 @@ exams = pandas.read_csv('./data/exams.csv', sep=',', index_col=False,
                                'Region':  np.uint8,
                                'TimeSinceLast': np.int16}, engine='c')
 
-patients = pandas.read_csv('./data/patients.csv', sep=',', index_col=False,
+patients = pandas.read_csv('./data/patients_table.csv', sep=',', index_col=False,
                            dtype={'Birthdate': str,
                                   'CensorDate': str,
                                   'PatientID': np.uint32,
