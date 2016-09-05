@@ -26,7 +26,7 @@ class TestFormatRows(unittest.TestCase):
 
         # declare file locations
 
-        rel_p = "./test_pre-processing/files/"
+        rel_p = "./test_preprocessing/files/"
         input_file, output_file = rel_p + "pre_process_input.csv", rel_p + "pre_process_output.csv"
         expected_output_file = rel_p + "pre_process_expected_output.csv"
 
