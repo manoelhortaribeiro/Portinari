@@ -9,7 +9,7 @@ class TestFindAndCompare(unittest.TestCase):
     def test_simple_matches(self):
         f = match_time_sequence
 
-        print(">> backend.query_maker.find_and_compare.match_time_sequence:")
+        print(">> backend.query_maker.find_and_compare.match_time_sequence (1):")
 
         _str = "t0d11t0d10t0d15"
         _dia, _tim, _exm = [11, 10, 15], [(0, 0), (0, 0)], [(0, 100), (0, 100)]
@@ -40,3 +40,22 @@ class TestFindAndCompare(unittest.TestCase):
         _dia, _tim, _exm = [11, 10, 15], [(125, 200), (100, 125)], [(2, 2), (1, 30)]
         self.assertEqual(f(_str, _dia, _tim, _exm), (True, [15, 5]))
         print("--> y skip, y time, y exam, y future - OK")
+
+
+    def test_pathological_case(self):
+        f = match_time_sequence
+
+        print(">> backend.query_maker.find_and_compare.match_time_sequence: (2)")
+        _str = "t10d11t10d10"*10
+        _dia, _tim, _exm = [10, 11, 15], [(0, 10000000), (0, 10000000)], [(0, 100), (0, 100)]
+        self.assertEqual(f(_str, _dia, _tim, _exm), (False, []))
+
+        partial = functools.partial(f, _str, _dia, _tim, _exm)
+        print(timeit.timeit(partial, number=100))
+        _dia, _tim, _exm = [10, 11, 15], [(0, 20), (0, 20)], [(0, 100), (0, 100)]
+        partial = functools.partial(f, _str, _dia, _tim, _exm)
+        print(timeit.timeit(partial, number=100))
+
+        print("--> n skip, n time, n exam, n future - OK")
+
+
