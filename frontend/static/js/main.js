@@ -4,6 +4,10 @@ var d3 = require("./external/d3.min.v4.js"),
     PredictionForm = require("./sankey_visualization/prediction_form.js"),
     PredictionGraph = require("./sankey_visualization/prediction_graph.js"),
     Reactor = require("./external/reactor.js");
+    Utils = require("./util.js")
+
+
+Utils.toggleButton("#expand-query-button", ".content_query", "Query");
 
 
 // Creates reactor pattern

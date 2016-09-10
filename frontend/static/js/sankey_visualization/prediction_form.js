@@ -78,7 +78,7 @@ function PredictionForm(future_form_selection, graph, reactor) {
 
         console.log(posted_data);
 
-        $(".content").slideToggle(200);
+        $(".content:visible").slideToggle(200);
 
 
         $.post("http://localhost:5000/", posted_data, function (data) {

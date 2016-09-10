@@ -53,69 +53,6 @@ def match_time_sequence(string, diagnosis, time, exams_range):
     split = regex.split('d|t', string)[1:]
     _time, _diagnosis = list(map(np.uint32, split[0:][::2])), list(map(np.uint8, split[1:][::2]))
 
-    # print(_time, _diagnosis, exams_range)
-
     result = recursive(_time, _diagnosis, time, diagnosis, exams_range)
 
-    # print(result[0], result[1], _diagnosis)
-
     return result[0], _diagnosis[result[1]:]
-
-
-def check_exam_range(diagnosis_row, i, exams_range, diagnosis):
-    back_range = (max(i - (exams_range[1] - exams_range[0] + 1), 0), max(i - exams_range[0] + 1, 0))
-    if diagnosis in diagnosis_row[back_range[0]:back_range[1]]:
-        return True
-    else:
-        return False
-
-
-def check_time_range(diagnosis_row, i, time_range, _time_range, diagnosis):
-
-    time_range_cum = np.cumsum(_time_range)
-    lower_bound = time_range_cum - (time_range[0])
-    upper_bound = time_range_cum - (time_range[1])
-    interval = zip(lower_bound, upper_bound)
-    print(list(interval))
-
-    for up, low in interval:
-        print(diagnosis in diagnosis_row[(low < time_range_cum) & ( time_range_cum > up)])
-
-
-    interval = zip(lower_bound, upper_bound)
-    print(list(interval))
-
-
-    return True
-
-
-def match_time_sequence_dynamic(string, diagnosis, time, exams_range):
-    # appends 0 to the beginning of the time
-    time = time + [(-100000, 100000)]
-    exams_range = exams_range + [(-1000000, 1000000)]
-
-    # splits both and separates the string
-    split = regex.split('d|t', string)[1:]
-    _time, _diagnosis = np.array(list(map(np.int32, split[0:][::2]))), np.array(list(map(np.uint16, split[1:][::2])))
-
-    matrix = np.zeros((len(diagnosis), len(_diagnosis)), dtype=bool)
-
-    for idx, row in enumerate(matrix):
-        for idy, element in enumerate(row):
-            if (idx == 0 or matrix[idx][idy - 1] is True) and diagnosis[idx] == _diagnosis[idy]:
-                matrix[idx][idy] = True
-            #if check_exam_range(_diagnosis, idy, exams_range[idx], diagnosis[idx]):
-            #    matrix[idx][idy] = True
-
-f = match_time_sequence_dynamic
-g = match_time_sequence
-print(">> backend.query_maker.find_and_compare.match_time_sequence: (2)")
-_str =_str = "t0d13t123d12t61d13t457d11t424d11t700d11t426d11t823d11t699d11t793d11t487d20t0d11t396d11t89d20t580d11t1126d11t1035d11"
-
- #"t0d1t0d2t20d3t20d1d15d2d10d3d5d4"
-_dia, _tim, _exm = [13, 11, 13], [(365, 1100), (365, 1100)], [(1, 4), (2, 4)]
-partial = functools.partial(g, _str, _dia, _tim, _exm)
-partial_d = functools.partial(f, _str, _dia, _tim, _exm)
-
-print(timeit.timeit(partial, number=1000))
-print(timeit.timeit(partial_d, number=1000))

@@ -722,6 +722,10 @@ var d3 = require("./external/d3.min.v4.js"),
     PredictionForm = require("./sankey_visualization/prediction_form.js"),
     PredictionGraph = require("./sankey_visualization/prediction_graph.js"),
     Reactor = require("./external/reactor.js");
+    Utils = require("./util.js")
+
+
+Utils.toggleButton("#expand-query-button", ".content_query", "Query");
 
 
 // Creates reactor pattern
@@ -767,7 +771,7 @@ var prediction_form = new PredictionForm(future_form_selection, query_graph.grap
 // Append the svg canvas to the page
 // var prediction_graph = new PredictionGraph(prediction_graph_selection1, prediction_graph_selection2, reactor);
 
-},{"./external/d3.min.v4.js":3,"./external/reactor.js":5,"./query_system/query_form.js":8,"./query_system/query_graph.js":9,"./sankey_visualization/prediction_form.js":11,"./sankey_visualization/prediction_graph.js":12}],8:[function(require,module,exports){
+},{"./external/d3.min.v4.js":3,"./external/reactor.js":5,"./query_system/query_form.js":8,"./query_system/query_graph.js":9,"./sankey_visualization/prediction_form.js":11,"./sankey_visualization/prediction_graph.js":12,"./util.js":13}],8:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
     json_config = require("../config.js");
@@ -1680,7 +1684,7 @@ function PredictionForm(future_form_selection, graph, reactor) {
 
         console.log(posted_data);
 
-        $(".content").slideToggle(200);
+        $(".content:visible").slideToggle(200);
 
 
         $.post("http://localhost:5000/", posted_data, function (data) {
@@ -1933,4 +1937,22 @@ PredictionGraph.prototype.updateResult = function (graph) {
 };
 
 module.exports = PredictionGraph;
-},{"../config.js":1,"../external/d3.min.v4.js":3,"../external/sankey.js":6}]},{},[7]);
+},{"../config.js":1,"../external/d3.min.v4.js":3,"../external/sankey.js":6}],13:[function(require,module,exports){
+function toggle_button(b_id, b_class, b_desc) {
+    $(b_id).click(function () {
+        $(b_class).slideToggle(200);
+
+        if ($(b_id).text() == b_desc + ' ▽') {
+            $(b_id).html(b_desc + ' &#9651');
+        }
+        else {
+            $(b_id).html(b_desc + ' &#9661');
+        }
+    });
+}
+
+module.exports = {
+    toggleButton: toggle_button,
+};
+
+},{}]},{},[7]);

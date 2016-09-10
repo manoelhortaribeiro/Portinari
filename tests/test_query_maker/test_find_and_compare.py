@@ -1,6 +1,4 @@
 from backend.query_maker.find_and_compare import match_time_sequence
-import functools
-import timeit
 import unittest
 
 
@@ -41,7 +39,6 @@ class TestFindAndCompare(unittest.TestCase):
         self.assertEqual(f(_str, _dia, _tim, _exm), (True, [15, 5]))
         print("--> y skip, y time, y exam, y future - OK")
 
-
     def test_pathological_case(self):
         f = match_time_sequence
 
@@ -49,13 +46,9 @@ class TestFindAndCompare(unittest.TestCase):
         _str = "t10d11t10d10"*10
         _dia, _tim, _exm = [10, 11, 15], [(0, 10000000), (0, 10000000)], [(0, 100), (0, 100)]
         self.assertEqual(f(_str, _dia, _tim, _exm), (False, []))
-
-        partial = functools.partial(f, _str, _dia, _tim, _exm)
-        print(timeit.timeit(partial, number=100))
+        _str = "t10d11t10d10"*10
         _dia, _tim, _exm = [10, 11, 15], [(0, 20), (0, 20)], [(0, 100), (0, 100)]
-        partial = functools.partial(f, _str, _dia, _tim, _exm)
-        print(timeit.timeit(partial, number=100))
-
-        print("--> n skip, n time, n exam, n future - OK")
+        self.assertEqual(f(_str, _dia, _tim, _exm), (False, []))
+        print("--> pathological case - OK")
 
 

@@ -55,9 +55,9 @@ def index():
                         else:
                             individuals = np.intersect1d(tmp, individuals)
 
-        print(len(individuals), individuals) 
-
-        print(patients[patients['PatientID'].isin(individuals)])
+        print(len(individuals), individuals)
+        patients_of_interest = patients[patients['PatientID'].isin(individuals)]
+        print(patients_of_interest)
 
     return "Hello World!"
 
