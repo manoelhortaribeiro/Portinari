@@ -288,7 +288,7 @@ GC.prototype.updateGraph = function () {
 
         if (isStart && isEnd) return ' ';
         else if (isStart) return 'start';
-        else if (isEnd) return 'end';
+        else if(isEnd) return 'end';
         else return ' ';
 
     });

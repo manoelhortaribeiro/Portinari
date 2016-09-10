@@ -144,6 +144,7 @@ body {
     background-color: $bg-color;
     border: $light-border;
     margin: $three-px;
+
     form {
       text-align: center;
       margin: $three-px;
@@ -251,7 +252,6 @@ body {
   }
 
   #forms-menu {
-
     height: 100%;
     background-color: $secondary-color;
 
@@ -267,6 +267,7 @@ body {
       background-color: $bg-color;
       border: $light-border;
       margin: $three-px;
+
       ul {
         list-style: none;
         text-align: center;

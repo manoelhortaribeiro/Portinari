@@ -1363,7 +1363,7 @@ GC.prototype.updateGraph = function () {
 
         if (isStart && isEnd) return ' ';
         else if (isStart) return 'start';
-        else if (isEnd) return 'end';
+        else if(isEnd) return 'end';
         else return ' ';
 
     });
@@ -1555,7 +1555,7 @@ function calcEdgePath(d, consts) {
 function Node(coor, id) {
     /* Node constructor */
     // Class name, id and id name
-    this.className = conf.nodeClass; this.name = "n" + id; this.id = id;
+    this.className = conf.QUERY_SYSTEM.nodeClass; this.name = "n" + id; this.id = id;
     // Constraints and display values
     this.key_op_value = []; this.display_value = [];
     // Coordinates of the node
@@ -1565,7 +1565,7 @@ function Node(coor, id) {
 function Edge(src, dst, id, kind) {
     /* Edge constructor */
     // Class name, id and id name
-    this.className = conf.edgeClass; this.name = "e" + id; this.id = id;
+    this.className = conf.QUERY_SYSTEM.edgeClass; this.name = "e" + id; this.id = id;
     // Constraints and display values
     this.key_op_value = []; this.display_value = [];
     // Source and destination names

@@ -5,7 +5,6 @@ import numpy as np
 import pandas
 import json
 
-
 app = Flask(__name__)
 
 exams_table = pandas.read_csv('./data/exams_table.csv', sep=',', index_col=False,
@@ -35,11 +34,10 @@ def index():
         jload = json.loads
         nodes, edges = jload(request.form['nodes']), jload(request.form['edges'])
         outcomes, future_nodes = jload(request.form['outcomes']), jload(request.form['future_nodes'])
-        prediction_attr = jload(request.form['prediction_attr']), jload(request.form['id'])
+        prediction_attr, id_attr = jload(request.form['prediction_attr']), jload(request.form['id'])
 
-
-
-
+        print(prediction_attr, id_attr)
+        #get_individuals(nodes, edges, individuals_table, exams_table)
     return "Hello World!"
 
 
