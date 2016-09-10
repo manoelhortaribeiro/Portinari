@@ -25,12 +25,14 @@ module.exports = {
 
     QUERY_FORM:{
         nodeAttributes: databaseinfo.outcome_attributes,
-        ID: "ID"
+        ID: databaseinfo
     }
-
 };
 },{"./databaseinfo.json":2}],2:[function(require,module,exports){
 module.exports={
+
+  "id_attribute": "ID",
+
   "outcome_attributes": [
     {
       "name": "Diagnosis",
@@ -38,6 +40,7 @@ module.exports={
       "type": "Diagnosis"
     }
   ],
+
   "node_attributes": [
     {
       "name": "Birthdate",
@@ -85,6 +88,7 @@ module.exports={
       "type": "ExamType"
     }
   ],
+
   "edge_attributes": [
     {
       "name": "TimeSinceLast",
@@ -97,6 +101,7 @@ module.exports={
       "type": "Number"
     }
   ],
+
   "types": {
     "Month": {
       "constraints": [
@@ -716,57 +721,73 @@ d3.sankey = function() {
 };
 
 },{"./d3.min.v4.js":3}],7:[function(require,module,exports){
-var d3 = require("./external/d3.min.v4.js"),
-    QueryForm = require("./query_system/query_form.js"),
-    QueryGraph = require("./query_system/query_graph.js"),
-    PredictionForm = require("./sankey_visualization/prediction_form.js"),
-    PredictionGraph = require("./sankey_visualization/prediction_graph.js"),
-    Reactor = require("./external/reactor.js"),
-    Utils = require("./util.js");
-
+/* ----------------------------- */
 /* ---  Initialization Stuff --- */
+/* ----------------------------- */
 
-var reactor = new Reactor(); // Creates reactor pattern
+// Import modules
+var d3 = require("./external/d3.min.v4.js"),
+    Reactor = require("./external/reactor.js");
 
+// Creates reactor
+var reactor = new Reactor();
 
-/* ---  Interface Related Stuff --- */
+/* ------------------------ */
+/* ---  Interface Stuff --- */
+/* ------------------------ */
 
+// Creates modules
+var Utils = require("./util.js");
+
+// Configures query button
 Utils.toggleButton("#expand-query-button", ".content_query", "Query");
 
-
+/* --------------------- */
 /* ---  Query System --- */
+/* --------------------- */
 
-// Register events
+/* ---Internal Query System Events--- */
 reactor.registerEvent('selected_node_changed');
 reactor.registerEvent('constraint_added');
 reactor.registerEvent('outcome_added');
+/* ---------------------------------- */
 
-// Create needed selections
+// Creates needed selections
 var query_graph_selection = d3.select("#query-interface-graph"),
     query_form_selection = d3.select("#query-interface-form"),
     query_current_selection = d3.select("#query-interface-current"),
     outcomes_form_selection = d3.select("#query-outcomes-form"),
     outcomes_current_selection = d3.select("#query-outcomes-current");
 
+// Import modules
+var QueryForm = require("./query_system/query_form.js"),
+    QueryGraph = require("./query_system/query_graph.js");
+
 // Creates query graph interface
 var query_graph = new QueryGraph(query_graph_selection, reactor);
 
 // Creates query form interface
-var query_form = new QueryForm(query_form_selection,
-    query_current_selection,
-    outcomes_form_selection,
-    outcomes_current_selection,
-    reactor);
+var query_form = new QueryForm(query_form_selection, query_current_selection,
+    outcomes_form_selection, outcomes_current_selection, reactor);
 
-/* ---  Prediction System --- */
+/* ------------------------------------ */
+/* ---  Prognosis Prediction System --- */
+/* ------------------------------------ */
 
+// Creates needed selections
 var future_form_selection = d3.select("#form-future-nodes");
+
+// Import modules
+var PredictionForm = require("./sankey_visualization/prediction_form.js"),
+    PredictionGraph = require("./sankey_visualization/prediction_graph.js");
 
 // Creates prediction form interface
 var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
 
-//reactor.registerEvent('query_successful');
 
+// IM HERE!
+
+//reactor.registerEvent('query_successful');
 // var future_form_selection = d3.select("#form-future-nodes");
 //var prediction_graph_selection1 = d3.select("#query-results1");
 //var prediction_graph_selection2 = d3.select("#query-results2");
@@ -1342,7 +1363,7 @@ GC.prototype.updateGraph = function () {
 
         if (isStart && isEnd) return ' ';
         else if (isStart) return 'start';
-        else if(isEnd) return 'end';
+        else if (isEnd) return 'end';
         else return ' ';
 
     });
@@ -1433,46 +1454,6 @@ GC.prototype.updateGraph = function () {
         .exit()
         .remove();
 
-
-    /*
-     // -- InText/Edges--
-     var text = thisGraph.svg
-     .select("g." + thisGraph.config.innerTextEdgeClass)
-     .selectAll("text");
-     var data = thisGraph.graph.edges;
-     var modifier = -10;
-     // -- enter
-     var aux = text.data(data, function (d) {
-     return d.name;
-     }).enter()
-     .append("text")
-     .attr("x", function (d) {
-     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
-     })
-     .attr("y", function (d) {
-     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
-     })
-     .attr("text-anchor", "middle")
-     .text(function (d) {
-     return " " + d.name + " ";
-     });
-     // -- update
-     text.data(data, function (d) {
-     return d.name;
-     }).attr("x", function (d) {
-     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
-     })
-     .attr("y", function (d) {
-     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
-     });
-     // -- exit
-     text.data(data, function (d) {
-     return d.name;
-     }).exit()
-     .remove();
-     */
-
-
     // -- OutText/Edges --
     var text = thisGraph.svg
         .select("g." + thisGraph.config.outerTextEdgeClass)
@@ -1524,85 +1505,82 @@ GC.prototype.getGraph = function () {
 module.exports = GC;
 
 },{"../config.js":1,"../external/d3.min.v4.js":3,"./utils.js":10}],10:[function(require,module,exports){
-var json_config = require("../config.js");
+var conf = require("../config.js");
 
-function canDo(tmp_x, tmp_y, radius, aspect, nodes, node) {
 
+function canDo(tmp_x, tmp_y, r, aspect, nodes, node) {
+    /* Checks if you can create a node in the specific location given the coordinates */
     var can = true;
 
-    if (radius + tmp_x > aspect[2] ||
-        tmp_x - radius < aspect[0] ||
-        radius + tmp_y > aspect[3] ||
-        tmp_y - radius < aspect[1]) {
-        can = false;
-    }
+    // if it is on the borders, then false
+    if (r + tmp_x > aspect[2] || tmp_x - r < aspect[0] || r + tmp_y > aspect[3] || tmp_y - r < aspect[1]) can = false;
 
+    // else if it is too close to another node, then also false!
     nodes.forEach(function (n) {
         var dist = Math.sqrt(Math.pow(tmp_x - n.x, 2) + Math.pow(tmp_y - n.y, 2));
-        console.log(dist);
-
-        if (dist <= 2 * radius && (typeof node == "undefined" || node.id != n.id)) {
-            can = false;
-        }
+        if (dist <= 2 * r && (typeof node == "undefined" || node.id != n.id)) can = false;
     });
 
+    // else, can is true!
     return can;
 }
 
-function internalCalc(d, consts) {
-    var vx = d.dst.x - d.src.x;
-    var vy = d.dst.y - d.src.y;
-    var norm = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
-    vx = vx / norm;
-    vy = vy / norm;
-    var pos_xs = d.src.x + vx * consts;
-    var pos_ys = d.src.y + vy * consts;
-    var pos_xd = d.dst.x - vx * consts;
-    var pos_yd = d.dst.y - vy * consts;
+function _internalCalc(d, consts) {
+    /* Calculates the edge in the weird SVG way */
+
+    var vx = d.dst.x - d.src.x, vy = d.dst.y - d.src.y,
+        norm = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
+
+    vx = vx / norm; vy = vy / norm;
+
+    var pos_xs = d.src.x + vx * consts, pos_ys = d.src.y + vy * consts,
+        pos_xd = d.dst.x - vx * consts, pos_yd = d.dst.y - vy * consts;
+
     return [pos_xd, pos_xs, pos_yd, pos_ys];
 }
 
 function calcTextEdgePath(d, consts, mod) {
-    var result = internalCalc(d, consts);
+    /* Gives the edge description for the d3 thingy */
+
+    var result = _internalCalc(d, consts);
     return [(result[0] + result[1]) / 2, (result[2] + result[3]) / 2 + mod];
 }
 
 function calcEdgePath(d, consts) {
-    var result = internalCalc(d, consts);
+    /* Gives the edge description for the SVG thingy */
+    var result = _internalCalc(d, consts);
     return "M" + result[1] + " " + result[3] + " L" + result[0] + " " + result[2];
 }
 
-function Node(coordinates, id) {
-    this.className = "Node";
-    this.name = "n" + id;
-    this.label = "Event";
-    this.key_op_value = [];
-    this.display_value = [];
-    this.x = coordinates[0];
-    this.y = coordinates[1];
-    this.id = id;
+function Node(coor, id) {
+    /* Node constructor */
+    // Class name, id and id name
+    this.className = conf.nodeClass; this.name = "n" + id; this.id = id;
+    // Constraints and display values
+    this.key_op_value = []; this.display_value = [];
+    // Coordinates of the node
+    this.x = coor[0]; this.y = coor[1];
 }
 
 function Edge(src, dst, id, kind) {
-    var thisEdge = this;
-    this.className = "Edge";
-    this.name = "e" + id;
-    this.label = "";
-    this.source = src.name;
-    this.destination = dst.name;
-    this.key_op_value = [];
-    this.display_value = [];
+    /* Edge constructor */
+    // Class name, id and id name
+    this.className = conf.edgeClass; this.name = "e" + id; this.id = id;
+    // Constraints and display values
+    this.key_op_value = []; this.display_value = [];
+    // Source and destination names
+    this.source = src.name; this.destination = dst.name;
+    // Pointers to source and destination nodes
+    this.src = src; this.dst = dst;
+    // Kind of edge, directed or undirected
     this.kind = kind;
-    this.src = src;
-    this.dst = dst;
-    this.id = id;
 }
 
 module.exports = {
     Node: Node,
     Edge: Edge,
     calcEdgePath: calcEdgePath,
-    calcTextEdgePath: calcTextEdgePath,
+    calcTextEdgePath : calcTextEdgePath,
     canDo: canDo
 };
 
@@ -1943,21 +1921,17 @@ module.exports = PredictionGraph;
 },{"../config.js":1,"../external/d3.min.v4.js":3,"../external/sankey.js":6}],13:[function(require,module,exports){
 var $ = require("./external/jquery.min.js");
 
-
 function toggle_button(b_id, b_class, b_desc) {
+    /* Makes the button toggle the section with id! */
     $(b_id).click(function () {
         $(b_class).slideToggle(200);
-
-        if ($(b_id).text() == b_desc + ' ▽') {
-            $(b_id).html(b_desc + ' &#9651');
-        }
-        else {
-            $(b_id).html(b_desc + ' &#9661');
-        }
+        if ($(b_id).text() == b_desc + ' ▽') $(b_id).html(b_desc + ' &#9651');
+        else $(b_id).html(b_desc + ' &#9661');
     });
 }
 
 function toggle_if_visible(b_id) {
+    /* Toggles button if the section is visible! */
     $(b_id + ":visible").click();
 }
 

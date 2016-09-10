@@ -1,4 +1,7 @@
 {
+
+  "id_attribute": "ID",
+
   "outcome_attributes": [
     {
       "name": "Diagnosis",
@@ -6,6 +9,7 @@
       "type": "Diagnosis"
     }
   ],
+
   "node_attributes": [
     {
       "name": "Birthdate",
@@ -53,6 +57,7 @@
       "type": "ExamType"
     }
   ],
+
   "edge_attributes": [
     {
       "name": "TimeSinceLast",
@@ -65,6 +70,7 @@
       "type": "Number"
     }
   ],
+
   "types": {
     "Month": {
       "constraints": [

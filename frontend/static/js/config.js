@@ -24,7 +24,6 @@ module.exports = {
 
     QUERY_FORM:{
         nodeAttributes: databaseinfo.outcome_attributes,
-        ID: "ID"
+        ID: databaseinfo
     }
-
 };

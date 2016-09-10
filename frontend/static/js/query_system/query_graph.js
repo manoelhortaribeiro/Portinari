@@ -288,7 +288,7 @@ GC.prototype.updateGraph = function () {
 
         if (isStart && isEnd) return ' ';
         else if (isStart) return 'start';
-        else if(isEnd) return 'end';
+        else if (isEnd) return 'end';
         else return ' ';
 
     });
@@ -378,46 +378,6 @@ GC.prototype.updateGraph = function () {
     })
         .exit()
         .remove();
-
-
-    /*
-     // -- InText/Edges--
-     var text = thisGraph.svg
-     .select("g." + thisGraph.config.innerTextEdgeClass)
-     .selectAll("text");
-     var data = thisGraph.graph.edges;
-     var modifier = -10;
-     // -- enter
-     var aux = text.data(data, function (d) {
-     return d.name;
-     }).enter()
-     .append("text")
-     .attr("x", function (d) {
-     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
-     })
-     .attr("y", function (d) {
-     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
-     })
-     .attr("text-anchor", "middle")
-     .text(function (d) {
-     return " " + d.name + " ";
-     });
-     // -- update
-     text.data(data, function (d) {
-     return d.name;
-     }).attr("x", function (d) {
-     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
-     })
-     .attr("y", function (d) {
-     return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
-     });
-     // -- exit
-     text.data(data, function (d) {
-     return d.name;
-     }).exit()
-     .remove();
-     */
-
 
     // -- OutText/Edges --
     var text = thisGraph.svg

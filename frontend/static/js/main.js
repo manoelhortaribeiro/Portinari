@@ -1,54 +1,70 @@
-var d3 = require("./external/d3.min.v4.js"),
-    QueryForm = require("./query_system/query_form.js"),
-    QueryGraph = require("./query_system/query_graph.js"),
-    PredictionForm = require("./sankey_visualization/prediction_form.js"),
-    PredictionGraph = require("./sankey_visualization/prediction_graph.js"),
-    Reactor = require("./external/reactor.js"),
-    Utils = require("./util.js");
-
+/* ----------------------------- */
 /* ---  Initialization Stuff --- */
+/* ----------------------------- */
 
-var reactor = new Reactor(); // Creates reactor pattern
+// Import modules
+var d3 = require("./external/d3.min.v4.js"),
+    Reactor = require("./external/reactor.js");
 
+// Creates reactor
+var reactor = new Reactor();
 
-/* ---  Interface Related Stuff --- */
+/* ------------------------ */
+/* ---  Interface Stuff --- */
+/* ------------------------ */
 
+// Creates modules
+var Utils = require("./util.js");
+
+// Configures query button
 Utils.toggleButton("#expand-query-button", ".content_query", "Query");
 
-
+/* --------------------- */
 /* ---  Query System --- */
+/* --------------------- */
 
-// Register events
+/* ---Internal Query System Events--- */
 reactor.registerEvent('selected_node_changed');
 reactor.registerEvent('constraint_added');
 reactor.registerEvent('outcome_added');
+/* ---------------------------------- */
 
-// Create needed selections
+// Creates needed selections
 var query_graph_selection = d3.select("#query-interface-graph"),
     query_form_selection = d3.select("#query-interface-form"),
     query_current_selection = d3.select("#query-interface-current"),
     outcomes_form_selection = d3.select("#query-outcomes-form"),
     outcomes_current_selection = d3.select("#query-outcomes-current");
 
+// Import modules
+var QueryForm = require("./query_system/query_form.js"),
+    QueryGraph = require("./query_system/query_graph.js");
+
 // Creates query graph interface
 var query_graph = new QueryGraph(query_graph_selection, reactor);
 
 // Creates query form interface
-var query_form = new QueryForm(query_form_selection,
-    query_current_selection,
-    outcomes_form_selection,
-    outcomes_current_selection,
-    reactor);
+var query_form = new QueryForm(query_form_selection, query_current_selection,
+    outcomes_form_selection, outcomes_current_selection, reactor);
 
-/* ---  Prediction System --- */
+/* ------------------------------------ */
+/* ---  Prognosis Prediction System --- */
+/* ------------------------------------ */
 
+// Creates needed selections
 var future_form_selection = d3.select("#form-future-nodes");
+
+// Import modules
+var PredictionForm = require("./sankey_visualization/prediction_form.js"),
+    PredictionGraph = require("./sankey_visualization/prediction_graph.js");
 
 // Creates prediction form interface
 var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
 
-//reactor.registerEvent('query_successful');
 
+// IM HERE!
+
+//reactor.registerEvent('query_successful');
 // var future_form_selection = d3.select("#form-future-nodes");
 //var prediction_graph_selection1 = d3.select("#query-results1");
 //var prediction_graph_selection2 = d3.select("#query-results2");
