@@ -1,6 +1,5 @@
 var conf = require("../config.js");
 
-
 function canDo(tmp_x, tmp_y, r, aspect, nodes, node) {
     /* Checks if you can create a node in the specific location given the coordinates */
     var can = true;

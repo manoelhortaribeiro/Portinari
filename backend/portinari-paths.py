@@ -1,30 +1,15 @@
 from query_maker.get_individuals import get_individuals
+from data_and_input_handling.reads_dataset import reads_dataset
 from flask_cors import cross_origin
 from flask import Flask, request
-import numpy as np
-import pandas
+import config
 import json
 
 app = Flask(__name__)
 
-exams_table = pandas.read_csv('./data/exams_table.csv', sep=',', index_col=False,
-                              dtype={'PatientID': np.uint32,
-                               'DiagnosisDate': str,
-                               'DiagnosisNbr': np.uint8,
-                               'ExamType': str,
-                               'Diagnosis': np.uint8,
-                               'MorphologyCode': str,
-                               'Stage': str,
-                               'LaboratoryNbr': np.uint8,
-                               'Region':  np.uint8,
-                               'TimeSinceLast': np.int16}, engine='c')
-
-individuals_table = pandas.read_csv('./data/patients_table.csv', sep=',', index_col=False,
-                                    dtype={'Birthdate': str,
-                                  'CensorDate': str,
-                                  'PatientID': np.uint32,
-                                  'StringRep': str}, engine='c')
-
+# Reads the dataset on initialization
+reads_dataset(config.event_table_name, config.event_table_description,
+              config.individuals_table_name, config.individuals_table_description)
 
 @app.route('/', methods=['POST'])
 @cross_origin()
@@ -36,7 +21,7 @@ def index():
         outcomes, future_nodes = jload(request.form['outcomes']), jload(request.form['future_nodes'])
         prediction_attr, id_attr = jload(request.form['prediction_attr']), jload(request.form['id'])
 
-        print(prediction_attr, id_attr)
+        print(nodes, edges)
         #get_individuals(nodes, edges, individuals_table, exams_table)
     return "Hello World!"
 

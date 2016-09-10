@@ -774,6 +774,10 @@ var query_form = new QueryForm(query_form_selection, query_current_selection,
 /* ---  Prognosis Prediction System --- */
 /* ------------------------------------ */
 
+/* ---Internal Query System Events--- */
+reactor.registerEvent('query_successful');
+/* ---------------------------------- */
+
 // Creates needed selections
 var future_form_selection = d3.select("#form-future-nodes");
 
@@ -784,14 +788,10 @@ var PredictionForm = require("./sankey_visualization/prediction_form.js"),
 // Creates prediction form interface
 var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
 
-
-// IM HERE!
-
-//reactor.registerEvent('query_successful');
+// reactor.registerEvent('query_successful');
 // var future_form_selection = d3.select("#form-future-nodes");
-//var prediction_graph_selection1 = d3.select("#query-results1");
-//var prediction_graph_selection2 = d3.select("#query-results2");
-
+// var prediction_graph_selection1 = d3.select("#query-results1");
+// var prediction_graph_selection2 = d3.select("#query-results2");
 // Append the svg canvas to the page
 // var prediction_graph = new PredictionGraph(prediction_graph_selection1, prediction_graph_selection2, reactor);
 
@@ -804,19 +804,18 @@ function FormHandler(qif, qic, qcf, qcc, reactor) {
 
     var thisForm = this;
 
-    // ** Config
+    // -- Config
     thisForm.config = json_config.QUERY_SYSTEM;
     thisForm.reactor = reactor;
     thisForm.reactor.addEventListener('selected_node_changed', this.updateForm.bind(this));
 
-    // ** Model
+    // -- Model
     // constraints forms
     thisForm.qif = qif;
     thisForm.qif.append("p").text("select a node or edge to add constraints");
     thisForm.qic = qic;
     thisForm.qic.append("p").text("select a node to see its constraints");
     thisForm.form = qif.append("form");
-
     // outcome forms
     thisForm.qcf = qcf;
     thisForm.qcc = qcc;
@@ -838,9 +837,7 @@ FormHandler.prototype.updateForm = function (element) {
 
     // in case someone just deleted a node, returns
     if (element == undefined) {
-        if (thisForm.qic.select("p").empty()) {
-            thisForm.qic.append("p").text("select a node to see its constraints");
-        }
+        if (thisForm.qic.select("p").empty()) thisForm.qic.append("p").text("select a node to see its constraints");
         thisForm.qif.append("p").text("select a node or edge to add constraints");
         thisForm.qic.select("ul").selectAll("li").remove();
         return;
@@ -851,12 +848,8 @@ FormHandler.prototype.updateForm = function (element) {
 
     // get the attributes
     var attributes;
-    if (element.className == thisForm.config.nodeClass) {
-        attributes = thisForm.config.nodeAttributes;
-    }
-    else {
-        attributes = thisForm.config.edgeAttributes;
-    }
+    if (element.className == thisForm.config.nodeClass) attributes = thisForm.config.nodeAttributes;
+    else attributes = thisForm.config.edgeAttributes;
 
     make_form(thisForm.form, thisForm.qic, "constraints", attributes, thisForm, constraints_form_callback)
 };
@@ -1051,18 +1044,14 @@ function updateConstraints(form, current, element) {
 function attr_getter(id, oper, val) {
 
     var aux = $(id).val();
-
     var id_text = d3.select(id + " [value='" + aux + "']").text();
-
     var type_name = d3.select(id + " [value=" + aux + "]").attr("type");
 
     aux = $(oper).val();
-
     var oper_text = d3.select(oper + " [value='" + aux + "']").text();
 
-    if (type_name == "Month" || type_name == "Number" || type_name == "TimeInterval") {
+    if (type_name == "Month" || type_name == "Number" || type_name == "TimeInterval")
         return id_text + " " + oper_text + " " + $(val).val();
-    }
 
     aux = $(val).val();
     var value_text = d3.select(val + " [value='" + aux + "']").text();
@@ -1506,7 +1495,6 @@ module.exports = GC;
 
 },{"../config.js":1,"../external/d3.min.v4.js":3,"./utils.js":10}],10:[function(require,module,exports){
 var conf = require("../config.js");
-
 
 function canDo(tmp_x, tmp_y, r, aspect, nodes, node) {
     /* Checks if you can create a node in the specific location given the coordinates */
