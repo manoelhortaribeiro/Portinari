@@ -3,15 +3,18 @@ var d3 = require("./external/d3.min.v4.js"),
     QueryGraph = require("./query_system/query_graph.js"),
     PredictionForm = require("./sankey_visualization/prediction_form.js"),
     PredictionGraph = require("./sankey_visualization/prediction_graph.js"),
-    Reactor = require("./external/reactor.js");
-    Utils = require("./util.js")
+    Reactor = require("./external/reactor.js"),
+    Utils = require("./util.js");
 
+/* ---  Initialization Stuff --- */
+
+var reactor = new Reactor(); // Creates reactor pattern
+
+
+/* ---  Interface Related Stuff --- */
 
 Utils.toggleButton("#expand-query-button", ".content_query", "Query");
 
-
-// Creates reactor pattern
-var reactor = new Reactor();
 
 /* ---  Query System --- */
 
@@ -21,11 +24,11 @@ reactor.registerEvent('constraint_added');
 reactor.registerEvent('outcome_added');
 
 // Create needed selections
-var query_graph_selection = d3.select("#query-interface-graph");
-var query_form_selection = d3.select("#query-interface-form");
-var query_current_selection = d3.select("#query-interface-current");
-var outcomes_form_selection = d3.select("#query-outcomes-form");
-var outcomes_current_selection = d3.select("#query-outcomes-current");
+var query_graph_selection = d3.select("#query-interface-graph"),
+    query_form_selection = d3.select("#query-interface-form"),
+    query_current_selection = d3.select("#query-interface-current"),
+    outcomes_form_selection = d3.select("#query-outcomes-form"),
+    outcomes_current_selection = d3.select("#query-outcomes-current");
 
 // Creates query graph interface
 var query_graph = new QueryGraph(query_graph_selection, reactor);

@@ -11,7 +11,7 @@ def to_unix(s):
     :return: Number of days in the unix time or empty string.
     """
     day_ms = 86400
-    return "" if s == "" else int(int(time.mktime(datetime.datetime.strptime(s, "%d.%m.%Y").timetuple()))/day_ms)
+    return "" if s == "" else int(int(time.mktime(datetime.datetime.strptime(s, "%d.%m.%Y").timetuple())) / day_ms)
 
 
 def pre_process(path, dest):
@@ -48,5 +48,4 @@ def pre_process(path, dest):
 
 
 if __name__ == "__main__":
-
     pre_process("opencrab.csv", "opencrab_processed.csv")

@@ -1,7 +1,5 @@
 import numpy as np
 import regex
-import functools
-import timeit
 import sys
 
 

@@ -1,3 +1,6 @@
+var $ = require("./external/jquery.min.js");
+
+
 function toggle_button(b_id, b_class, b_desc) {
     $(b_id).click(function () {
         $(b_class).slideToggle(200);
@@ -11,6 +14,11 @@ function toggle_button(b_id, b_class, b_desc) {
     });
 }
 
+function toggle_if_visible(b_id) {
+    $(b_id + ":visible").click();
+}
+
 module.exports = {
     toggleButton: toggle_button,
+    toggleIfVisible: toggle_if_visible
 };

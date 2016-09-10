@@ -17,14 +17,22 @@
 
 <body>
 <div class="container-fluid">
+
+    <!-- Title -->
     <h1>portinari</h1>
 
+    <!--------------------->
+    <!-- UPPER INTERFACE -->
+    <!--------------------->
+
+    <!-- Upper Menu -->
     <div id="toggle-menu">
         <button type="button" class="btn btn-primary btn-xs" id="expand-query-button">Query &#9661;</button>
-        <button type="button" class="btn btn-info btn-xs" id="tutorial-button">Tutorial &#9661;</button>
-        <button type="button" class="btn btn-default btn-xs" id="about-button">About &#9661;</button>
+        <button type="button" class="btn btn-info btn-xs" id="tutorial-button">Tutorial</button>
+        <button type="button" class="btn btn-default btn-xs" id="about-button">About</button>
     </div>
 
+    <!-- Query System -->
     <div class="col-md-12 content_query content" id="query-system">
         <div class="col-md-8" id="query-interface-graph">
             <!-- query interface goes here goes here -->
@@ -58,37 +66,40 @@
         </div>
     </div>
 
+    <!-- TODO: Tutorial -->
+
+    <!-- TODO: About -->
+
     <br>
 
-    <!-- Im here -->
+    <!--------------------->
+    <!-- LOWER INTERFACE -->
+    <!--------------------->
 
+    <!-- Navigation Tabs -->
     <ul class="nav nav-tabs" id="nav-menu">
         <li class="active"><a data-toggle="tab" href="#vis-prog">Visualize Prognosis</a></li>
-     <!--    <li><a data-toggle="tab" href="#vis-coh">Visualize Cohort</a></li>
-        <li><a data-toggle="tab" href="#compare">Compare</a></li>
-        <li><a data-toggle="tab" href="#mine">Mine</a></li>-->
+        <!-- TODO as I implement these functionalities on the backend -->
+        <!-- <li><a data-toggle="tab" href="#vis-coh">Visualize Cohort</a></li> -->
+        <!-- <li><a data-toggle="tab" href="#compare">Compare</a></li> -->
+        <!-- <li><a data-toggle="tab" href="#mine">Mine</a></li> -->
     </ul>
 
+    <!-- Navigation Contents -->
     <div class="tab-content">
         <div id="vis-prog" class="tab-pane fade in active">
             <div id="form-future-nodes" class="form"></div>
         </div>
-        <!--
-        <div id="vis-coh" class="tab-pane fade">
-            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                consequat.</p>
-        </div>
-        <div id="compare" class="tab-pane fade">
-            <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-        </div>
-        <div id="mine" class="tab-pane fade">
-            <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-        </div>
-        -->
+        <!-- TODO as I implement these functionalities on the backend -->
+        <!-- <div id="vis-coh" class="tab-pane fade"> </div> -->
+        <!-- <div id="compare" class="tab-pane fade"> </div> -->
+        <!-- <div id="mine" class="tab-pane fade"> </div> -->
     </div>
 
+    <!-- TODO: Footer -->
+
+    <!-- Where magic happens! -->
     <script src="../static/js/bundle.js"></script>
 </div>
-
 </body>
 </html>
