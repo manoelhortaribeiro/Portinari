@@ -1,4 +1,4 @@
-var $ = require("./external/jquery.min.js");
+var $ = require("../external/jquery.min.js");
 
 function toggle_button(b_id, b_class, b_desc) {
     /* Makes the button toggle the section with id! */

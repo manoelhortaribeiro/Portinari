@@ -1,5 +1,5 @@
 var d3 = require("../external/d3.min.v4.js"),
-    json_config = require("../config.js");
+    json_config = require("../config/config.js");
 
 require("../external/sankey.js");
 

@@ -1,6 +1,6 @@
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
-    json_config = require("../config.js");
+    json_config = require("../config/config.js");
 
 function FormHandler(qif, qic, qcf, qcc, reactor) {
 

@@ -14,7 +14,7 @@ var reactor = new Reactor();
 /* ------------------------ */
 
 // Creates modules
-var Utils = require("./util.js");
+var Utils = require("./util/util.js");
 
 // Configures query button
 Utils.toggleButton("#expand-query-button", ".content_query", "Query");

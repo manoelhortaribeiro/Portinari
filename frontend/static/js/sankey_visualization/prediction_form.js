@@ -1,7 +1,7 @@
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
-    json_config = require("../config.js"),
-    Utils = require("../util.js");
+    json_config = require("../config/config.js"),
+    Utils = require("../util/util.js");
 
 function PredictionForm(future_form_selection, graph, reactor) {
 
