@@ -1,7 +1,7 @@
+from preprocessing.format_rows import to_unix, pre_process
 import unittest
 import csv
 import os
-from preprocessing.format_rows import to_unix, pre_process
 
 
 class TestFormatRows(unittest.TestCase):

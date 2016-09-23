@@ -11,6 +11,7 @@ def get_first_pdseries(series):
     :param series: panda series.
     :return: First value of the first element.
     """
+
     return series.head(1).values[0]
 
 
@@ -72,8 +73,7 @@ def make_exams_tables(rows_to_drop, df, dest):
                        'stage': 'Stage',
                        'lab_nr': 'LaboratoryNbr',
                        'reg': 'Region',
-                       'sincelast': 'TimeSinceLast'
-                       }, inplace=True)
+                       'sincelast': 'TimeSinceLast'}, inplace=True)
 
     df.to_csv(dest, mode='w', index=False)
 

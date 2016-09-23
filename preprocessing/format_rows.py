@@ -1,6 +1,6 @@
-import csv
 import datetime
 import time
+import csv
 
 
 def to_unix(s):
@@ -10,6 +10,7 @@ def to_unix(s):
     :param s: Date string or empty string.
     :return: Number of days in the unix time or empty string.
     """
+
     day_ms = 86400
     return "" if s == "" else int(int(time.mktime(datetime.datetime.strptime(s, "%d.%m.%Y").timetuple())) / day_ms)
 
@@ -48,4 +49,5 @@ def pre_process(path, dest):
 
 
 if __name__ == "__main__":
+
     pre_process("opencrab.csv", "opencrab_processed.csv")
