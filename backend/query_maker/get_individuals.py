@@ -1,10 +1,9 @@
 from query_interpreter.graph_maker import Graph
+from query_maker.find_and_compare import match_time_sequence
 import numpy as np
+import functools
+import pandas
 import config
-
-
-def apply_matching(x):
-    print(x['StringRep'])
 
 
 def get_constraint(key_values, name, operator, not_found_return):
@@ -48,8 +47,7 @@ def get_query_matching_values(graph, paths):
 
         diags.append(diag), times.append(time), exams.append(exam)
 
-    print(diags, times, exams)
-    return True
+    return diags, times, exams
 
 
 def filter_by_attributes(graph, paths, individuals_table, exams_table):
@@ -76,9 +74,12 @@ def get_individuals(nodes, edges, individuals_table, exams_table):
     paths = graph.make_maximal_paths()
 
     # Get query matching string
-    matching_string = get_query_matching_values(graph, paths)
+    diags, times, exams = get_query_matching_values(graph, paths)
+
+    print(diags, times, exams)
 
     # Filter by attributes
-    patients_of_interest = filter_by_attributes(graph, paths, individuals_table, exams_table)
-
-    # pandas.DataFrame(patients_of_interest).apply(apply_matching, axis=1)
+    for d, t, e in zip(diags, times, exams):
+        patients_of_interest = filter_by_attributes(graph, paths, individuals_table, exams_table)
+        f = functools.partial(match_time_sequence, diagnosis=d, time=t, exams_range=e)
+        result = pandas.DataFrame(patients_of_interest)['StringRep'].apply(f)

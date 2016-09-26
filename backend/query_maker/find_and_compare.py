@@ -43,6 +43,7 @@ def recursive(_time, _diagnosis, time, diagnosis, exams_range, acc_time=0, acc_e
 
 
 def match_time_sequence(string, diagnosis, time, exams_range):
+
     # appends 0 to the beginning of the time
     time = [(-sys.maxsize, sys.maxsize)] + time
     exams_range = [(-sys.maxsize, sys.maxsize)] + exams_range
@@ -52,5 +53,7 @@ def match_time_sequence(string, diagnosis, time, exams_range):
     _time, _diagnosis = list(map(np.uint32, split[0:][::2])), list(map(np.uint8, split[1:][::2]))
 
     result = recursive(_time, _diagnosis, time, diagnosis, exams_range)
+
+    print(result[0], _diagnosis[result[1]:], string)
 
     return result[0], _diagnosis[result[1]:]
