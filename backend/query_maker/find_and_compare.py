@@ -4,16 +4,22 @@ import sys
 
 
 def recursive(_time, _diagnosis, time, diagnosis, exams_range, acc_time=0, acc_exams=0, first=True, p=0):
+
     if len(time) == 0:  # case 1: pattern ended, returns true
         return True, p
 
     if len(_time) == 0:  # case 2: string ended, returns false
         return False, p
 
-    try:  # case 3: if first pattern element cannot be found, returns false
-        start = _diagnosis.index(diagnosis[0])
-        if not (exams_range[0][0] + acc_exams <= start + 1 <= exams_range[0][1] + acc_exams):
-            return False, p
+    try:  # case 3: if first pattern element cannot be found, returns false.
+
+        # if first element is unspecified (-1) then start is the next element
+        if diagnosis[0] != -1:
+            start = _diagnosis.index(diagnosis[0])
+            if not (exams_range[0][0] + acc_exams <= start + 1 <= exams_range[0][1] + acc_exams):
+                return False, p
+        else:
+            start = 0
 
     except ValueError:
         return False, p

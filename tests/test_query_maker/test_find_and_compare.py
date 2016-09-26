@@ -59,4 +59,21 @@ class TestFindAndCompare(unittest.TestCase):
 
         print("--> pathological case - OK")
 
+    def test_unspecified_sequence(self):
+        f = match_time_sequence
 
+        print(">> backend.query_maker.find_and_compare.match_time_sequence (3):")
+
+        _str = "t0d11t0d10t0d15t0d10"
+        _dia, _tim, _exm = [11, -1, -1], [(0, 0), (0, 0)], [(0, 100), (0, 100)]
+        self.assertEqual(f(_str, _dia, _tim, _exm), (True, [10]))
+
+        _str = "t0d11t0d10t0d15t0d10"
+        _dia, _tim, _exm = [11, -1, -1], [(0, 0), (0, 0)], [(0, 100), (0, 100)]
+        self.assertEqual(f(_str, _dia, _tim, _exm), (True, [10]))
+
+        _str = "t0d10t0d10t0d10t0d10t0d11t0d11"
+        _dia, _tim, _exm = [10, -1, -1, 11], [(0, 0), (0, 0), (0, 0)], [(0, 100), (0, 100), (0, 100)]
+        self.assertEqual(f(_str, _dia, _tim, _exm), (True, [11]))
+
+        print("--> unspecified case - OK")
