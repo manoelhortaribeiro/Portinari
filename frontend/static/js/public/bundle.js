@@ -721,6 +721,7 @@ d3.sankey = function() {
 };
 
 },{"./d3.min.v4.js":3}],7:[function(require,module,exports){
+
 /* ----------------------------- */
 /* ---  Initialization Stuff --- */
 /* ----------------------------- */
@@ -814,7 +815,7 @@ function FormHandler(qif, qic, qcf, qcc, reactor) {
     thisForm.qif = qif;
     thisForm.qif.append("p").text("select a node or edge to add constraints");
     thisForm.qic = qic;
-    thisForm.qic.append("p").text("select a node to see its constraints");
+    thisForm.qic.append("p").text("select a node or edge to see its constraints");
     thisForm.form = qif.append("form");
     // outcome forms
     thisForm.qcf = qcf;
@@ -822,24 +823,30 @@ function FormHandler(qif, qic, qcf, qcc, reactor) {
     thisForm.qcc.append("p").text("outcomes to be inspected will appear here");
     thisForm.outcome = qcf.append("form");
     // get the attributes
-    var attributes =thisForm.config.outcomeAttributes;
+    var attributes = thisForm.config.outcomeAttributes;
     make_form(thisForm.outcome, thisForm.qcc, "outcomes", attributes, thisForm, outcome_form_callback)
 
 }
 
 FormHandler.prototype.updateForm = function (element) {
 
+    console.log("updated")
     var thisForm = this;
 
     // removes everything in the form
     thisForm.form.selectAll("*").remove();
     thisForm.qif.selectAll("p").remove();
+    thisForm.qic.selectAll("p").remove();
+    thisForm.qic.select("ul").select("li").remove();
+
+
 
     // in case someone just deleted a node, returns
     if (element == undefined) {
         if (thisForm.qic.select("p").empty()) thisForm.qic.append("p").text("select a node to see its constraints");
-        thisForm.qif.append("p").text("select a node or edge to add constraints");
         thisForm.qic.select("ul").selectAll("li").remove();
+        thisForm.qif.append("p").text("select a node or edge to add constraints");
+
         return;
     }
 
@@ -852,6 +859,12 @@ FormHandler.prototype.updateForm = function (element) {
     else attributes = thisForm.config.edgeAttributes;
 
     make_form(thisForm.form, thisForm.qic, "constraints", attributes, thisForm, constraints_form_callback)
+
+
+    if (thisForm.qic.select("ul").select("li").empty()) {
+        console.log("-- empty ul");
+        thisForm.qic.append("p").text("select a node or edge to see its constraints");
+    }
 };
 
 function make_form(form, current, name, attributes, thisForm, callback) {
@@ -981,7 +994,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
     });
 }
 
-function outcome_form_callback(attr, disp, current, thisForm){
+function outcome_form_callback(attr, disp, current, thisForm) {
 
     var element = thisForm.reactor.dispatchEvent("outcome_added")[0];
     element.outcome_key_op_value.push(attr);
@@ -1037,6 +1050,9 @@ function updateConstraints(form, current, element) {
             node.key_op_value.splice(index, 1);
             node.display_value.splice(index, 1);
             d3.select(this).remove();
+            if (form.qic.select("ul").select("li").empty())
+                form.qic.append("p").text("select a node or edge to see its constraints");
+
             form.reactor.dispatchEvent("constraint_added");
         });
 }
