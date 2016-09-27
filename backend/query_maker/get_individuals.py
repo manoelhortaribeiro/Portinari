@@ -50,22 +50,32 @@ def get_query_matching_values(graph, paths):
     return diags, times, exams
 
 
-def filter_by_attributes(graph, paths, individuals_table, exams_table):
+def filter_by_attributes(graph, paths, ind_table, exa_table):
     # Filter by attributes
     individuals = None
+
+    has_constraint = False
 
     for path in paths:
         for node in path:
             json_node = graph.get_node(node)
             for constraint in json_node['key_op_value']:
                 if constraint[0] == 'Diagnosis' and constraint[1] == '==':
-                    tmp = exams_table.query("Diagnosis == " + constraint[2]).PatientID
+                    has_constraint = True
+                    tmp = exa_table.query("Diagnosis == " + constraint[2]).PatientID
                     if individuals is None:
                         individuals = tmp
                     else:
                         individuals = np.intersect1d(tmp, individuals)
 
-    return individuals_table[individuals_table['PatientID'].isin(individuals)]
+    if individuals is not None:
+        ind = ind_table[ind_table['PatientID'].isin(individuals)]
+    elif not has_constraint:
+        ind = ind_table
+    else:
+        ind = None
+
+    return ind
 
 
 def get_individuals(nodes, edges, individuals_table, exams_table):
@@ -76,7 +86,7 @@ def get_individuals(nodes, edges, individuals_table, exams_table):
     # Get query matching string
     diags, times, exams = get_query_matching_values(graph, paths)
 
-    print(diags, times, exams)
+    #print(diags, times, exams)
 
     # Filter by attributes
     for d, t, e in zip(diags, times, exams):

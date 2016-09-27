@@ -60,6 +60,6 @@ def match_time_sequence(string, diagnosis, time, exams_range):
 
     result = recursive(_time, _diagnosis, time, diagnosis, exams_range)
 
-    print(result[0], _diagnosis[result[1]:], string)
+    # print(result[0], _diagnosis[result[1]:], string)
 
     return result[0], _diagnosis[result[1]:]
