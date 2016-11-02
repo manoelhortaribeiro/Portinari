@@ -1,7 +1,9 @@
+import numpy as np
 import datetime
 import pandas
 import time
 import csv
+import os
 
 
 def to_unix(s):
@@ -74,10 +76,6 @@ def pre_process_exams_query(src, dest, s1_fields, s2_fields, undocumented):
     # merge both
     survey_df = pandas.merge(survey_df, reg_data)
 
-    # makes them unix time
-    survey_df['birthdate'] = survey_df['birthdate'].apply(to_unix)
-    survey_df['dateres'] = survey_df['dateres'].apply(to_unix)
-
     # separates survey1 and survey2
     survey1 = survey_df[survey_df.study == 1].copy(deep=True)
     survey1.drop(s2_fields + ['study'] + undocumented, axis=1, inplace=True)
@@ -91,15 +89,15 @@ def pre_process_exams_query(src, dest, s1_fields, s2_fields, undocumented):
     survey1.to_csv(dest[0] + dest[1], index=False)
     survey2.to_csv(dest[0] + dest[2], index=False)
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # -- OPENCRAB DATASET
 
-    pre_process_exams_only("./surveys/opencrab/opencrab.csv", "./preprocessed/opencrab/opencrab_processed.csv")
-
-    _undocumented = ["q14newpa"]
+    # pre_process_exams_only("./surveys/opencrab/opencrab.csv", "./preprocessed/opencrab/opencrab_processed.csv")
 
     # -- SURVEYS DATASET
+
+    _undocumented = ["q14newpa"]
 
     _survey2fields = [
         "q5aagsto", "q5esnu", "q5esnust", "q5fagsnu", "q5g1snu", "q5g2snu", "q5g3snu", "q5g4snu", "q5g5snu", "q5g6snu",
@@ -118,7 +116,14 @@ if __name__ == "__main__":
         "c8aageco", "c8bhormc", "c8cyrhor", "c11conew"
     ]
 
-    _dest, _src = ("./preprocessed/surveys/", "s1.csv", "s2.csv", "mixed.csv"), \
+    _dest, _src = ("./preprocessed/surveys/", "s1_tmp.csv", "s2_tmp.csv", "mixed_tmp.csv"), \
                   ("./raw/surveys/surveydata.csv", "./raw/surveys/regdata.csv")
 
     pre_process_exams_query(_src, _dest, _survey1fields, _survey2fields, _undocumented)
+
+    pre_process_exams_only("./preprocessed/surveys/s1_tmp.csv", "./preprocessed/surveys/s1.csv")
+    pre_process_exams_only("./preprocessed/surveys/s2_tmp.csv", "./preprocessed/surveys/s2.csv")
+    pre_process_exams_only("./preprocessed/surveys/mixed_tmp.csv", "./preprocessed/surveys/mixed.csv")
+    os.system('rm ./preprocessed/surveys/s1_tmp.csv')
+    os.system('rm ./preprocessed/surveys/s2_tmp.csv')
+    os.system('rm ./preprocessed/surveys/mixed_tmp.csv')
