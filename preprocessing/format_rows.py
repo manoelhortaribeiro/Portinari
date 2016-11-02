@@ -18,8 +18,8 @@ def to_unix(s):
 
 def pre_process_exams_only(path, dest):
     """
-    This function receives a path to an existing csv file and for an output csv file, which may exist or not.
-    It calculates the time in between diagnosis taken by the same individual, adding a row called "sincelast" has the time
+    This function receives a path to an existing csv file and for an output csv file, which may exist or not. It
+    calculates the time in between diagnosis taken by the same individual, adding a row called "sincelast" has the time
     in days since the individual's last diagnosis.
     :param path: Path to origin csv file.
     :param dest: Path to destination csv file.
@@ -54,6 +54,17 @@ def pre_process_exams_only(path, dest):
 
 
 def pre_process_exams_query(src, dest, s1_fields, s2_fields, undocumented):
+    """
+    This function receives a tuple with the path to the source of the surveys and its destination. It also receives the
+    fields for each distinct survey and the undocumented fields. It pre process it.
+
+    :param src: source csv files.
+    :param dest: destination csv files.
+    :param s1_fields: list of fields in the first survey.
+    :param s2_fields: list of fields in the second survey.
+    :param undocumented: list of undocumented fields.
+    :return:
+    """
     # opens
     survey_df = pandas.read_csv(src[0])
 
@@ -81,9 +92,14 @@ def pre_process_exams_query(src, dest, s1_fields, s2_fields, undocumented):
     survey2.to_csv(dest[0] + dest[2], index=False)
 
 if __name__ == "__main__":
-    #pre_process_exams_only("./surveys/opencrab/opencrab.csv", "./preprocessed/opencrab/opencrab_processed.csv")
+
+    # -- OPENCRAB DATASET
+
+    pre_process_exams_only("./surveys/opencrab/opencrab.csv", "./preprocessed/opencrab/opencrab_processed.csv")
 
     _undocumented = ["q14newpa"]
+
+    # -- SURVEYS DATASET
 
     _survey2fields = [
         "q5aagsto", "q5esnu", "q5esnust", "q5fagsnu", "q5g1snu", "q5g2snu", "q5g3snu", "q5g4snu", "q5g5snu", "q5g6snu",
@@ -104,4 +120,5 @@ if __name__ == "__main__":
 
     _dest, _src = ("./preprocessed/surveys/", "s1.csv", "s2.csv", "mixed.csv"), \
                   ("./raw/surveys/surveydata.csv", "./raw/surveys/regdata.csv")
+
     pre_process_exams_query(_src, _dest, _survey1fields, _survey2fields, _undocumented)

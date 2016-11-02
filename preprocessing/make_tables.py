@@ -4,6 +4,7 @@ import functools
 import gc
 import os
 
+#TODO: here!
 
 def get_first_pdseries(series):
     """
@@ -71,6 +72,9 @@ def make_exams_tables(rows_to_drop, renaming_hash, df, dest):
 
 
 if __name__ == '__main__':
+
+    # -- OPENCRAB DATASET
+
     source = "./preprocessed/opencrab/opencrab_processed.csv"
     patient_dest = "./final/opencrab/patients.csv"
     exams_dest = "./final/opencrab/exams.csv"
