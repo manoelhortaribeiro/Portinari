@@ -1,4 +1,3 @@
-import numpy as np
 import datetime
 import pandas
 import time
@@ -18,13 +17,14 @@ def to_unix(s):
     return "" if s == "" else int(int(time.mktime(datetime.datetime.strptime(s, "%d.%m.%Y").timetuple())) / day_ms)
 
 
-def pre_process_exams_only(path, dest):
+def pre_process_exams_only(path, dest, has_dateres=False):
     """
     This function receives a path to an existing csv file and for an output csv file, which may exist or not. It
     calculates the time in between diagnosis taken by the same individual, adding a row called "sincelast" has the time
     in days since the individual's last diagnosis.
     :param path: Path to origin csv file.
     :param dest: Path to destination csv file.
+    :param has_dateres: has the column dateres
     :return: Nothing
     """
 
@@ -48,7 +48,12 @@ def pre_process_exams_only(path, dest):
 
         p_diag_date, p_row_id = row["diagnosisdate"], row["ID"]  # Gets data for this row for the future iteration
 
-        row["diagnosisdate"], row["birthdate"] = to_unix(row["diagnosisdate"]), to_unix(row["birthdate"])
+        row["diagnosisdate"] = to_unix(row["diagnosisdate"])
+        row["birthdate"] = to_unix(row["birthdate"])
+        row["censordate"] = to_unix(row["censordate"])
+
+        if has_dateres:
+            row["dateres"] = to_unix(row["dateres"])
 
         row["age"] = row["diagnosisdate"] - row["birthdate"]
 
@@ -79,8 +84,10 @@ def pre_process_exams_query(src, dest, s1_fields, s2_fields, undocumented):
     # separates survey1 and survey2
     survey1 = survey_df[survey_df.study == 1].copy(deep=True)
     survey1.drop(s2_fields + ['study'] + undocumented, axis=1, inplace=True)
+
     survey2 = survey_df[survey_df.study == 2].copy(deep=True)
     survey2.drop(s1_fields + ['study'] + undocumented, axis=1, inplace=True)
+
     mixed = survey_df.copy(deep=True)
     mixed.drop(s1_fields + s2_fields + ['study'] + undocumented, axis=1, inplace=True)
 
@@ -91,9 +98,10 @@ def pre_process_exams_query(src, dest, s1_fields, s2_fields, undocumented):
 
 
 if __name__ == "__main__":
+
     # -- OPENCRAB DATASET
 
-    # pre_process_exams_only("./surveys/opencrab/opencrab.csv", "./preprocessed/opencrab/opencrab_processed.csv")
+    pre_process_exams_only("./raw/opencrab/opencrab.csv", "./preprocessed/opencrab/opencrab_processed.csv")
 
     # -- SURVEYS DATASET
 
@@ -121,9 +129,9 @@ if __name__ == "__main__":
 
     pre_process_exams_query(_src, _dest, _survey1fields, _survey2fields, _undocumented)
 
-    pre_process_exams_only("./preprocessed/surveys/s1_tmp.csv", "./preprocessed/surveys/s1.csv")
-    pre_process_exams_only("./preprocessed/surveys/s2_tmp.csv", "./preprocessed/surveys/s2.csv")
-    pre_process_exams_only("./preprocessed/surveys/mixed_tmp.csv", "./preprocessed/surveys/mixed.csv")
+    pre_process_exams_only("./preprocessed/surveys/s1_tmp.csv", "./preprocessed/surveys/s1.csv", True)
+    pre_process_exams_only("./preprocessed/surveys/s2_tmp.csv", "./preprocessed/surveys/s2.csv", True)
+    pre_process_exams_only("./preprocessed/surveys/mixed_tmp.csv", "./preprocessed/surveys/mixed.csv", True)
     os.system('rm ./preprocessed/surveys/s1_tmp.csv')
     os.system('rm ./preprocessed/surveys/s2_tmp.csv')
     os.system('rm ./preprocessed/surveys/mixed_tmp.csv')

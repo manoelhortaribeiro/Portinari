@@ -18,6 +18,7 @@ def make_individual_table(x, renam):
     """
     This function is responsible for extracting the data from each group (Records of different patients)
     :param x: DataFrame containing a single group of a groupBy.
+    :param renam: hash containing the renaming for the patient table attributes.
     :return: Treated data frame.
     """
 
@@ -44,6 +45,7 @@ def make_patient_tables(ran, df, dest, renaming_hash):
     :param ran: Tuple containing the start and end of the range.
     :param df: data frame with preprocessed data.
     :param dest: destination of the file.
+    :param renaming_hash: hash containing the renaming for the patient table attributes.
     :return: Nothing.
     """
 
@@ -170,10 +172,23 @@ if __name__ == '__main__':
     _to_drop_ex = list(_renaming_pa.keys())
     _to_drop_ex.remove('ID')
 
-    parallel_parsing(source="./preprocessed/surveys/mixed_sample.csv",
-                     patient_dest="./final/surveys/mixed_patients_sample.csv",
-                     exams_dest="./final/surveys/mixed_exams_sample.csv",
+    parallel_parsing(source="./preprocessed/surveys/mixed.csv",
+                     patient_dest="./final/surveys/mixed_patients.csv",
+                     exams_dest="./final/surveys/mixed_exams.csv",
                      renaming_pa=_renaming_pa,
                      renaming_ex=_renaming_ex,
                      to_drop_ex=_to_drop_ex)
 
+    parallel_parsing(source="./preprocessed/surveys/s1.csv",
+                     patient_dest="./final/surveys/s1_patients.csv",
+                     exams_dest="./final/surveys/s1_exams.csv",
+                     renaming_pa=_renaming_pa,
+                     renaming_ex=_renaming_ex,
+                     to_drop_ex=_to_drop_ex)
+
+    parallel_parsing(source="./preprocessed/surveys/s2.csv",
+                     patient_dest="./final/surveys/s2_patients.csv",
+                     exams_dest="./final/surveys/s2_exams.csv",
+                     renaming_pa=_renaming_pa,
+                     renaming_ex=_renaming_ex,
+                     to_drop_ex=_to_drop_ex)

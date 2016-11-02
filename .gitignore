@@ -10,3 +10,5 @@
 /preprocessing/raw/surveys/surveydata.csv
 /preprocessing/final/opencrab/exams.csv
 /preprocessing/final/opencrab/patients.csv
+/preprocessing/final/surveys/*_exams.csv
+/preprocessing/final/surveys/*_patients.csv
