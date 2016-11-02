@@ -94,6 +94,7 @@ def parallel_parsing(source, patient_dest, exams_dest, renaming_pa, renaming_ex,
 
 
 if __name__ == '__main__':
+
     # -- OPENCRAB DATASET
 
     # - Patients Table
@@ -111,12 +112,12 @@ if __name__ == '__main__':
     _to_drop_ex = list(_renaming_pa.keys())
     _to_drop_ex.remove('ID')
 
-    # parallel_parsing(source="./preprocessed/opencrab/opencrab_processed_sample.csv",
-    #                  patient_dest="./final/opencrab/patients_sample.csv",
-    #                  exams_dest="./final/opencrab/exams_sample.csv",
-    #                  renaming_pa=_renaming_pa,
-    #                  renaming_ex=_renaming_ex,
-    #                  to_drop_ex=_to_drop_ex)
+    parallel_parsing(source="./preprocessed/opencrab/opencrab_processed_sample.csv",
+                     patient_dest="./final/opencrab/patients_sample.csv",
+                     exams_dest="./final/opencrab/exams_sample.csv",
+                     renaming_pa=_renaming_pa,
+                     renaming_ex=_renaming_ex,
+                     to_drop_ex=_to_drop_ex)
 
     # -- SURVEYS DATASET
 
