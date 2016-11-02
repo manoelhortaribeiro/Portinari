@@ -1,4 +1,4 @@
-from preprocessing.format_rows import to_unix, pre_process
+from preprocessing.format_rows import to_unix, pre_process_exams_only
 import unittest
 import csv
 import os
@@ -26,12 +26,12 @@ class TestFormatRows(unittest.TestCase):
 
         # declare file locations
 
-        rel_p = "./test_preprocessing/files/"
+        rel_p = "./files/"
         input_file, output_file = rel_p + "pre_process_input.csv", rel_p + "pre_process_output.csv"
         expected_output_file = rel_p + "pre_process_expected_output.csv"
 
         # does preprocessing
-        pre_process(input_file, output_file)
+        pre_process_exams_only(input_file, output_file)
 
         # compare expected file with actual file
         output_dict = csv.DictReader(open(output_file, 'r'))

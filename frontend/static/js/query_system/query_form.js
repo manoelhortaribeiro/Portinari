@@ -2,7 +2,7 @@ var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
     json_config = require("../config/config.js");
 
-function FormHandler(qif, qic, qcf, qcc, reactor) {
+function FormHandler(qif, qic, qgif, qgic, qcf, qcc, dsc, reactor) {
 
     var thisForm = this;
 
@@ -12,26 +12,42 @@ function FormHandler(qif, qic, qcf, qcc, reactor) {
     thisForm.reactor.addEventListener('selected_node_changed', this.updateForm.bind(this));
 
     // -- Model
-    // constraints forms
+
+    // dataset choice form
+    thisForm.dsc = dsc;
+    thisForm.dataset = dsc.append("form");
+    var attributes = thisForm.config.datasets;
+    make_form_dataset(thisForm.dataset, thisForm.dsc, "dataset", attributes, thisForm);
+
+    // local constraints forms
     thisForm.qif = qif;
-    thisForm.qif.append("p").text("select a node or edge to add constraints");
+    thisForm.qif.append("p").text("Select a node or edge to add constraints");
     thisForm.qic = qic;
-    thisForm.qic.append("p").text("select a node or edge to see its constraints");
+    thisForm.qic.append("p").text("Select a node or edge to see its constraints");
     thisForm.form = qif.append("form");
+
+    //global constraints forms
+    thisForm.qgif = qgif;
+    thisForm.qgic = qgic;
+    thisForm.qgic.append("p").text("Global attributes to be inspected will appear here");
+    thisForm.global = qgif.append("form");
+    //get the attributes
+    var attributes = thisForm.config.globalAttributes();
+    make_form(thisForm.global, thisForm.qgic, "globals", attributes, thisForm, global_form_callback);
+
     // outcome forms
     thisForm.qcf = qcf;
     thisForm.qcc = qcc;
-    thisForm.qcc.append("p").text("outcomes to be inspected will appear here");
+    thisForm.qcc.append("p").text("Outcomes to be inspected will appear here");
     thisForm.outcome = qcf.append("form");
     // get the attributes
-    var attributes = thisForm.config.outcomeAttributes;
-    make_form(thisForm.outcome, thisForm.qcc, "outcomes", attributes, thisForm, outcome_form_callback)
+    var attributes = thisForm.config.outcomeAttributes();
+    make_form(thisForm.outcome, thisForm.qcc, "outcomes", attributes, thisForm, outcome_form_callback);
 
 }
 
 FormHandler.prototype.updateForm = function (element) {
 
-    console.log("updated")
     var thisForm = this;
 
     // removes everything in the form
@@ -40,14 +56,11 @@ FormHandler.prototype.updateForm = function (element) {
     thisForm.qic.selectAll("p").remove();
     thisForm.qic.select("ul").select("li").remove();
 
-
-
     // in case someone just deleted a node, returns
     if (element == undefined) {
-        if (thisForm.qic.select("p").empty()) thisForm.qic.append("p").text("select a node to see its constraints");
+        if (thisForm.qic.select("p").empty()) thisForm.qic.append("p").text("Select a node or edge to see its constraints");
         thisForm.qic.select("ul").selectAll("li").remove();
-        thisForm.qif.append("p").text("select a node or edge to add constraints");
-
+        thisForm.qif.append("p").text("Select a node or edge to add constraints");
         return;
     }
 
@@ -56,17 +69,57 @@ FormHandler.prototype.updateForm = function (element) {
 
     // get the attributes
     var attributes;
-    if (element.className == thisForm.config.nodeClass) attributes = thisForm.config.nodeAttributes;
-    else attributes = thisForm.config.edgeAttributes;
+    if (element.className == thisForm.config.nodeClass) attributes = thisForm.config.nodeAttributes();
+    else attributes = thisForm.config.edgeAttributes();
 
-    make_form(thisForm.form, thisForm.qic, "constraints", attributes, thisForm, constraints_form_callback)
+    make_form(thisForm.form, thisForm.qic, "constraints", attributes, thisForm, constraints_form_callback);
 
 
     if (thisForm.qic.select("ul").select("li").empty()) {
         console.log("-- empty ul");
-        thisForm.qic.append("p").text("select a node or edge to see its constraints");
+        thisForm.qic.append("p").text("Select a node or edge to see its constraints");
     }
 };
+
+function make_form_dataset(form, current, name, attributes, thisForm) {
+    // form
+    form.classed("query_" + name, true)
+        .attr("id", "new_" + name);
+
+    // ** FORM Pt1. attr_name **
+    var select_attr = form.append("select")
+        .classed("styled_form", true)
+        .attr("id", "attr_name_" + name)
+        .attr("name", "attribute");
+
+    attributes.forEach(function (op) {
+
+        if (thisForm.config.filename() == op.name) {
+            select_attr.append("option")
+                .attr("value", op.name)
+                .attr("selected", "selected")
+                .text(op.display);
+        }
+        else {
+            select_attr.append("option")
+                .attr("value", op.name)
+                .text(op.display);
+        }
+    });
+
+    form.append("input")
+        .classed("styled_form", true)
+        .attr("id", "submit_query_form_" + name)
+        .attr("type", "submit");
+
+    $(".query_" + name).bind("submit", function (event) {
+        event.preventDefault();
+        //location.reload();
+        var data = $("#new_" + name).serializeArray();
+        json_config.QUERY_SYSTEM.changeDataset(data[0].value);
+        thisForm.updateForm(undefined)
+    });
+}
 
 function make_form(form, current, name, attributes, thisForm, callback) {
     // form
@@ -103,7 +156,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
         var sel = $("#attr_name_" + name).val();
         var type_name = d3.select("#attr_name_" + name + " [value=" + sel + "]").attr("type");
-        var types = thisForm.config.types[type_name];
+        var types = thisForm.config.types()[type_name];
 
         // ** FORM Pt2. oper_field **
         var select_oper = form.append("select")
@@ -165,7 +218,6 @@ function make_form(form, current, name, attributes, thisForm, callback) {
                 var keys_values = keys.map(function (v) {
                     return [v, types.values[v]];
                 });
-                console.log(keys_values);
                 keys_values.forEach(function (op) {
                     select_value.append("option")
                         .attr("value", op[0])
@@ -195,9 +247,41 @@ function make_form(form, current, name, attributes, thisForm, callback) {
     });
 }
 
+function global_form_callback(attr, disp, current, thisForm) {
+
+    var element = thisForm.reactor.dispatchEvent("outcome_added")[0];
+
+    element.global_key_op_value.push(attr);
+    element.global_display_value.push(disp);
+    current.selectAll("p").remove();
+    var list = current.select("ul");
+
+    list.selectAll("li").remove();
+
+    list.selectAll("li")
+        .data(element.global_display_value)
+        .enter()
+        .append("li")
+        .text(function (d, i) {
+            return d;
+        })
+        .on("click", function () {
+            var value = d3.select(this).data()[0];
+            var graph = element;
+            var index = graph.global_key_op_value.indexOf(value);
+            graph.global_key_op_value.splice(index, 1);
+            graph.global_display_value.splice(index, 1);
+            d3.select(this).remove();
+            if (graph.global_display_value.length == 0) {
+                thisForm.qgic.append("p").text("Global attributes to be inspected will appear here");
+            }
+        });
+}
+
 function outcome_form_callback(attr, disp, current, thisForm) {
 
     var element = thisForm.reactor.dispatchEvent("outcome_added")[0];
+
     element.outcome_key_op_value.push(attr);
     element.outcome_display_value.push(disp);
     current.selectAll("p").remove();
@@ -219,6 +303,11 @@ function outcome_form_callback(attr, disp, current, thisForm) {
             graph.outcome_key_op_value.splice(index, 1);
             graph.outcome_display_value.splice(index, 1);
             d3.select(this).remove();
+
+            if (graph.outcome_display_value.length == 0) {
+                thisForm.qcc.append("p").text("Outcomes to be inspected will appear here");
+            }
+
         });
 }
 
@@ -252,7 +341,7 @@ function updateConstraints(form, current, element) {
             node.display_value.splice(index, 1);
             d3.select(this).remove();
             if (form.qic.select("ul").select("li").empty())
-                form.qic.append("p").text("select a node or edge to see its constraints");
+                form.qic.append("p").text("Select a node or edge to see its constraints");
 
             form.reactor.dispatchEvent("constraint_added");
         });

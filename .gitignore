@@ -1,7 +1,12 @@
 .idea/
 .sass-cache
 /backend/data/
-/preprocessing/preprocessed/opencrab_processed.csv
-/preprocessing/raw/opencrab.csv
-/preprocessing/final/exams.csv
-/preprocessing/final/patients.csv
+/preprocessing/preprocessed/opencrab/opencrab_processed.csv
+/preprocessing/preprocessed/surveys/mixed.csv
+/preprocessing/preprocessed/surveys/s1.csv
+/preprocessing/preprocessed/surveys/s2.csv
+/preprocessing/raw/opencrab/opencrab.csv
+/preprocessing/raw/surveys/regdata.csv
+/preprocessing/raw/surveys/surveydata.csv
+/preprocessing/final/opencrab/exams.csv
+/preprocessing/final/opencrab/patients.csv

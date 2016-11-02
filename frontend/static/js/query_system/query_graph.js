@@ -13,6 +13,7 @@ function GC(query_interface_selection, reactor) {
     thisGraph.reactor = reactor;
     thisGraph.reactor.addEventListener('constraint_added', this.updateGraph.bind(this));
     thisGraph.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
+    thisGraph.reactor.addEventListener('global_added', this.getGraph.bind(this));
     thisGraph.config = json_config.QUERY_SYSTEM;
 
     // -- Model
@@ -24,7 +25,8 @@ function GC(query_interface_selection, reactor) {
     thisGraph.graph.id_attr = "None";
     thisGraph.graph.outcome_key_op_value = [];
     thisGraph.graph.outcome_display_value = [];
-
+    thisGraph.graph.global_key_op_value = [];
+    thisGraph.graph.global_display_value = [];
     // -- View
     // svg
     thisGraph.svg = query_interface_selection.append("svg")

@@ -1,4 +1,5 @@
 import datetime
+import pandas
 import time
 import csv
 
@@ -15,7 +16,7 @@ def to_unix(s):
     return "" if s == "" else int(int(time.mktime(datetime.datetime.strptime(s, "%d.%m.%Y").timetuple())) / day_ms)
 
 
-def pre_process(path, dest):
+def pre_process_exams_only(path, dest):
     """
     This function receives a path to an existing csv file and for an output csv file, which may exist or not.
     It calculates the time in between diagnosis taken by the same individual, adding a row called "sincelast" has the time
@@ -28,7 +29,7 @@ def pre_process(path, dest):
     # Open files
     input_file, output_file = open(path, 'r'), open(dest, 'w')
     csv_in = csv.DictReader(input_file)
-    csv_out = csv.DictWriter(output_file, csv_in.fieldnames + ["sincelast"])
+    csv_out = csv.DictWriter(output_file, csv_in.fieldnames + ["sincelast", "age"])
 
     p_row_id, p_diag_date = -1, -1  # Silly control variables
 
@@ -45,9 +46,62 @@ def pre_process(path, dest):
 
         p_diag_date, p_row_id = row["diagnosisdate"], row["ID"]  # Gets data for this row for the future iteration
 
+        row["diagnosisdate"], row["birthdate"] = to_unix(row["diagnosisdate"]), to_unix(row["birthdate"])
+
+        row["age"] = row["diagnosisdate"] - row["birthdate"]
+
         csv_out.writerow(row)
 
 
-if __name__ == "__main__":
+def pre_process_exams_query(src, dest, s1_fields, s2_fields, undocumented):
+    # opens
+    survey_df = pandas.read_csv(src[0])
 
-    pre_process("opencrab.csv", "opencrab_processed.csv")
+    # finds outcomes in reg_data
+    reg_data = pandas.read_csv(src[1])
+
+    # merge both
+    survey_df = pandas.merge(survey_df, reg_data)
+
+    # makes them unix time
+    survey_df['birthdate'] = survey_df['birthdate'].apply(to_unix)
+    survey_df['dateres'] = survey_df['dateres'].apply(to_unix)
+
+    # separates survey1 and survey2
+    survey1 = survey_df[survey_df.study == 1].copy(deep=True)
+    survey1.drop(s2_fields + ['study'] + undocumented, axis=1, inplace=True)
+    survey2 = survey_df[survey_df.study == 2].copy(deep=True)
+    survey2.drop(s1_fields + ['study'] + undocumented, axis=1, inplace=True)
+    mixed = survey_df.copy(deep=True)
+    mixed.drop(s1_fields + s2_fields + ['study'] + undocumented, axis=1, inplace=True)
+
+    # saves
+    mixed.to_csv(dest[0] + dest[3], index=False)
+    survey1.to_csv(dest[0] + dest[1], index=False)
+    survey2.to_csv(dest[0] + dest[2], index=False)
+
+if __name__ == "__main__":
+    #pre_process_exams_only("./surveys/opencrab/opencrab.csv", "./preprocessed/opencrab/opencrab_processed.csv")
+
+    _undocumented = ["q14newpa"]
+
+    _survey2fields = [
+        "q5aagsto", "q5esnu", "q5esnust", "q5fagsnu", "q5g1snu", "q5g2snu", "q5g3snu", "q5g4snu", "q5g5snu", "q5g6snu",
+        "q5g7snu", "q5g8snu", "q6adrk", "q6aagsto", "q6bsoda", "q6brwin", "q6bwwin", "q6bdwin", "q6dbeer", "q6dsoda",
+        "q6drwin", "q6dwwin", "q6ddwin", "q6dvodk", "c6aagdrk", "q6eagdrk", "q7cagpr1", "q7cres1", "q7cagpr2",
+        "q7cres2", "q7cagpr3", "q7cres3", "q7cagpr4", "q7cres4", "q7cagpr5", "q7cres5", "q7cagpr6", "q7cres6",
+        "q7cagpr7", "q7cres7", "q7cagpr8", "q7cres8", "q7cagpr9", "q7cres9", "q8bpill", "q8bagpi", "q8bdupi",
+        "q8bmini", "q8bagmi", "q8bdumi", "q8bspir", "q8bagsp", "q8bdusp", "q8both", "q8bagot", "q8bduot", "q8cmapi",
+        "q8cagma", "q8crema", "q10conew", "q11bno", "q11bco", "q11bhor", "q11bsafe", "q11bwith", "q11bmorn", "q11both",
+        "q13youpa", "q15risk", "q15agchl", "q15agher", "q15agtri", "q15aggon", "q19vac", "q19agvac", "q22awork",
+        "q22bhome", "q23heigh", "q23weigh"
+    ]
+
+    _survey1fields = [
+        "c6c2wine", "c6b2beer", "c6b3soda", "c6b4rwin", "c6b5wwin", "c6b6dwin", "c6b7vodk", "c6aagdrk", "c7aagepr",
+        "c8aageco", "c8bhormc", "c8cyrhor", "c11conew"
+    ]
+
+    _dest, _src = ("./preprocessed/surveys/", "s1.csv", "s2.csv", "mixed.csv"), \
+                  ("./raw/surveys/surveydata.csv", "./raw/surveys/regdata.csv")
+    pre_process_exams_query(_src, _dest, _survey1fields, _survey2fields, _undocumented)

@@ -55,33 +55,25 @@ def make_patient_tables(ran, df, dest):
     patients_table_raw.to_csv(dest + 'r' + str(ran[0]) + str(ran[1]), mode='w', index=False, header=has_header)
 
 
-def make_exams_tables(rows_to_drop, df, dest):
+def make_exams_tables(rows_to_drop, renaming_hash, df, dest):
     """
     This function drops the rows used in the patients tables and creates a table just with the exams.
     :param rows_to_drop: Rows that will be dropped in dataframe.
+    :param renaming_hash: hash with the new names.
     :param df: Dataframe.
     :param dest: destination of the file.
     :return: Nothing.
     """
     df.drop(rows_to_drop, axis=1, inplace=True)
-    df.rename(columns={'ID': 'PatientID',
-                       'diagnosisdate': 'DiagnosisDate',
-                       'diagnosisnumber': 'DiagnosisNbr',
-                       'type': 'ExamType',
-                       'diagnosis1': 'Diagnosis',
-                       'diagnosis2': 'MorphologyCode',
-                       'stage': 'Stage',
-                       'lab_nr': 'LaboratoryNbr',
-                       'reg': 'Region',
-                       'sincelast': 'TimeSinceLast'}, inplace=True)
+    df.rename(columns=renaming_hash, inplace=True)
 
     df.to_csv(dest, mode='w', index=False)
 
 
 if __name__ == '__main__':
-    source = "./preprocessed/opencrab_processed.csv"
-    patient_dest = "./final/patients.csv"
-    exams_dest = "./final/exams.csv"
+    source = "./preprocessed/opencrab/opencrab_processed.csv"
+    patient_dest = "./final/opencrab/patients.csv"
+    exams_dest = "./final/opencrab/exams.csv"
 
     main_df = pd.read_csv(source)
 
@@ -96,4 +88,16 @@ if __name__ == '__main__':
     os.system('rm ' + patient_dest + 'r*')
 
     # - Exams Table
-    make_exams_tables(['birthdate', 'censordate'], main_df, exams_dest)
+    renaming = {'ID': 'PatientID',
+                'diagnosisdate': 'DiagnosisDate',
+                'diagnosisnumber': 'DiagnosisNbr',
+                'type': 'ExamType',
+                'diagnosis1': 'Diagnosis',
+                'diagnosis2': 'MorphologyCode',
+                'stage': 'Stage',
+                'lab_nr': 'LaboratoryNbr',
+                'reg': 'Region',
+                'sincelast': 'TimeSinceLast',
+                'age': 'Age'}
+
+    make_exams_tables(['birthdate', 'censordate'], renaming, main_df, exams_dest)

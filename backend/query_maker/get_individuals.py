@@ -4,6 +4,13 @@ import numpy as np
 import functools
 import pandas
 import config
+from joblib import Parallel, delayed
+import multiprocessing
+
+
+def apply_parallel(dfGrouped, func):
+    retLst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(val) for val in dfGrouped)
+    return retLst
 
 
 def get_constraint(key_values, name, operator, not_found_return):
@@ -88,8 +95,12 @@ def get_individuals(nodes, edges, individuals_table, exams_table):
 
     #print(diags, times, exams)
 
+    rs = []
+
     # Filter by attributes
     for d, t, e in zip(diags, times, exams):
         patients_of_interest = filter_by_attributes(graph, paths, individuals_table, exams_table)
         f = functools.partial(match_time_sequence, diagnosis=d, time=t, exams_range=e)
-        result = pandas.DataFrame(patients_of_interest)['StringRep'].apply(f)
+        rs.append(apply_parallel(pandas.DataFrame(patients_of_interest)['StringRep'], f))
+
+    return rs

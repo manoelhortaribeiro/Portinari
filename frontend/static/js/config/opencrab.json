@@ -10,7 +10,7 @@
     }
   ],
 
-  "node_attributes": [
+  "global_attributes": [
     {
       "name": "Birthdate",
       "display": "Birthdate",
@@ -20,7 +20,10 @@
       "name": "CensorDate",
       "display": "Censor Date",
       "type": "Month"
-    },
+    }
+  ],
+
+  "node_attributes": [
     {
       "name": "DiagnosisDate",
       "display": "Diagnosis Date",
@@ -30,6 +33,11 @@
       "name": "Diagnosis",
       "display": "Diagnosis",
       "type": "Diagnosis"
+    },
+    {
+      "name": "Age",
+      "display": "Age",
+      "type": "Number"
     },
     {
       "name": "MorphologyCode",
