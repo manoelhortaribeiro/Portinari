@@ -72,6 +72,24 @@ def parse_sequence(nodes, edges, pred_attr, future_nodes, id_attr, begin_date, e
                 query += "}"
             query += ")\n"
 
+        where_node_const = False
+
+        for step in path:
+            node = graph.get_node(step)
+            name = node['name']
+            for const in node['key_op_value']:
+                if const[1] != "==":
+
+                    if where_node_const is False:
+                        query += "WHERE "
+                        where_node_const = True
+                    else:
+                        query += "AND "
+
+                    query += "{0}.{1} {2} {3}".format(name, const[0], const[1], const[2])
+
+        query += "\n"
+
         for step1, step2 in zip(path[:-1], path[1:]):
             node1 = graph.get_node(step1)
             node2 = graph.get_node(step2)
@@ -83,14 +101,6 @@ def parse_sequence(nodes, edges, pred_attr, future_nodes, id_attr, begin_date, e
                     next = ":Next" + key[2]
 
             query += "MATCH ({0})-[{1}{2}]->({3})\n".format(node1['name'], edge['name'], next, node2['name'])
-
-        for step in path:
-            node = graph.get_node(step)
-            name = node['name']
-            for const in node['key_op_value']:
-                if const[1] != "==":
-
-                    query += "{0}.{1} {2} {3}".format(name, const[0], const[1], const[2])
 
         where_path_const = False
 
@@ -127,4 +137,3 @@ def parse_sequence(nodes, edges, pred_attr, future_nodes, id_attr, begin_date, e
         query += "UNION\n"
 
     return query[:-6]
-

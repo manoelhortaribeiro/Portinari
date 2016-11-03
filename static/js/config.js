@@ -103,6 +103,10 @@ var node_attributes = [
         {name: "type", display: "Type of Exam", type: "type"}
     ];
 
+var query_attributes = [
+        {name: "diagnosis1", display: "Diagnosis", type: "diagnosis1"},
+    ];
+
 var edge_attributes = [
         {name: "sincelast", display: "Time Interval", type: "number"},
         {name: "type", display: "Exam Interval", type: "number"}
@@ -163,7 +167,7 @@ module.exports = {
     },
 
     VIEW_PREDICTION_FORM: {
-        "Node": node_attributes
+        "Node": query_attributes
     },
 
 
