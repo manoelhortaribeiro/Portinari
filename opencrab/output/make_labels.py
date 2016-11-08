@@ -1,5 +1,6 @@
 import pandas as pd
 import random
+import collections
 
 display = {
     "-2": "Origin",
@@ -18,15 +19,20 @@ display = {
     "36": "Cancer"
 }
 
-comb = pd.read_csv('./combinations.csv')
+comb = pd.read_csv('./combinations.csv', header=None)
 
 val_list = []
 
 for i in comb.values:
     val_list.append(str(i[0]).split('0'))
 
+val_list.append(['-1'])
+val_list.append(['-2'])
+
 list_result = []
-dict_result = {}
+dict_result = {"-2": "Origin", "-1": "Nothing"}
+
+
 r = lambda: random.randint(0, 255)
 
 for i in val_list:
@@ -39,7 +45,7 @@ for i in val_list:
     item = '\n'.join(tmp)
 
     list_result.append([key, item])
-    dict_result[key] = {'text': item,'color': '#%02X%02X%02X' % (r(), r(), r()) }
+    dict_result[key] = {'text': item, 'color': '#%02X%02X%02X' % (r(), r(), r())}
 
 print(list_result)
 print(dict_result)

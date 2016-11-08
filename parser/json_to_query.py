@@ -84,7 +84,7 @@ def parse_sequence(nodes, edges, pred_attr, future_nodes, id_attr, begin_date, e
                         query += "WHERE "
                         where_node_const = True
                     else:
-                        query += "AND "
+                        query += " AND "
 
                     query += "{0}.{1} {2} {3}".format(name, const[0], const[1], const[2])
 
