@@ -1,10 +1,11 @@
 .idea/
 neo4jdb/__pycache__/
 opencrab/data/output
-opencrab/data/raw_data
 opencrab/data/processed_data
-opencrab/processed_data/opencrabunix.csv
+opencrab/processed_data/opencrabunix_d.csv
+opencrab/processed_data/opencrab_final.csv
 opencrab/raw_data/opencrab.csv
+opencrab/raw_data/opencrab_d.csv
 parser/__init__.pyc
 parser/__pycache__/
 static/js/bundle.js
