@@ -1,7 +1,6 @@
 import csv
 
 
-# TODO: document this script better
 def write_nodes_and_rels(path, nodes, edges, node_values, edge_values):
 
     nodes_writer = csv.writer(open(path + 'events.csv', 'w'))
@@ -21,6 +20,7 @@ def write_nodes_and_rels(path, nodes, edges, node_values, edge_values):
     count = 0
 
     for patient, links in zip(nodes, edges):
+
         tmp = []
 
         flag = True
@@ -43,13 +43,13 @@ def write_nodes_and_rels(path, nodes, edges, node_values, edge_values):
                 acc = 0
                 for val in links[i:j]:
                     acc += int(val[0])
+                    acc += int(val[0])
 
                 edges_writer.writerow([tmp[i], tmp[j], "Next"+str(j-i), acc])
 
 
-def parse_opencrab(path_src, path_out, id_value,
-                   event_date, start_date, end_date,
-                   node_values, edge_values):
+def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_date, node_values, edge_values):
+
     # Open the file
     file = open(path_src, 'r')
     csvfile = csv.DictReader(file)
@@ -62,6 +62,7 @@ def parse_opencrab(path_src, path_out, id_value,
     count = 0
 
     for row in csvfile:
+
 
         if event_date is not None:
             if int(row[event_date]) < start_date or int(row[event_date]) > end_date:
@@ -86,34 +87,49 @@ def parse_opencrab(path_src, path_out, id_value,
             id_v = int(row[id_value])
 
             for i in node_values:
-                tmp_nodes.append(row[i[0]])
+                #print('fnode', i[2], row[i[0]])
+                if len(row[i[0]]) != 0:
+                    tmp_nodes.append(i[2](row[i[0]]))
+                else:
+                    tmp_nodes.append(row[i[0]])
+
             nodes.append(tmp_nodes)
         else:
             for i in node_values:
-                tmp_nodes.append(row[i[0]])
+                #print('node', i[2], row[i[0]])
+                if len(row[i[0]]) != 0:
+                    tmp_nodes.append(i[2](row[i[0]]))
+                else:
+                    tmp_nodes.append(row[i[0]])
             nodes.append(tmp_nodes)
 
             for i in edge_values:
-                tmp_edges.append(row[i[0]])
+                #print('edge', i[2], row[i[0]])
+                if len(row[i[0]]) != 0:
+                    tmp_edges.append(i[2](row[i[0]]))
+                else:
+                    tmp_edges.append(row[i[0]])
             edges.append(tmp_edges)
 
     write_nodes_and_rels(path_out, f_nodes, f_edges, node_values, edge_values)
 
-parse_opencrab("../data/processed_data/opencrabunix.csv",
-               "../data/output/",
+
+f = lambda a: int(float(a))
+parse_opencrab("../processed_data/opencrab_final.csv",
+               "../output/",
                id_value="ID",
                event_date="diagnosisdate",
                start_date=0,
                end_date=1000000000,
-               node_values=[("ID", ":int", int),
-                            ("birthdate", ":int", int),
-                            ("diagnosisnumber", ":int", int),
-                            ("censordate", ":int", int),
+               node_values=[("ID", ":int", f),
+                            ("birthdate", ":int", f),
+                            ("diagnosisnumber", ":int", f),
+                            ("censordate", ":int", f),
                             ("type", "", str),
-                            ("diagnosis1", ":int", int),
-                            ("diagnosis2", ":int", int),
-                            ("stage", ":int", int),
-                            ("lab_nr", ":int", int),
-                            ("diagnosisdate", ":int", int),
-                            ("age", ":int", int)],
-               edge_values=[("sincelast", ":int", int)])
+                            ("diagnosis1", "long", f),
+                            ("diagnosis2", ":int", f),
+                            ("stage", ":int", f),
+                            ("lab_nr", ":int", f),
+                            ("diagnosisdate", ":int", f),
+                            ("age", ":int", f)],
+               edge_values=[("sincelast", ":int", f)])
