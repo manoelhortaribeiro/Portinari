@@ -153,7 +153,7 @@ def make_patient_tables(ran, df, dest):
     gc.collect()
     df.to_csv(dest + 'r' + str(ran[0]) + str(ran[1]), mode='w', index=False, header=has_header)
 
-_drop = [35, 14]
+_drop = [35, 14, 24]
 
 _group = {
     36: 36, 37: 36, 38: 36,  # Cancer - done

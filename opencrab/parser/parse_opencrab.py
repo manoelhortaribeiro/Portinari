@@ -63,7 +63,6 @@ def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_dat
 
     for row in csvfile:
 
-
         if event_date is not None:
             if int(row[event_date]) < start_date or int(row[event_date]) > end_date:
                 continue
@@ -87,7 +86,7 @@ def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_dat
             id_v = int(row[id_value])
 
             for i in node_values:
-                #print('fnode', i[2], row[i[0]])
+                # print('fnode', i[2], row[i[0]])
                 if len(row[i[0]]) != 0:
                     tmp_nodes.append(i[2](row[i[0]]))
                 else:
@@ -96,7 +95,7 @@ def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_dat
             nodes.append(tmp_nodes)
         else:
             for i in node_values:
-                #print('node', i[2], row[i[0]])
+                # print('node', i[2], row[i[0]])
                 if len(row[i[0]]) != 0:
                     tmp_nodes.append(i[2](row[i[0]]))
                 else:
@@ -104,7 +103,7 @@ def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_dat
             nodes.append(tmp_nodes)
 
             for i in edge_values:
-                #print('edge', i[2], row[i[0]])
+                # print('edge', i[2], row[i[0]])
                 if len(row[i[0]]) != 0:
                     tmp_edges.append(i[2](row[i[0]]))
                 else:
@@ -126,7 +125,7 @@ parse_opencrab("../processed_data/opencrab_final.csv",
                             ("diagnosisnumber", ":int", f),
                             ("censordate", ":int", f),
                             ("type", "", str),
-                            ("diagnosis1", "long", f),
+                            ("diagnosis1", ":long", f),
                             ("diagnosis2", ":int", f),
                             ("stage", ":int", f),
                             ("lab_nr", ":int", f),
