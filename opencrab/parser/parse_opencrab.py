@@ -81,23 +81,19 @@ def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_dat
 
         # First case: id_v not initialized
         if id_v is None or id_v != int(row[id_value]):
+
             nodes = []
             edges = []
             id_v = int(row[id_value])
 
-            if row['diagnosis1'] == '31031018031031031':
-                print('a', row)
 
             for i in node_values:
                 # print('fnode', i[2], row[i[0]])
-
-
                 if len(row[i[0]]) != 0:
 
                     tmp_nodes.append(i[2](row[i[0]]))
                 else:
                     tmp_nodes.append(row[i[0]])
-
             nodes.append(tmp_nodes)
         else:
             for i in node_values:
@@ -116,10 +112,11 @@ def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_dat
                     tmp_edges.append(row[i[0]])
             edges.append(tmp_edges)
 
+
     write_nodes_and_rels(path_out, f_nodes, f_edges, node_values, edge_values)
 
 
-f = lambda a: int(float(a))
+f = lambda a: int(a.rstrip('.0'))
 parse_opencrab("../processed_data/opencrab_final.csv",
                "../output/",
                id_value="ID",

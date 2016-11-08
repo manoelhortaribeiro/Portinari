@@ -120,6 +120,13 @@ def merge(table):
             else:
                 to_drop.append(i)
 
+        #print('before', diagnosis1, types)
+
+        tuples = list(zip(diagnosis1, types))
+        tuples = sorted(tuples, key=lambda a: a[0])
+        diagnosis1, types = list(list(zip(*tuples))[0]), list(list(zip(*tuples))[1])
+        #print('after', diagnosis1, types)
+
         all_types.append('/'.join(types))
         all_diagnosis.append(int('0'.join(diagnosis1)))
 
@@ -182,6 +189,7 @@ _df = pandas.read_csv(_source)
 f = functools.partial(make_patient_tables, df=_df, dest=_dest,)
 
 range_of = list(zip(list(range(0, 1000000, 25000)), list(range(25000, 1000000, 25000))))
+
 with Pool(3) as p:
     p.map(f, range_of)
 
