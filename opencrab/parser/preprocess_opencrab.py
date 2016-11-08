@@ -153,7 +153,7 @@ def make_patient_tables(ran, df, dest):
     gc.collect()
     df.to_csv(dest + 'r' + str(ran[0]) + str(ran[1]), mode='w', index=False, header=has_header)
 
-_drop = [35, 14, 24]
+_drop = [35, 14]
 
 _group = {
     36: 36, 37: 36, 38: 36,  # Cancer - done
@@ -170,20 +170,20 @@ _field_names = [
     "diagnosisdate", "age", "sincelast"  # Related to date
 ]
 
-unprocessed = "../raw_data/opencrab_d.csv"
-source = "../processed_data/opencrabunix_d.csv"
-dest = '../processed_data/opencrab_final.csv'
+_unprocessed = "../raw_data/opencrab_d.csv"
+_source = "../processed_data/opencrabunix_d.csv"
+_dest = '../processed_data/opencrab_final.csv'
 
-# pre_process(unprocessed, source, _drop, _group, _field_names)
+# pre_process(_unprocessed, _source, _drop, _group, _field_names)
 
 
-_df = pandas.read_csv(source)
+_df = pandas.read_csv(_source)
 
-f = functools.partial(make_patient_tables, df=_df, dest=dest,)
+f = functools.partial(make_patient_tables, df=_df, dest=_dest,)
 
 range_of = list(zip(list(range(0, 1000000, 25000)), list(range(25000, 1000000, 25000))))
 with Pool(3) as p:
     p.map(f, range_of)
 
-os.system('cat ' + dest + 'r* > ' + dest)
-os.system('rm ' + dest + 'r*')
+os.system('cat ' + _dest + 'r* > ' + _dest)
+os.system('rm ' + _dest + 'r*')

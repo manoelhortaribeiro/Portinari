@@ -24,8 +24,7 @@ def get_hash_val(node_key, i):
 
 def make_sankey(data, future_nodes):
 
-    print(data)
-
+    data = data[data.c1 <= 3]
 
     # Gets "val_hash"
 
@@ -35,6 +34,7 @@ def make_sankey(data, future_nodes):
     for i in range(int(future_nodes) + 1):
         p = 'p' + str(i)
         attr = pandas.Series(data[p].ravel()).unique().tolist()
+        print(attr)
         for node_key in attr:
             value = get_hash_val(node_key, i)
             if value not in val_hash:
