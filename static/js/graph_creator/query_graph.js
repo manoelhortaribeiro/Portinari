@@ -139,6 +139,8 @@ GC.prototype.svgKeyDown = function () {
     var nodes = thisGraph.graph.nodes;
     var edges = thisGraph.graph.edges;
 
+    console.log(d3.event.keyCode)
+
     switch (d3.event.keyCode) {
         case thisGraph.config.delete:
             // - deletes a node/edge -

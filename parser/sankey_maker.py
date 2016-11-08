@@ -24,17 +24,27 @@ def get_hash_val(node_key, i):
 
 def make_sankey(data, future_nodes):
 
-    data = data[data.c1 <= 3]
+    sor_np_val = numpy.copy(data.c0.values, order='K')
+    sor_np_val.sort()
+    sor_np_val = sor_np_val[::-1]
+
+    print(sor_np_val)
+
+    maxval = min(15, len(sor_np_val))
+
+    data = data[data.c0 > sor_np_val[maxval]]
+    data = data[data.c0 > sor_np_val[maxval]]
+
+
+    print(data)
 
     # Gets "val_hash"
-
     val_hash = dict()
     count = 0
 
     for i in range(int(future_nodes) + 1):
         p = 'p' + str(i)
         attr = pandas.Series(data[p].ravel()).unique().tolist()
-        print(attr)
         for node_key in attr:
             value = get_hash_val(node_key, i)
             if value not in val_hash:
@@ -52,7 +62,6 @@ def make_sankey(data, future_nodes):
             node = {"node": val_hash[get_hash_val(node_key, i)], "name": node_key}
             nodes.append(node)
 
-
     # Gets "edges"
     edges = list()
 
@@ -66,7 +75,6 @@ def make_sankey(data, future_nodes):
         tmp_data = data.groupby([p_past, p_future])[c_past].sum()
         tmp_data = tmp_data.reset_index()
 
-        print(tmp_data)
 
         p0s = pandas.Series(tmp_data[p_past].ravel()).tolist()
         p1s = pandas.Series(tmp_data[p_future].ravel()).tolist()
