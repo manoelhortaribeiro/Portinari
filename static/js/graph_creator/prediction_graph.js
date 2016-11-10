@@ -92,7 +92,7 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .attr("class", "sankey_link")
         .attr("d", path)
         .style("stroke-width", function (d) {
-            return Math.max(1, d.dy);
+            return Math.max(3, d.dy);
         }).sort(function (a, b) {
             if (a.target.name == -1 || a.source.name == -1) {
                 return -1;
@@ -150,7 +150,7 @@ PredictionGraph.prototype.updateResult = function (graph) {
     // add the rectangles for the nodes
     node.append("rect")
         .attr("height", function (d) {
-            return d.dy;
+            return Math.max(3, d.dy + 2)
         })
         .attr("width", sankey.nodeWidth())
         .style("fill", function (d) {
@@ -203,7 +203,7 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .attr("y", function (d) {
             return d.dy / 2;
         })
-        .attr("dy", ".35em")
+        .attr("dy", ".25em")
         .attr("text-anchor", "end")
         .attr("transform", null)
         .text(function (d) {

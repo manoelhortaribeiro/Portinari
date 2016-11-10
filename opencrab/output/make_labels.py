@@ -1,6 +1,10 @@
 import pandas as pd
 import random
-import collections
+
+
+def r():
+    return random.randint(0, 255)
+
 
 display = {
     "-2": "Origin",
@@ -35,8 +39,6 @@ list_result = []
 
 dict_result = {}
 
-r = lambda: random.randint(0, 255)
-
 for i in val_list:
 
     tmp = []
@@ -46,7 +48,9 @@ for i in val_list:
     key = '0'.join(i)
     item = ','.join(tmp)
 
-    list_result.append([key, item])
+    if len(tmp) <= 2:
+        list_result.append([key, item])
+
     dict_result[key] = {'text': item, 'color': '#%02X%02X%02X' % (r(), r(), r())}
 
 print(list_result)
