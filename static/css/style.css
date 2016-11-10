@@ -121,6 +121,7 @@ input {
     border-color: rgba(43, 102, 154, 0.38);
     padding: 10px 20px;
     min-width: 120px;
+    max-width: 200px;
     font-size: 15px;
     margin: 20px 10px 20px 0;
     color: #6c5c70;

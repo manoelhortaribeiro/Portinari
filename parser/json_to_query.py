@@ -59,10 +59,17 @@ def parse_sequence(nodes, edges, pred_attr, future_nodes, id_attr, begin_date, e
 
     for path in paths:
 
+        is_first = True
+
         for step in path:
             node = graph.get_node(step)
             has_eq_const = False
-            query += "MATCH ( {0}:{1} {{".format(node['name'], node['label'])
+            if is_first:
+                is_first = False
+                tmp = 'First'
+            else:
+                tmp = node['label']
+            query += "MATCH ( {0}:{1} {{".format(node['name'], tmp)
             for const in node['key_op_value']:
                 if const[1] == '==':
                     query += " {0}:{1} ,".format(const[0], const[2])
@@ -114,7 +121,7 @@ def parse_sequence(nodes, edges, pred_attr, future_nodes, id_attr, begin_date, e
                         query += "WHERE "
                         where_path_const = True
                     else:
-                        query += "AND "
+                        query += " AND "
 
                     query += "{0}.{1} {2} {3}\n".format(name, const[0], const[1], const[2])
 
@@ -123,15 +130,15 @@ def parse_sequence(nodes, edges, pred_attr, future_nodes, id_attr, begin_date, e
         range_future_nodes = list(range(int(future_nodes)))
 
         first_fut_node = "ft{0}".format(range_future_nodes[0])
-        query += "MATCH ({0})-[first_future:Next1]->({1})\n".format(last_spec_node, first_fut_node)
+        query += "OPTIONAL MATCH ({0})-[first_future:Next1]->({1})\n".format(last_spec_node, first_fut_node)
         query += "WHERE first_future.sincelast >= {0} AND first_future.sincelast <= {1}\n".format(begin_date, end_date)
         for i, j in zip(range_future_nodes[:-1], range_future_nodes[1:]):
             query += "OPTIONAL MATCH (ft{0})-[:Next1]->(ft{1})\n".format(i, j)
 
-        query += "RETURN COUNT(distinct {0}.{1}) as c0, -2 as p0,".format(last_spec_node, id_attr)
+        query += "RETURN COUNT({0}.{1}) as c0, -2 as p0,".format(last_spec_node, id_attr)
 
         for i in range_future_nodes:
-            query += " ft{0}.{1} as p{3}, COUNT(distinct ft{0}.{2}) as c{3},".format(i, pred_attr, id_attr, i + 1)
+            query += " ft{0}.{1} as p{3}, COUNT(ft{0}.{2}) as c{3},".format(i, pred_attr, id_attr, i + 1)
         query = query[:-1] + "\n"
 
         query += "UNION\n"

@@ -15,14 +15,14 @@ function PredictionGraph(svg1, svg2, reactor) {
     thisResult.svg1 = svg1.append("svg")
         .classed("shadow-box", true)
         .classed("grid-svg", true)
-        .attr("width", "600px")
+        .attr("width", "900px")
         .attr("height", "825px")
         .attr("visibility", "hidden");
 
     thisResult.svg2 = svg2.append("svg")
         .classed("shadow-box", true)
         .classed("grid-svg", true)
-        .attr("width", "600px")
+        .attr("width", "900px")
         .attr("height", "825px")
         .attr("visibility", "hidden");
 
@@ -105,12 +105,12 @@ PredictionGraph.prototype.updateResult = function (graph) {
             }
         });
 
-    link.each(function (p) {
-        if (p.target.name == -1) {
-            d3.select(this)
-                .attr("visibility", "hidden");
-        }
-    });
+    // link.each(function (p) {
+    //     if (p.target.name == -1) {
+    //         d3.select(this)
+    //             .attr("visibility", "hidden");
+    //     }
+    // });
 
     // add the link titles
     link.append("title")
@@ -215,12 +215,12 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .attr("x", 6 + sankey.nodeWidth())
         .attr("text-anchor", "start");
 
-    node.each(function (p) {
-        if (p.name == -1) {
-            d3.select(this)
-                .attr("visibility", "hidden");
-        }
-    });
+    // node.each(function (p) {
+    //     if (p.name == -1) {
+    //         d3.select(this)
+    //             .attr("visibility", "hidden");
+    //     }
+    // });
 
     this.start = (this.start + 1) % 2;
     this.queryNumber += 1;

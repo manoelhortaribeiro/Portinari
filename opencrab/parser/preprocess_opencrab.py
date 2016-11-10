@@ -120,12 +120,12 @@ def merge(table):
             else:
                 to_drop.append(i)
 
-        #print('before', diagnosis1, types)
+        # print('before', diagnosis1, types)
 
         tuples = list(zip(diagnosis1, types))
         tuples = sorted(tuples, key=lambda a: a[0])
         diagnosis1, types = list(list(zip(*tuples))[0]), list(list(zip(*tuples))[1])
-        #print('after', diagnosis1, types)
+        # print('after', diagnosis1, types)
 
         all_types.append('/'.join(types))
         all_diagnosis.append(int('0'.join(diagnosis1)))

@@ -24,23 +24,43 @@ def get_hash_val(node_key, i):
 
 def make_sankey(data, future_nodes):
 
+
+    if data.empty:
+        return json.dumps('', cls=MyEncoder)
+
+    data.to_csv('log.csv')
+
     sor_np_val = numpy.copy(data.c0.values, order='K')
     sor_np_val.sort()
     sor_np_val = sor_np_val[::-1]
 
-    print(sor_np_val)
+    maxval = 25
+    if len(sor_np_val) >= maxval:
 
-    maxval = min(15, len(sor_np_val))
+        temp = data[data.c0 <= sor_np_val[maxval]]
 
-    data = data[data.c0 > sor_np_val[maxval]]
-    data = data[data.c0 > sor_np_val[maxval]]
+        print(temp)
+        col_vals1 = numpy.array(['c0', 'p0', 'p1']).tolist()
+        col_vals2 = numpy.setdiff1d(temp.columns.values, col_vals1).tolist()
+        oth_vals = [temp.c0.values.sum(), -2, -3]
 
+        for i in col_vals2:
+            oth_vals.append(None)
 
-    print(data)
+        col_vals = col_vals1 + col_vals2
+
+        add_vals = pandas.Series(oth_vals, index=col_vals)
+
+        data = data[data.c0 > sor_np_val[maxval]]
+
+        data = data.append(add_vals, ignore_index=True)
+        data.fillna(-1, inplace=True)
 
     # Gets "val_hash"
     val_hash = dict()
     count = 0
+
+    print(data)
 
     for i in range(int(future_nodes) + 1):
         p = 'p' + str(i)

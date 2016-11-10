@@ -27,6 +27,7 @@ def write_nodes_and_rels(path, nodes, edges, node_values, edge_values):
 
         for event in patient:
 
+
             labels = "Event"
 
             if flag:
@@ -86,9 +87,7 @@ def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_dat
             edges = []
             id_v = int(row[id_value])
 
-
             for i in node_values:
-                # print('fnode', i[2], row[i[0]])
                 if len(row[i[0]]) != 0:
 
                     tmp_nodes.append(i[2](row[i[0]]))
@@ -116,22 +115,30 @@ def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_dat
     write_nodes_and_rels(path_out, f_nodes, f_edges, node_values, edge_values)
 
 
-f = lambda a: int(a.rstrip('.0'))
+
+def treat_float(a):
+    tmp = a.find('.')
+    if tmp == -1:
+        return int(a)
+    else:
+        return int(a[:tmp])
+
+f = lambda a: int(a[:-2])
 parse_opencrab("../processed_data/opencrab_final.csv",
                "../output/",
                id_value="ID",
                event_date="diagnosisdate",
                start_date=0,
                end_date=100000000000,
-               node_values=[("ID", ":int", f),
-                            ("birthdate", ":int", f),
-                            ("diagnosisnumber", ":int", f),
-                            ("censordate", ":int", f),
+               node_values=[("ID", ":int", treat_float),
+                            ("birthdate", ":int", treat_float),
+                            ("diagnosisnumber", ":int", treat_float),
+                            ("censordate", ":int", treat_float),
                             ("type", "", str),
-                            ("diagnosis1", ":long", f),
-                            ("diagnosis2", ":int", f),
-                            ("stage", ":int", f),
-                            ("lab_nr", ":int", f),
-                            ("diagnosisdate", ":int", f),
-                            ("age", ":int", f)],
-               edge_values=[("sincelast", ":int", f)])
+                            ("diagnosis1", ":long", treat_float),
+                            ("diagnosis2", ":int", treat_float),
+                            ("stage", ":int", treat_float),
+                            ("lab_nr", ":int", treat_float),
+                            ("diagnosisdate", ":int", treat_float),
+                            ("age", ":int", treat_float)],
+               edge_values=[("sincelast", ":int", treat_float)])
