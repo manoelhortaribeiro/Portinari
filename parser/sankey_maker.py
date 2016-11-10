@@ -23,8 +23,6 @@ def get_hash_val(node_key, i):
 
 
 def make_sankey(data, future_nodes):
-
-
     if data.empty:
         return json.dumps('', cls=MyEncoder)
 
@@ -78,7 +76,6 @@ def make_sankey(data, future_nodes):
         p = 'p' + str(i)
         attr = pandas.Series(data[p].ravel()).unique().tolist()
         for node_key in attr:
-
             node = {"node": val_hash[get_hash_val(node_key, i)], "name": node_key}
             nodes.append(node)
 
@@ -95,7 +92,6 @@ def make_sankey(data, future_nodes):
         tmp_data = data.groupby([p_past, p_future])[c_past].sum()
         tmp_data = tmp_data.reset_index()
 
-
         p0s = pandas.Series(tmp_data[p_past].ravel()).tolist()
         p1s = pandas.Series(tmp_data[p_future].ravel()).tolist()
         c0s = pandas.Series(tmp_data[c_past].ravel()).tolist()
@@ -103,10 +99,10 @@ def make_sankey(data, future_nodes):
         for p0, p1, c0 in zip(p0s, p1s, c0s):
 
             edge = {
-                    "source": val_hash[get_hash_val(p0, past)],
-                    "target": val_hash[get_hash_val(p1, future)],
-                    "value": c0
-                    }
+                "source": val_hash[get_hash_val(p0, past)],
+                "target": val_hash[get_hash_val(p1, future)],
+                "value": c0
+            }
 
             if edge["value"] != 0:
                 edges.append(edge)
@@ -120,4 +116,3 @@ def make_sankey(data, future_nodes):
     print(sankey)
 
     return json.dumps(sankey, cls=MyEncoder)
-
