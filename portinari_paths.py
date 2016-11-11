@@ -29,11 +29,14 @@ def index():
         future_nodes = json.loads(request.form['future_nodes'])
         id_attr = json.loads(request.form['id'])
 
-        if len(request.form['begin_date']) > 2 and len(request.form['end_date']) > 2:
+        if len(request.form['begin_date']) > 2:
             begin_date = json.loads(request.form['begin_date'])
-            end_date = json.loads(request.form['end_date'])
         else:
             begin_date = 0
+
+        if len(request.form['end_date']) > 2:
+            end_date = json.loads(request.form['end_date'])
+        else:
             end_date = 10000 * 365  # 10 thousand years ;)
 
         query = parse_sequence(nodes, edges, pred_attr, future_nodes, id_attr, begin_date, end_date)
