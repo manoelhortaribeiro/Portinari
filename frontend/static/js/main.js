@@ -20,7 +20,6 @@ var Utils = require("./util/util.js");
 // Configures query button
 Utils.toggleButton("#expand-query-button", ".content_query", "Query");
 
-
 /* --------------------- */
 /* ---  Query System --- */
 /* --------------------- */

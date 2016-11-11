@@ -17,7 +17,7 @@ def to_unix(s):
     return "" if s == "" else int(int(time.mktime(datetime.datetime.strptime(s, "%d.%m.%Y").timetuple())) / day_ms)
 
 
-def pre_process_exams_only(path, dest, has_dateres=False):
+def pre_process_exams_only(path, dest, diagnosis_hash, has_dateres=False):
     """
     This function receives a path to an existing csv file and for an output csv file, which may exist or not. It
     calculates the time in between diagnosis taken by the same individual, adding a row called "sincelast" has the time
@@ -51,6 +51,7 @@ def pre_process_exams_only(path, dest, has_dateres=False):
         row["diagnosisdate"] = to_unix(row["diagnosisdate"])
         row["birthdate"] = to_unix(row["birthdate"])
         row["censordate"] = to_unix(row["censordate"])
+        row["diagnosis1"] = diagnosis_hash[int(row["diagnosis1"])]
 
         if has_dateres:
             row["dateres"] = to_unix(row["dateres"])
@@ -99,39 +100,45 @@ def pre_process_exams_query(src, dest, s1_fields, s2_fields, undocumented):
 
 if __name__ == "__main__":
 
+    new_diagnosis = {0: 11, 1: 12, 9: 13, 10: 14, 11: 15, 12: 16, 13: 17, 14: 18, 15: 19, 16: 21, 17: 22, 18: 23,
+                     10: 14, 20: 25, 21: 26, 22: 27, 30: 28, 31: 29, 32: 31, 33: 32, 34: 33, 35: 34, 99: 35, 41: 36,
+                     42: 37, 43: 38}
+
     # -- OPENCRAB DATASET
 
-    pre_process_exams_only("./raw/opencrab/opencrab.csv", "./preprocessed/opencrab/opencrab_processed.csv")
+    pre_process_exams_only(path="./raw/opencrab/opencrab_sample.csv",
+                           dest="./preprocessed/opencrab/opencrab_processed_sample.csv",
+                           diagnosis_hash=new_diagnosis)
 
-    # -- SURVEYS DATASET
-
-    _undocumented = ["q14newpa"]
-
-    _survey2fields = [
-        "q5aagsto", "q5esnu", "q5esnust", "q5fagsnu", "q5g1snu", "q5g2snu", "q5g3snu", "q5g4snu", "q5g5snu", "q5g6snu",
-        "q5g7snu", "q5g8snu", "q6adrk", "q6aagsto", "q6bsoda", "q6brwin", "q6bwwin", "q6bdwin", "q6dbeer", "q6dsoda",
-        "q6drwin", "q6dwwin", "q6ddwin", "q6dvodk", "c6aagdrk", "q6eagdrk", "q7cagpr1", "q7cres1", "q7cagpr2",
-        "q7cres2", "q7cagpr3", "q7cres3", "q7cagpr4", "q7cres4", "q7cagpr5", "q7cres5", "q7cagpr6", "q7cres6",
-        "q7cagpr7", "q7cres7", "q7cagpr8", "q7cres8", "q7cagpr9", "q7cres9", "q8bpill", "q8bagpi", "q8bdupi",
-        "q8bmini", "q8bagmi", "q8bdumi", "q8bspir", "q8bagsp", "q8bdusp", "q8both", "q8bagot", "q8bduot", "q8cmapi",
-        "q8cagma", "q8crema", "q10conew", "q11bno", "q11bco", "q11bhor", "q11bsafe", "q11bwith", "q11bmorn", "q11both",
-        "q13youpa", "q15risk", "q15agchl", "q15agher", "q15agtri", "q15aggon", "q19vac", "q19agvac", "q22awork",
-        "q22bhome", "q23heigh", "q23weigh"
-    ]
-
-    _survey1fields = [
-        "c6c2wine", "c6b2beer", "c6b3soda", "c6b4rwin", "c6b5wwin", "c6b6dwin", "c6b7vodk", "c6aagdrk", "c7aagepr",
-        "c8aageco", "c8bhormc", "c8cyrhor", "c11conew"
-    ]
-
-    _dest, _src = ("./preprocessed/surveys/", "s1_tmp.csv", "s2_tmp.csv", "mixed_tmp.csv"), \
-                  ("./raw/surveys/surveydata.csv", "./raw/surveys/regdata.csv")
-
-    pre_process_exams_query(_src, _dest, _survey1fields, _survey2fields, _undocumented)
-
-    pre_process_exams_only("./preprocessed/surveys/s1_tmp.csv", "./preprocessed/surveys/s1.csv", True)
-    pre_process_exams_only("./preprocessed/surveys/s2_tmp.csv", "./preprocessed/surveys/s2.csv", True)
-    pre_process_exams_only("./preprocessed/surveys/mixed_tmp.csv", "./preprocessed/surveys/mixed.csv", True)
-    os.system('rm ./preprocessed/surveys/s1_tmp.csv')
-    os.system('rm ./preprocessed/surveys/s2_tmp.csv')
-    os.system('rm ./preprocessed/surveys/mixed_tmp.csv')
+    # # -- SURVEYS DATASET
+    #
+    # _undocumented = ["q14newpa"]
+    #
+    # _survey2fields = [
+    #     "q5aagsto", "q5esnu", "q5esnust", "q5fagsnu", "q5g1snu", "q5g2snu", "q5g3snu", "q5g4snu", "q5g5snu", "q5g6snu",
+    #     "q5g7snu", "q5g8snu", "q6adrk", "q6aagsto", "q6bsoda", "q6brwin", "q6bwwin", "q6bdwin", "q6dbeer", "q6dsoda",
+    #     "q6drwin", "q6dwwin", "q6ddwin", "q6dvodk", "c6aagdrk", "q6eagdrk", "q7cagpr1", "q7cres1", "q7cagpr2",
+    #     "q7cres2", "q7cagpr3", "q7cres3", "q7cagpr4", "q7cres4", "q7cagpr5", "q7cres5", "q7cagpr6", "q7cres6",
+    #     "q7cagpr7", "q7cres7", "q7cagpr8", "q7cres8", "q7cagpr9", "q7cres9", "q8bpill", "q8bagpi", "q8bdupi",
+    #     "q8bmini", "q8bagmi", "q8bdumi", "q8bspir", "q8bagsp", "q8bdusp", "q8both", "q8bagot", "q8bduot", "q8cmapi",
+    #     "q8cagma", "q8crema", "q10conew", "q11bno", "q11bco", "q11bhor", "q11bsafe", "q11bwith", "q11bmorn", "q11both",
+    #     "q13youpa", "q15risk", "q15agchl", "q15agher", "q15agtri", "q15aggon", "q19vac", "q19agvac", "q22awork",
+    #     "q22bhome", "q23heigh", "q23weigh"
+    # ]
+    #
+    # _survey1fields = [
+    #     "c6c2wine", "c6b2beer", "c6b3soda", "c6b4rwin", "c6b5wwin", "c6b6dwin", "c6b7vodk", "c6aagdrk", "c7aagepr",
+    #     "c8aageco", "c8bhormc", "c8cyrhor", "c11conew"
+    # ]
+    #
+    # _dest, _src = ("./preprocessed/surveys/", "s1_tmp.csv", "s2_tmp.csv", "mixed_tmp.csv"), \
+    #               ("./raw/surveys/surveydata.csv", "./raw/surveys/regdata.csv")
+    #
+    # pre_process_exams_query(_src, _dest, _survey1fields, _survey2fields, _undocumented)
+    #
+    # pre_process_exams_only("./preprocessed/surveys/s1_tmp.csv", "./preprocessed/surveys/s1.csv", True)
+    # pre_process_exams_only("./preprocessed/surveys/s2_tmp.csv", "./preprocessed/surveys/s2.csv", True)
+    # pre_process_exams_only("./preprocessed/surveys/mixed_tmp.csv", "./preprocessed/surveys/mixed.csv", True)
+    # os.system('rm ./preprocessed/surveys/s1_tmp.csv')
+    # os.system('rm ./preprocessed/surveys/s2_tmp.csv')
+    # os.system('rm ./preprocessed/surveys/mixed_tmp.csv')

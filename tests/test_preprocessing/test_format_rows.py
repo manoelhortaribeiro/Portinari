@@ -25,13 +25,17 @@ class TestFormatRows(unittest.TestCase):
     def test_pre_process(self):
 
         # declare file locations
-
         rel_p = "./files/"
         input_file, output_file = rel_p + "pre_process_input.csv", rel_p + "pre_process_output.csv"
         expected_output_file = rel_p + "pre_process_expected_output.csv"
 
+        # declare diagnosis hash
+        new_diagnosis = {0: 11, 1: 12, 9: 13, 10: 14, 11: 15, 12: 16, 13: 17, 14: 18, 15: 19, 16: 21, 17: 22, 18: 23,
+                         10: 14, 20: 25, 21: 26, 22: 27, 30: 28, 31: 29, 32: 31, 33: 32, 34: 33, 35: 34, 99: 35, 41: 36,
+                         42: 37, 43: 38}
+
         # does preprocessing
-        pre_process_exams_only(input_file, output_file)
+        pre_process_exams_only(input_file, output_file, new_diagnosis)
 
         # compare expected file with actual file
         output_dict = csv.DictReader(open(output_file, 'r'))
