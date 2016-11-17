@@ -31,8 +31,8 @@ def pre_process_exams_only(path, dest, group, drop, has_dateres=False):
     :param dest: Path to destination csv file.
     :param group: Hash containing the diagnosis groupings.
     :param drop: If diagnosis is in this list, drops it.
-    :param has_dateres: has the column dateres
-    :return: Nothing
+    :param has_dateres: has the column dateres.
+    :return: Nothing.
     """
 
     # Open files
@@ -248,12 +248,10 @@ if __name__ == "__main__":
     # _raw_oc = "./raw/opencrab/"
     # _pre_oc = "./preprocessed/opencrab/"
     #
-    # # treat the exams
-    #
-    # _original_path = _raw_oc + "opencrab.csv"
-    # _changed_diagnosis = _raw_oc + "change_tmp.csv"
-    # _preprocessed = _pre_oc + "opencrab_processed.csv"
-    # _grouped = _pre_oc + "opencrab_p_g.csv"
+    # _original_path = _raw_oc + "opencrab.csv"  # original dataset
+    # _changed_diagnosis = _raw_oc + "change_tmp.csv"  # changed diagnosis, as shown in hash ´_diag´
+    # _preprocessed = _pre_oc + "opencrab_processed.csv"  # adds sincelast, does grouping, drops diagnosis in ´_drop_diag´
+    # _grouped = _pre_oc + "opencrab_p_g.csv"  # merges diagnosis that happened in the same month
     #
     # # change diagnosis
     # change_diagnosis(path=_original_path, dest=_changed_diagnosis, new_diagnosis=_diag)
@@ -269,21 +267,20 @@ if __name__ == "__main__":
 
     # -- SURVEYS DATASET
 
-    _raw_sv = "./raw/surveys/"
+    _original_name = "./raw/surveys/surveydata.csv", "./raw/surveys/regdata.csv"  # original datasets
     _pre_sv = "./preprocessed/surveys/"
+    _srctmp = ["s1_tmp.csv", "s2_tmp.csv", "mixed_tmp.csv"]  # joins all data in one big stupid file
+    _srctmp2 = ["s1_tmp2.csv", "s2_tmp2.csv", "mixed_tmp2.csv"]  # changed diagnosis, as shown in hash ´_diag´
+    _srctmp3 = ["s1_tmp3.csv", "s2_tmp3.csv", "mixed_tmp3.csv"]  # sincelast grouping, drops diagnosis in ´_drop_diag´
 
-    _srctmp = ["s1_tmp.csv", "s2_tmp.csv", "mixed_tmp.csv"]
-    _srctmp2 = ["s1_tmp2.csv", "s2_tmp2.csv", "mixed_tmp2.csv"]
-    _srctmp3 = ["s1_tmp3.csv", "s2_tmp3.csv", "mixed_tmp3.csv"]
-
-    _srcfin = ["s1.csv", "s2.csv", "mixed.csv"]
+    _srcfin = ["s1.csv", "s2.csv", "mixed.csv"]  # merges diagnosis that happened in the same month
 
     _undocumented = ["q14newpa"]
 
     _survey2fields = ["q5aagsto", "q5esnu", "q5esnust", "q5fagsnu", "q5g1snu", "q5g2snu", "q5g3snu", "q5g4snu",
                       "q5g5snu", "q5g6snu", "q5g7snu", "q5g8snu", "q6adrk", "q6aagsto", "q6bsoda", "q6brwin",
                       "q6bwwin", "q6bdwin", "q6dbeer", "q6dsoda", "q6drwin", "q6dwwin", "q6ddwin", "q6dvodk",
-                      "c6aagdrk", "q6eagdrk", "q7cagpr1", "q7cres1", "q7cagpr2", "q7cres2", "q7cagpr3", "q7cres3",
+                      "q6eagdrk", "q7cagpr1", "q7cres1", "q7cagpr2", "q7cres2", "q7cagpr3", "q7cres3",
                       "q7cagpr4", "q7cres4", "q7cagpr5", "q7cres5", "q7cagpr6", "q7cres6", "q7cagpr7", "q7cres7",
                       "q7cagpr8", "q7cres8", "q7cagpr9", "q7cres9", "q8bpill", "q8bagpi", "q8bdupi", "q8bmini",
                       "q8bagmi", "q8bdumi", "q8bspir", "q8bagsp", "q8bdusp", "q8both", "q8bagot", "q8bduot", "q8cmapi",
@@ -295,7 +292,7 @@ if __name__ == "__main__":
                       "c7aagepr", "c8aageco", "c8bhormc", "c8cyrhor", "c11conew"]
 
     _dest, _src = (_pre_sv, _srctmp[0], _srctmp[1], _srctmp[2]), \
-                  (_raw_sv + "surveydata_sample.csv", _raw_sv + "regdata_sample.csv")
+                  (_original_name[0], _original_name[1])
 
     # condenses survey and the diagnosis into one file
     pre_process_exams_query(_src, _dest, _survey1fields, _survey2fields, _undocumented)
