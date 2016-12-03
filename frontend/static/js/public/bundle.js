@@ -470,6 +470,8 @@ reactor.registerEvent('selected_node_changed');
 reactor.registerEvent('constraint_added');
 reactor.registerEvent('outcome_added');
 reactor.registerEvent('global_added');
+reactor.registerEvent('update_graph');
+
 /* ---------------------------------- */
 
 // Creates needed selections
@@ -772,7 +774,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
 function global_form_callback(attr, disp, current, thisForm) {
 
-    var element = thisForm.reactor.dispatchEvent("outcome_added")[0];
+    var element = thisForm.reactor.dispatchEvent("global_added")[0];
 
     element.global_key_op_value.push(attr);
     element.global_display_value.push(disp);
@@ -799,6 +801,7 @@ function global_form_callback(attr, disp, current, thisForm) {
                 thisForm.qgic.append("p").text("Global attributes to be inspected will appear here");
             }
         });
+    thisForm.reactor.dispatchEvent("update_graph");
 }
 
 function outcome_form_callback(attr, disp, current, thisForm) {
@@ -832,15 +835,16 @@ function outcome_form_callback(attr, disp, current, thisForm) {
             }
 
         });
+    thisForm.reactor.dispatchEvent("update_graph");
 }
 
 function constraints_form_callback(attr, disp, current, thisForm) {
-    var element = d3.select(".selected").data()[0];
+    var element = thisForm.reactor.dispatchEvent("constraint_added")[0];
     element.key_op_value.push(attr);
     element.display_value.push(disp);
     current.selectAll("p").remove();
     updateConstraints(thisForm, current, element);
-    thisForm.reactor.dispatchEvent("constraint_added");
+    thisForm.reactor.dispatchEvent("update_graph");
 }
 
 function updateConstraints(form, current, element) {
@@ -904,7 +908,8 @@ function GC(query_interface_selection, reactor) {
     thisGraph.aspect = [0, 0, 1600, 600];
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
-    thisGraph.reactor.addEventListener('constraint_added', this.updateGraph.bind(this));
+    thisGraph.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
+    thisGraph.reactor.addEventListener('constraint_added', this.getElement.bind(this));
     thisGraph.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
     thisGraph.reactor.addEventListener('global_added', this.getGraph.bind(this));
     thisGraph.config = json_config.QUERY_SYSTEM;
@@ -1108,6 +1113,9 @@ GC.prototype.replaceSelected = function (svg_element) {
 GC.prototype.updateGraph = function () {
 
     var thisGraph = this;
+
+    // This is for debugging
+    console.log(thisGraph.graph);
 
     // -- Nodes --
     var nodes = thisGraph.svg
@@ -1320,6 +1328,11 @@ GC.prototype.updateGraph = function () {
 GC.prototype.getGraph = function () {
     var thisGraph = this;
     return thisGraph.graph;
+};
+
+GC.prototype.getElement = function () {
+    var element = d3.select(".selected").data()[0];
+    return element;
 };
 
 module.exports = GC;

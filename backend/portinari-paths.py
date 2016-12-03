@@ -17,12 +17,14 @@ app = Flask(__name__)
 @app.route('/', methods=['POST'])
 @cross_origin()
 def index():
+
+    print(request)
     response = jsonify({'some': 'data'})
 
     # Reads the parameters from the query
-    ##nodes, edges, outcomes, globals, future_nodes, prediction_attr, id_attr = reads_params(request)
+    nodes, edges, outcomes, globals, future_nodes, prediction_attr, id_attr = reads_params(request)
 
-    ##print(nodes, edges, outcomes, future_nodes, prediction_attr, id_attr)
+    print(nodes, edges, outcomes, future_nodes, prediction_attr, id_attr)
 
     # Gets individual
     ##individuals = get_individuals(nodes, edges, i_table, e_table)

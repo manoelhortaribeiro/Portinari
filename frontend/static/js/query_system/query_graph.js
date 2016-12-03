@@ -11,7 +11,8 @@ function GC(query_interface_selection, reactor) {
     thisGraph.aspect = [0, 0, 1600, 600];
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
-    thisGraph.reactor.addEventListener('constraint_added', this.updateGraph.bind(this));
+    thisGraph.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
+    thisGraph.reactor.addEventListener('constraint_added', this.getElement.bind(this));
     thisGraph.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
     thisGraph.reactor.addEventListener('global_added', this.getGraph.bind(this));
     thisGraph.config = json_config.QUERY_SYSTEM;
@@ -215,6 +216,9 @@ GC.prototype.replaceSelected = function (svg_element) {
 GC.prototype.updateGraph = function () {
 
     var thisGraph = this;
+
+    // This is for debugging
+    console.log(thisGraph.graph);
 
     // -- Nodes --
     var nodes = thisGraph.svg
@@ -427,6 +431,11 @@ GC.prototype.updateGraph = function () {
 GC.prototype.getGraph = function () {
     var thisGraph = this;
     return thisGraph.graph;
+};
+
+GC.prototype.getElement = function () {
+    var element = d3.select(".selected").data()[0];
+    return element;
 };
 
 module.exports = GC;

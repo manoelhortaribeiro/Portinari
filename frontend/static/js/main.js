@@ -29,6 +29,8 @@ reactor.registerEvent('selected_node_changed');
 reactor.registerEvent('constraint_added');
 reactor.registerEvent('outcome_added');
 reactor.registerEvent('global_added');
+reactor.registerEvent('update_graph');
+
 /* ---------------------------------- */
 
 // Creates needed selections

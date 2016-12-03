@@ -249,7 +249,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
 function global_form_callback(attr, disp, current, thisForm) {
 
-    var element = thisForm.reactor.dispatchEvent("outcome_added")[0];
+    var element = thisForm.reactor.dispatchEvent("global_added")[0];
 
     element.global_key_op_value.push(attr);
     element.global_display_value.push(disp);
@@ -276,6 +276,7 @@ function global_form_callback(attr, disp, current, thisForm) {
                 thisForm.qgic.append("p").text("Global attributes to be inspected will appear here");
             }
         });
+    thisForm.reactor.dispatchEvent("update_graph");
 }
 
 function outcome_form_callback(attr, disp, current, thisForm) {
@@ -309,15 +310,16 @@ function outcome_form_callback(attr, disp, current, thisForm) {
             }
 
         });
+    thisForm.reactor.dispatchEvent("update_graph");
 }
 
 function constraints_form_callback(attr, disp, current, thisForm) {
-    var element = d3.select(".selected").data()[0];
+    var element = thisForm.reactor.dispatchEvent("constraint_added")[0];
     element.key_op_value.push(attr);
     element.display_value.push(disp);
     current.selectAll("p").remove();
     updateConstraints(thisForm, current, element);
-    thisForm.reactor.dispatchEvent("constraint_added");
+    thisForm.reactor.dispatchEvent("update_graph");
 }
 
 function updateConstraints(form, current, element) {
