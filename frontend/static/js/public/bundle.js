@@ -3,9 +3,12 @@ var $ = require("../external/jquery.min.js");
 
 function DBI() {
     var thisDatabaseInfo = this;
-    thisDatabaseInfo.filename = "default";
+    thisDatabaseInfo.filename = "base";
     thisDatabaseInfo.conf_file = null;
-    thisDatabaseInfo.getDataSet()
+    thisDatabaseInfo.getDataSet();
+    thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
+    thisDatabaseInfo.matching_default =thisDatabaseInfo.conf_file["default_matching"];
+    thisDatabaseInfo.getDataSet();
 }
 
 DBI.prototype.getFilename = function (){
@@ -54,8 +57,21 @@ DBI.prototype.types = function () {
 };
 
 DBI.prototype.id = function () {
-    return this.conf_file['id']
+    return this.conf_file['id_attribute']
 };
+
+DBI.prototype.datasets = function () {
+    return this.conf_file['datasets']
+};
+
+DBI.prototype.matching = function () {
+    return this.conf_file['matching_options']
+};
+
+DBI.prototype.matchingDefault = function () {
+    return this.matching_default;
+};
+
 
 var databaseinfo = new DBI();
 
@@ -63,7 +79,6 @@ module.exports = {
 
     QUERY_SYSTEM: {
         /*Stuff adjustable in the front end*/
-        datasets: [{display:"opencrab", name:"default"}, {display:"mock", name:"mock"}],
         innerTextNodeClass: "InTextN",
         innerTextEdgeClass: "InTextE",
         outerTextNodeClass: "OuTextN",
@@ -78,6 +93,9 @@ module.exports = {
         rectangleWidth: 40,
         delete: 68,
         /*Stuff adjustable in the back end*/
+        datasets: databaseinfo.datasets.bind(databaseinfo),
+        matching:  databaseinfo.matching.bind(databaseinfo),
+        matchingDefault:  databaseinfo.matchingDefault.bind(databaseinfo),
         changeDataset: databaseinfo.changeDataSet.bind(databaseinfo),
         outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
         globalAttributes: databaseinfo.global_attributes.bind(databaseinfo),
@@ -88,8 +106,8 @@ module.exports = {
     },
 
     QUERY_FORM: {
-        nodeAttributes: databaseinfo.node_attributes.bind(databaseinfo),
-        ID: databaseinfo.id.bind(databaseinfo)
+        outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
+        id: databaseinfo.id.bind(databaseinfo)
     }
 };
 },{"../external/jquery.min.js":3}],2:[function(require,module,exports){
@@ -128,7 +146,7 @@ Reactor.prototype.registerEvent = function (eventName) {
 };
 
 Reactor.prototype.dispatchEvent = function (eventName, eventArgs) {
-    var return_events = []
+    var return_events = [];
     this.events[eventName].callbacks.forEach(function (callback) {
         return_events.push(callback(eventArgs));
     });
@@ -471,6 +489,7 @@ reactor.registerEvent('constraint_added');
 reactor.registerEvent('outcome_added');
 reactor.registerEvent('global_added');
 reactor.registerEvent('update_graph');
+reactor.registerEvent('matching_changed');
 
 /* ---------------------------------- */
 
@@ -482,7 +501,8 @@ var query_graph_selection = d3.select("#query-interface-graph"),
     query_global_current_selection = d3.select("#query-global-interface-current"),
     outcomes_form_selection = d3.select("#query-outcomes-form"),
     outcomes_current_selection = d3.select("#query-outcomes-current"),
-    dataset_choice = d3.select("#dataset-choice");
+    dataset_choice = d3.select("#dataset-choice"),
+    matching_choice = d3.select("#matching-choice");
 
 // Import modules
 var QueryForm = require("./query_system/query_form.js"),
@@ -495,7 +515,7 @@ var query_graph = new QueryGraph(query_graph_selection, reactor);
 var query_form = new QueryForm(query_local_form_selection, query_local_current_selection,
     query_global_form_selection, query_global_current_selection,
     outcomes_form_selection, outcomes_current_selection,
-    dataset_choice, reactor);
+    dataset_choice, matching_choice, reactor);
 
 /* ------------------------------------ */
 /* ---  Prognosis Prediction System --- */
@@ -527,7 +547,7 @@ var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
     json_config = require("../config/config.js");
 
-function FormHandler(qif, qic, qgif, qgic, qcf, qcc, dsc, reactor) {
+function FormHandler(qif, qic, qgif, qgic, qcf, qcc, dsc, mtc, reactor) {
 
     var thisForm = this;
 
@@ -541,8 +561,14 @@ function FormHandler(qif, qic, qgif, qgic, qcf, qcc, dsc, reactor) {
     // dataset choice form
     thisForm.dsc = dsc;
     thisForm.dataset = dsc.append("form");
-    var attributes = thisForm.config.datasets;
+    var attributes = thisForm.config.datasets();
     make_form_dataset(thisForm.dataset, thisForm.dsc, "dataset", attributes, thisForm);
+
+    // matching choice form
+    thisForm.mtc = mtc;
+    thisForm.matching = mtc.append("form");
+    var attributes = thisForm.config.matching();
+    make_form_matching(thisForm.matching, thisForm.mtc, "matching", attributes, thisForm);
 
     // local constraints forms
     thisForm.qif = qif;
@@ -605,6 +631,45 @@ FormHandler.prototype.updateForm = function (element) {
         thisForm.qic.append("p").text("Select a node or edge to see its constraints");
     }
 };
+
+function make_form_matching(form, current, name, attributes, thisForm) {
+    // form
+    form.classed("query_" + name, true)
+        .attr("id", "new_" + name);
+
+    // ** FORM Pt1. attr_name **
+    var select_attr = form.append("select")
+        .classed("styled_form", true)
+        .attr("id", "attr_name_" + name)
+        .attr("name", "attribute");
+
+    attributes.forEach(function (op) {
+
+        if (thisForm.config.filename() == op.name) {
+            select_attr.append("option")
+                .attr("value", op.name)
+                .attr("selected", "selected")
+                .text(op.display);
+        }
+        else {
+            select_attr.append("option")
+                .attr("value", op.name)
+                .text(op.display);
+        }
+    });
+
+    form.append("input")
+        .classed("styled_form", true)
+        .attr("id", "submit_query_form_" + name)
+        .attr("type", "submit");
+
+    $(".query_" + name).bind("submit", function (event) {
+        event.preventDefault();
+        var data = $("#new_" + name).serializeArray();
+        thisForm.reactor.dispatchEvent("matching_changed", data[0].value );
+    });
+}
+
 
 function make_form_dataset(form, current, name, attributes, thisForm) {
     // form
@@ -905,13 +970,14 @@ function GC(query_interface_selection, reactor) {
 
     // -- Config
     thisGraph.idct = 0;
-    thisGraph.aspect = [0, 0, 1600, 600];
+    thisGraph.aspect = [0, 0, 1600, 900];
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
     thisGraph.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
     thisGraph.reactor.addEventListener('constraint_added', this.getElement.bind(this));
     thisGraph.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
     thisGraph.reactor.addEventListener('global_added', this.getGraph.bind(this));
+    thisGraph.reactor.addEventListener('matching_changed', this.changeMatching.bind(this));
     thisGraph.config = json_config.QUERY_SYSTEM;
 
     // -- Model
@@ -925,6 +991,8 @@ function GC(query_interface_selection, reactor) {
     thisGraph.graph.outcome_display_value = [];
     thisGraph.graph.global_key_op_value = [];
     thisGraph.graph.global_display_value = [];
+    thisGraph.graph.matching = thisGraph.config.matchingDefault();
+
     // -- View
     // svg
     thisGraph.svg = query_interface_selection.append("svg")
@@ -1335,6 +1403,11 @@ GC.prototype.getElement = function () {
     return element;
 };
 
+GC.prototype.changeMatching = function (new_matching){
+    var thisGraph = this;
+    thisGraph.graph.matching = new_matching;
+};
+
 module.exports = GC;
 
 },{"../config/config.js":1,"../external/d3.min.v4.js":2,"./utils.js":9}],9:[function(require,module,exports){
@@ -1434,7 +1507,7 @@ function PredictionForm(future_form_selection, graph, reactor) {
     thisForm.futureNodes = [1, 2, 3, 4, 5];
 
     var values = [];
-    thisForm.config.nodeAttributes().forEach(function (attr) {
+    thisForm.config.outcomeAttributes().forEach(function (attr) {
         values.push([attr.name, attr.display]);
     });
 
@@ -1484,8 +1557,6 @@ function PredictionForm(future_form_selection, graph, reactor) {
 
         var attr = [data[0].value, data[1].value, data[2].value, data[3].value];
 
-
-        console.log(thisForm.graph.global_key_op_value);
         var posted_data = {
             'nodes': JSON.stringify(thisForm.graph.nodes),
             'edges': JSON.stringify(thisForm.graph.edges),
@@ -1495,33 +1566,21 @@ function PredictionForm(future_form_selection, graph, reactor) {
             'future_nodes': JSON.stringify(attr[1]),
             'begin_date': JSON.stringify(attr[2]),
             'end_date': JSON.stringify(attr[3]),
-            'id': JSON.stringify(thisForm.config.ID)
+            'id': JSON.stringify(thisForm.config.id())
         };
 
         console.log(posted_data);
 
         Utils.toggleIfVisible("#expand-query-button");
+
         $.ajax({
             type: 'POST',
             url: "http://localhost:5000/",
             data: posted_data,
-            success: function (data) {},
+            success: function (data) {
+            },
             async: true
         });
-
-        // $.post("http://localhost:5000/config/", posted_data, function (data) {
-        //
-        //     /***
-        //     var graph = JSON.parse(data);
-        //
-        //     graph.pred_attr = attr[0];
-        //     graph.future_nodes = attr[1];
-        //     graph.begin_date = attr[2];
-        //     graph.end_date = attr[3];
-        //
-        //     thisForm.reactor.dispatchEvent("query_successful", graph);
-        //     ***/
-        // });
 
         event.preventDefault();
     });
@@ -1589,11 +1648,11 @@ PredictionGraph.prototype.updateResult = function (graph) {
 
     this.svgtext.insert("p", ":first-child")
         .text("query: " + this.queryNumber.toString() +
-              ", attr: "  + graph.pred_attr.toString() +
-              ", steps: " + graph.future_nodes.toString() +
-              ", time range: [" + graph.begin_date.toString() + "," + graph.end_date.toString() + "]");
+            ", attr: " + graph.pred_attr.toString() +
+            ", steps: " + graph.future_nodes.toString() +
+            ", time range: [" + graph.begin_date.toString() + "," + graph.end_date.toString() + "]");
 
-    this.svg.attr("visibility","visible");
+    this.svg.attr("visibility", "visible");
     this.svg.select("*").remove();
 
     var svg = this.svg.append("g");
@@ -1656,9 +1715,6 @@ PredictionGraph.prototype.updateResult = function (graph) {
                     last += p.value;
                 }
             });
-            console.log(d.source.sourceLinks);
-            console.log(value);
-            console.log(last);
 
             var round_abs = Math.round((d.value / value) * 10000) / 100;
             var round_rel = Math.round((d.value / (value - last)) * 10000) / 100;
@@ -1705,7 +1761,7 @@ PredictionGraph.prototype.updateResult = function (graph) {
                 aux = true;
             }
 
-            if (d.name == -2){
+            if (d.name == -2) {
                 aux = false;
             }
 

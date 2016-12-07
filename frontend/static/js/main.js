@@ -30,6 +30,7 @@ reactor.registerEvent('constraint_added');
 reactor.registerEvent('outcome_added');
 reactor.registerEvent('global_added');
 reactor.registerEvent('update_graph');
+reactor.registerEvent('matching_changed');
 
 /* ---------------------------------- */
 
@@ -41,7 +42,8 @@ var query_graph_selection = d3.select("#query-interface-graph"),
     query_global_current_selection = d3.select("#query-global-interface-current"),
     outcomes_form_selection = d3.select("#query-outcomes-form"),
     outcomes_current_selection = d3.select("#query-outcomes-current"),
-    dataset_choice = d3.select("#dataset-choice");
+    dataset_choice = d3.select("#dataset-choice"),
+    matching_choice = d3.select("#matching-choice");
 
 // Import modules
 var QueryForm = require("./query_system/query_form.js"),
@@ -54,7 +56,7 @@ var query_graph = new QueryGraph(query_graph_selection, reactor);
 var query_form = new QueryForm(query_local_form_selection, query_local_current_selection,
     query_global_form_selection, query_global_current_selection,
     outcomes_form_selection, outcomes_current_selection,
-    dataset_choice, reactor);
+    dataset_choice, matching_choice, reactor);
 
 /* ------------------------------------ */
 /* ---  Prognosis Prediction System --- */

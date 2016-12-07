@@ -23,8 +23,8 @@ class TestFormatRows(unittest.TestCase):
         renaming = {'ID': 'PatientID', 'birthdate': 'Birthdate', 'censordate': 'CensorDate'}
 
         # make data frames
-        dataframe = pandas.read_csv('./files/make_individual_table_input.csv')
-        expected_dataframe = pandas.read_csv('./files/make_individual_table_expected_output.csv')
+        dataframe = pandas.read_csv('./files_make_tables/make_individual_table_input.csv')
+        expected_dataframe = pandas.read_csv('./files_make_tables/make_individual_table_expected_output.csv')
 
         # make individual table
         individual_table = make_individual_table(dataframe, renaming)
@@ -37,7 +37,7 @@ class TestFormatRows(unittest.TestCase):
     def test_make_patient_tables(self):
         # auxiliary variables
         ran = (0, 3)
-        rel_p = "./files/"
+        rel_p = "./files_make_tables/"
         input_file, output_file = rel_p + "make_patient_tables_input.csv", rel_p + "make_patient_tables_output.csv"
         expected_output_file = rel_p + "make_patient_tables_expected_output.csv"
 
@@ -65,7 +65,7 @@ class TestFormatRows(unittest.TestCase):
 
     def test_make_exam_tables(self):
         # auxiliary variables
-        rel_p = "./files/"
+        rel_p = "./files_make_tables/"
         input_file, output_file = rel_p + "make_exam_tables_input.csv", rel_p + "make_exam_tables_output.csv"
         expected_output_file = rel_p + "make_exam_tables_expected_output.csv"
 

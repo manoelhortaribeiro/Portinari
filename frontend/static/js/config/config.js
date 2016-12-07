@@ -2,9 +2,12 @@ var $ = require("../external/jquery.min.js");
 
 function DBI() {
     var thisDatabaseInfo = this;
-    thisDatabaseInfo.filename = "default";
+    thisDatabaseInfo.filename = "base";
     thisDatabaseInfo.conf_file = null;
-    thisDatabaseInfo.getDataSet()
+    thisDatabaseInfo.getDataSet();
+    thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
+    thisDatabaseInfo.matching_default =thisDatabaseInfo.conf_file["default_matching"];
+    thisDatabaseInfo.getDataSet();
 }
 
 DBI.prototype.getFilename = function (){
@@ -53,8 +56,21 @@ DBI.prototype.types = function () {
 };
 
 DBI.prototype.id = function () {
-    return this.conf_file['id']
+    return this.conf_file['id_attribute']
 };
+
+DBI.prototype.datasets = function () {
+    return this.conf_file['datasets']
+};
+
+DBI.prototype.matching = function () {
+    return this.conf_file['matching_options']
+};
+
+DBI.prototype.matchingDefault = function () {
+    return this.matching_default;
+};
+
 
 var databaseinfo = new DBI();
 
@@ -62,7 +78,6 @@ module.exports = {
 
     QUERY_SYSTEM: {
         /*Stuff adjustable in the front end*/
-        datasets: [{display:"opencrab", name:"default"}, {display:"mock", name:"mock"}],
         innerTextNodeClass: "InTextN",
         innerTextEdgeClass: "InTextE",
         outerTextNodeClass: "OuTextN",
@@ -77,6 +92,9 @@ module.exports = {
         rectangleWidth: 40,
         delete: 68,
         /*Stuff adjustable in the back end*/
+        datasets: databaseinfo.datasets.bind(databaseinfo),
+        matching:  databaseinfo.matching.bind(databaseinfo),
+        matchingDefault:  databaseinfo.matchingDefault.bind(databaseinfo),
         changeDataset: databaseinfo.changeDataSet.bind(databaseinfo),
         outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
         globalAttributes: databaseinfo.global_attributes.bind(databaseinfo),
@@ -87,7 +105,7 @@ module.exports = {
     },
 
     QUERY_FORM: {
-        nodeAttributes: databaseinfo.node_attributes.bind(databaseinfo),
-        ID: databaseinfo.id.bind(databaseinfo)
+        outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
+        id: databaseinfo.id.bind(databaseinfo)
     }
 };

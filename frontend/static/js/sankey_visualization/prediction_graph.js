@@ -57,11 +57,11 @@ PredictionGraph.prototype.updateResult = function (graph) {
 
     this.svgtext.insert("p", ":first-child")
         .text("query: " + this.queryNumber.toString() +
-              ", attr: "  + graph.pred_attr.toString() +
-              ", steps: " + graph.future_nodes.toString() +
-              ", time range: [" + graph.begin_date.toString() + "," + graph.end_date.toString() + "]");
+            ", attr: " + graph.pred_attr.toString() +
+            ", steps: " + graph.future_nodes.toString() +
+            ", time range: [" + graph.begin_date.toString() + "," + graph.end_date.toString() + "]");
 
-    this.svg.attr("visibility","visible");
+    this.svg.attr("visibility", "visible");
     this.svg.select("*").remove();
 
     var svg = this.svg.append("g");
@@ -124,9 +124,6 @@ PredictionGraph.prototype.updateResult = function (graph) {
                     last += p.value;
                 }
             });
-            console.log(d.source.sourceLinks);
-            console.log(value);
-            console.log(last);
 
             var round_abs = Math.round((d.value / value) * 10000) / 100;
             var round_rel = Math.round((d.value / (value - last)) * 10000) / 100;
@@ -173,7 +170,7 @@ PredictionGraph.prototype.updateResult = function (graph) {
                 aux = true;
             }
 
-            if (d.name == -2){
+            if (d.name == -2) {
                 aux = false;
             }
 

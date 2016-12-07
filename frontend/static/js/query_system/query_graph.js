@@ -8,13 +8,14 @@ function GC(query_interface_selection, reactor) {
 
     // -- Config
     thisGraph.idct = 0;
-    thisGraph.aspect = [0, 0, 1600, 600];
+    thisGraph.aspect = [0, 0, 1600, 900];
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
     thisGraph.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
     thisGraph.reactor.addEventListener('constraint_added', this.getElement.bind(this));
     thisGraph.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
     thisGraph.reactor.addEventListener('global_added', this.getGraph.bind(this));
+    thisGraph.reactor.addEventListener('matching_changed', this.changeMatching.bind(this));
     thisGraph.config = json_config.QUERY_SYSTEM;
 
     // -- Model
@@ -28,6 +29,8 @@ function GC(query_interface_selection, reactor) {
     thisGraph.graph.outcome_display_value = [];
     thisGraph.graph.global_key_op_value = [];
     thisGraph.graph.global_display_value = [];
+    thisGraph.graph.matching = thisGraph.config.matchingDefault();
+
     // -- View
     // svg
     thisGraph.svg = query_interface_selection.append("svg")
@@ -436,6 +439,11 @@ GC.prototype.getGraph = function () {
 GC.prototype.getElement = function () {
     var element = d3.select(".selected").data()[0];
     return element;
+};
+
+GC.prototype.changeMatching = function (new_matching){
+    var thisGraph = this;
+    thisGraph.graph.matching = new_matching;
 };
 
 module.exports = GC;

@@ -15,7 +15,7 @@ function PredictionForm(future_form_selection, graph, reactor) {
     thisForm.futureNodes = [1, 2, 3, 4, 5];
 
     var values = [];
-    thisForm.config.nodeAttributes().forEach(function (attr) {
+    thisForm.config.outcomeAttributes().forEach(function (attr) {
         values.push([attr.name, attr.display]);
     });
 
@@ -65,8 +65,6 @@ function PredictionForm(future_form_selection, graph, reactor) {
 
         var attr = [data[0].value, data[1].value, data[2].value, data[3].value];
 
-
-        console.log(thisForm.graph.global_key_op_value);
         var posted_data = {
             'nodes': JSON.stringify(thisForm.graph.nodes),
             'edges': JSON.stringify(thisForm.graph.edges),
@@ -76,33 +74,21 @@ function PredictionForm(future_form_selection, graph, reactor) {
             'future_nodes': JSON.stringify(attr[1]),
             'begin_date': JSON.stringify(attr[2]),
             'end_date': JSON.stringify(attr[3]),
-            'id': JSON.stringify(thisForm.config.ID)
+            'id': JSON.stringify(thisForm.config.id())
         };
 
         console.log(posted_data);
 
         Utils.toggleIfVisible("#expand-query-button");
+
         $.ajax({
             type: 'POST',
             url: "http://localhost:5000/",
             data: posted_data,
-            success: function (data) {},
+            success: function (data) {
+            },
             async: true
         });
-
-        // $.post("http://localhost:5000/config/", posted_data, function (data) {
-        //
-        //     /***
-        //     var graph = JSON.parse(data);
-        //
-        //     graph.pred_attr = attr[0];
-        //     graph.future_nodes = attr[1];
-        //     graph.begin_date = attr[2];
-        //     graph.end_date = attr[3];
-        //
-        //     thisForm.reactor.dispatchEvent("query_successful", graph);
-        //     ***/
-        // });
 
         event.preventDefault();
     });

@@ -1,4 +1,3 @@
-import config
 import pandas
 import json
 
@@ -22,10 +21,13 @@ def read_config(request):
 
 
 def get_config(param):
-    with open(config.config_frontend[param], "r") as file:
-        string = file.read()
-        return string
 
+    base_json = json.loads(open("./config/base.json", "r").read())
 
-def load_config(cf):
-    print(json.loads(cf))
+    other_json = json.loads(open("./config/" + param + ".json", "r").read())
+
+    merged_json = {key: value for (key, value) in (list(base_json.items()) + list(other_json.items()))}
+
+    print(merged_json)
+
+    return json.dumps(merged_json)

@@ -1,12 +1,21 @@
 {
+  "id_attribute": {
+    "name": "PatientID",
+    "display": "ID",
+    "type": "Number",
+    "pytype": "np.uint32"
+  },
 
-  "id_attribute": "ID",
+  "event_table_name": "./data/exams_table.csv",
+
+  "individuals_table_name": "./data/patients_table.csv",
 
   "outcome_attributes": [
     {
       "name": "Diagnosis",
       "display": "Diagnosis",
-      "type": "Diagnosis"
+      "type": "Diagnosis",
+      "pytype": "np.uint8"
     }
   ],
 
@@ -14,12 +23,14 @@
     {
       "name": "Birthdate",
       "display": "Birthdate",
-      "type": "Month"
+      "type": "Month",
+      "pytype": "np.uint32"
     },
     {
       "name": "CensorDate",
       "display": "Censor Date",
-      "type": "Month"
+      "type": "Month",
+      "pytype": "np.int32"
     }
   ],
 
@@ -27,42 +38,56 @@
     {
       "name": "DiagnosisDate",
       "display": "Diagnosis Date",
-      "type": "Month"
+      "type": "Month",
+      "pytype": "np.int32"
+    },
+    {
+      "name": "DiagnosisNbr",
+      "display": "Diagnosis Number",
+      "type": "Number",
+      "pytype": "np.uint8"
     },
     {
       "name": "Diagnosis",
       "display": "Diagnosis",
-      "type": "Diagnosis"
+      "type": "Diagnosis",
+      "pytype": "np.uint8"
     },
     {
       "name": "Age",
       "display": "Age",
-      "type": "Number"
+      "type": "Number",
+      "pytype": "np.int32"
     },
     {
       "name": "MorphologyCode",
       "display": "Morphology Code",
-      "type": "Number"
+      "type": "Number",
+      "pytype": "str"
     },
     {
       "name": "LaboratoryNbr",
       "display": "Laboratory Number",
-      "type": "Number"
+      "type": "Number",
+      "pytype": "np.uint8"
     },
     {
       "name": "Region",
       "display": "Region",
-      "type": "Region"
+      "type": "Region",
+      "pytype": "np.uint8"
     },
     {
       "name": "Stage",
       "display": "Stage",
-      "type": "Stage"
+      "type": "Stage",
+      "pytype": "str"
     },
     {
       "name": "ExamType",
       "display": "Type of Exam",
-      "type": "ExamType"
+      "type": "ExamType",
+      "pytype": "str"
     }
   ],
 
@@ -70,12 +95,14 @@
     {
       "name": "TimeSinceLast",
       "display": "Time Interval",
-      "type": "TimeInterval"
+      "type": "TimeInterval",
+      "pytype": "np.int32"
     },
     {
       "name": "ExamType",
       "display": "Exam Interval",
-      "type": "Number"
+      "type": "Number",
+      "pytype": "np.int32"
     }
   ],
 
@@ -94,6 +121,7 @@
       "values": "months",
       "display": "months"
     },
+
     "Diagnosis": {
       "constraints": [
         [
@@ -243,6 +271,7 @@
         }
       }
     },
+
     "Region": {
       "constraints": [
         [
@@ -259,10 +288,11 @@
         "2": "Middle",
         "3": "West",
         "4": "North",
-        "9": "Unknown",
+        "9": "Unknown"
       },
       "display": "std"
     },
+
     "Stage": {
       "constraints": [
         [
@@ -294,6 +324,7 @@
       },
       "display": "std"
     },
+
     "ExamType": {
       "constraints": [
         [
@@ -313,6 +344,7 @@
       },
       "display": "std"
     },
+
     "Number": {
       "constraints": [
         [
@@ -331,6 +363,7 @@
       "values": "number",
       "display": "none"
     },
+
     "TimeInterval": {
       "constraints": [
         [
