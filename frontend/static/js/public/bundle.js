@@ -92,6 +92,7 @@ module.exports = {
         nodeRadius: 45,
         rectangleWidth: 40,
         delete: 68,
+
         /*Stuff adjustable in the back end*/
         datasets: databaseinfo.datasets.bind(databaseinfo),
         matching:  databaseinfo.matching.bind(databaseinfo),
@@ -106,6 +107,8 @@ module.exports = {
     },
 
     QUERY_FORM: {
+        /*Stuff adjustable in the back end*/
+        filename: databaseinfo.getFilename.bind(databaseinfo),
         outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
         id: databaseinfo.id.bind(databaseinfo)
     }
@@ -1562,6 +1565,8 @@ function PredictionForm(future_form_selection, graph, reactor) {
             'edges': JSON.stringify(thisForm.graph.edges),
             'outcomes': JSON.stringify(thisForm.graph.outcome_key_op_value),
             'globals': JSON.stringify(thisForm.graph.global_key_op_value),
+            'matching': JSON.stringify(thisForm.graph.matching),
+            'datasets': JSON.stringify(thisForm.config.filename()),
             'prediction_attr': JSON.stringify(attr[0]),
             'future_nodes': JSON.stringify(attr[1]),
             'begin_date': JSON.stringify(attr[2]),

@@ -62,6 +62,16 @@ def pre_process_exams_only(path, dest, group, drop, has_dateres=False):
         row["birthdate"] = to_unix(row["birthdate"])
         row["censordate"] = to_unix(row["censordate"])
 
+        if "dateres" in row:
+            row["dateres"] = to_unix(row["dateres"])
+
+        row["stage"] = int(row["stage"])
+
+        if row["diagnosis2"] == "":
+            row["diagnosis2"] = 0
+        else:
+            row["diagnosis2"] = int(float(row["diagnosis2"]))
+
         if int(row["diagnosis1"]) in list(group.keys()):
             row["diagnosis1"] = group[int(row["diagnosis1"])]
 
@@ -110,22 +120,26 @@ def pre_process_exams_query(src, dest, s1_fields, s2_fields, undocumented):
     survey2.to_csv(dest[0] + dest[2], index=False)
 
 
-def change_diagnosis(path, dest, new_diagnosis):
+def change_diagnosis(path, dest, new_diagnosis, new_type):
     """
     This simple function changes the original diagnosis numbers to a new representation that is more friendly to joint
     diagnosis.
     :param path: Path to the source file.
     :param dest: Path to the destination file.
     :param new_diagnosis: Hash table having the old diagnosis as keys and the new ones as items.
+    :param new_type: Hash table having the old types as keys and the new ones as items.
     :return: Nothing.
     """
     df = pandas.read_csv(path)
 
-    loc = list(df.columns.values).index('diagnosis1')
+    loc_d1 = list(df.columns.values).index('diagnosis1')
+    loc_t1 = list(df.columns.values).index('type')
     table = df.values
 
     for row in range(len(table)):
-        table[row][loc] = new_diagnosis[table[row][loc]]
+        table[row][loc_d1] = new_diagnosis[table[row][loc_d1]]
+        table[row][loc_t1] = new_type[table[row][loc_t1]]
+
     df2 = pandas.DataFrame(table, columns=df.columns)
     df2.to_csv(dest, index=False)
 
@@ -174,8 +188,8 @@ def merge(table):
             row_of_int = tmp[tmp.diagnosisnumber == i].iloc[0].values
             loc_type = list(tmp.columns.values).index('type')
             loc_diag = list(tmp.columns.values).index('diagnosis1')
-            types.append(row_of_int[loc_type])
-            diagnosis1.append(str(row_of_int[loc_diag]))
+            types.append(str(int(row_of_int[loc_type])))
+            diagnosis1.append(str(int(row_of_int[loc_diag])))
 
         is_first = False
         to_drop = []
@@ -189,7 +203,7 @@ def merge(table):
         tuples = sorted(tuples, key=lambda a: a[0])
         diagnosis1, types = list(list(zip(*tuples))[0]), list(list(zip(*tuples))[1])
 
-        all_types.append('/'.join(types))
+        all_types.append(int('0'.join(types)))
         all_diagnosis.append(int('0'.join(diagnosis1)))
 
         if len(to_drop) > 0:
@@ -198,7 +212,6 @@ def merge(table):
     tmp['diagnosis1'] = all_diagnosis
     tmp['type'] = all_types
     tmp['diagnosisnumber'] = range(1, len(all_diagnosis) + 1)
-
     return tmp
 
 

@@ -70,6 +70,8 @@ function PredictionForm(future_form_selection, graph, reactor) {
             'edges': JSON.stringify(thisForm.graph.edges),
             'outcomes': JSON.stringify(thisForm.graph.outcome_key_op_value),
             'globals': JSON.stringify(thisForm.graph.global_key_op_value),
+            'matching': JSON.stringify(thisForm.graph.matching),
+            'datasets': JSON.stringify(thisForm.config.filename()),
             'prediction_attr': JSON.stringify(attr[0]),
             'future_nodes': JSON.stringify(attr[1]),
             'begin_date': JSON.stringify(attr[2]),

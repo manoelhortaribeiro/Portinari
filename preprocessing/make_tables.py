@@ -1,6 +1,7 @@
 from multiprocessing import Pool
 import pandas as pd
 import functools
+import numpy as np
 import gc
 import os
 
@@ -14,38 +15,46 @@ def get_first_pdseries(series):
     return series.head(1).values[0]
 
 
-def make_individual_table(x, renam):
+def make_individual_table(x, renam, sincelast, index_values, index_display):
     """
     This function is responsible for extracting the data from each group (Records of different patients)
     :param x: DataFrame containing a single group of a groupBy.
     :param renam: hash containing the renaming for the patient table attributes.
+    :param sincelast:
+    :param index_values:
+    :param index_display:
     :return: Treated data frame.
     """
-
-    string_rep = ""
-
-    for i, j in zip(x['sincelast'].values, x['diagnosis1'].values):
-        string_rep += 't{0}d{1}'.format(i, j)
-
-    if get_first_pdseries(x['ID']) % 10000 == 0:
-        gc.collect()
 
     tmp = {}
 
     for key, item in renam.items():
         tmp[item] = get_first_pdseries(x[key])
 
-    tmp['StringRep'] = [string_rep]
+    for val, disp in zip(index_values, index_display):
+
+        string_rep = ""
+
+        for i, j in zip(x[sincelast].values, x[val].values):
+            string_rep += 't{0}d{1}'.format(i, j)
+
+        if get_first_pdseries(x['ID']) % 10000 == 0:
+            gc.collect()
+
+        tmp[disp] = [string_rep]
 
     return pd.DataFrame.from_dict(data=tmp)
 
 
-def make_patient_tables(ran, df, dest, renaming_hash):
+def make_patient_tables(ran, df, dest, renaming_hash, sincelast, index_values, index_display):
     """
     This function queries a range of ids and generates their individual tables.
     :param ran: Tuple containing the start and end of the range.
     :param df: data frame with preprocessed data.
     :param dest: destination of the file.
+    :param sincelast:
+    :param index_values:
+    :param index_display:
     :param renaming_hash: hash containing the renaming for the patient table attributes.
     :return: Nothing.
     """
@@ -54,7 +63,8 @@ def make_patient_tables(ran, df, dest, renaming_hash):
     if ran[0] == 0:
         has_header = True
 
-    f = functools.partial(make_individual_table, renam=renaming_hash)
+    f = functools.partial(make_individual_table, renam=renaming_hash,  sincelast=sincelast,
+                          index_values=index_values, index_display=index_display)
 
     df = df.query('ID >= ' + str(ran[0]))
     df = df.query('ID < ' + str(ran[1]))
@@ -75,19 +85,20 @@ def make_exams_tables(rows_to_drop, renaming_hash, df, dest):
     """
     df.drop(rows_to_drop, axis=1, inplace=True)
     df.rename(columns=renaming_hash, inplace=True)
-
     df.to_csv(dest, mode='w', index=False)
 
 
-def parallel_parsing(source, patient_dest, exams_dest, renaming_pa, renaming_ex, to_drop_ex):
+def parallel_parsing(source, patient_dest, exams_dest, renaming_pa, renaming_ex, to_drop_ex,
+                     sincelast, index_values, index_display):
     main_df = pd.read_csv(source)
 
-    f = functools.partial(make_patient_tables, df=main_df, dest=patient_dest, renaming_hash=renaming_pa)
+    f = functools.partial(make_patient_tables, df=main_df, dest=patient_dest, renaming_hash=renaming_pa,
+                          sincelast=sincelast, index_values=index_values, index_display=index_display)
 
     range_of = list(zip(list(range(0, 1000000, 100000)), list(range(100000, 1100000, 100000))))
 
     with Pool(2) as p:
-         p.map(f, range_of)
+        p.map(f, range_of)
 
     os.system('cat ' + patient_dest + 'r* > ' + patient_dest)
     os.system('rm ' + patient_dest + 'r*')

@@ -1,10 +1,10 @@
 {
-
   "no_indexed_event": -1,
   "time_min": 0,
   "time_max": 10000000,
   "event_min": 0,
   "event_max": 50,
+  "nan_int": -999999999,
   "matching_options": [
     {
       "display": "First Occurence",

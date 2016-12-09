@@ -1,63 +1,50 @@
 {
+  "event_table_name": "./data/events_opencrab.csv",
+  "individuals_table_name": "./data/entity_opencrab.csv",
   "id_attribute": {
     "name": "PatientID",
     "display": "ID",
     "type": "Number",
-    "pytype": "np.uint32"
+    "pytype": "uint32"
   },
-
-  "event_table_name": "./data/exams_table.csv",
-
-  "individuals_table_name": "./data/patients_table.csv",
-
   "outcome_attributes": [
     {
       "name": "Diagnosis",
       "display": "Diagnosis",
       "type": "Diagnosis",
-      "pytype": "np.uint8"
+      "pytype": "uint8",
+      "index": "StringRepDiagnosis",
+      "index_pytype": "str"
+    },
+    {
+      "name": "ExamType",
+      "display": "Type of Exam",
+      "type": "ExamType",
+      "pytype": "uint8",
+      "index": "StringRepExamType",
+      "index_pytype": "str"
     }
   ],
-
   "global_attributes": [
-    {
-      "name": "Birthdate",
-      "display": "Birthdate",
-      "type": "Month",
-      "pytype": "np.uint32"
-    },
     {
       "name": "CensorDate",
       "display": "Censor Date",
       "type": "Month",
-      "pytype": "np.int32"
+      "pytype": "int32"
+    },
+    {
+      "name": "Birthdate",
+      "display": "Birthdate",
+      "type": "Month",
+      "pytype": "uint32"
     }
   ],
-
   "node_attributes": [
     {
-      "name": "DiagnosisDate",
-      "display": "Diagnosis Date",
-      "type": "Month",
-      "pytype": "np.int32"
-    },
-    {
-      "name": "DiagnosisNbr",
-      "display": "Diagnosis Number",
+      "name": "diagnosisgroupsize",
+      "display": "Concurrent Exams",
       "type": "Number",
-      "pytype": "np.uint8"
-    },
-    {
-      "name": "Diagnosis",
-      "display": "Diagnosis",
-      "type": "Diagnosis",
-      "pytype": "np.uint8"
-    },
-    {
-      "name": "Age",
-      "display": "Age",
-      "type": "Number",
-      "pytype": "np.int32"
+      "pytype": "int32"
     },
     {
       "name": "MorphologyCode",
@@ -66,16 +53,46 @@
       "pytype": "str"
     },
     {
+      "name": "DiagnosisDate",
+      "display": "Diagnosis Date",
+      "type": "Month",
+      "pytype": "int32"
+    },
+    {
       "name": "LaboratoryNbr",
       "display": "Laboratory Number",
       "type": "Number",
-      "pytype": "np.uint8"
+      "pytype": "uint8"
+    },
+    {
+      "name": "TimeSinceLast",
+      "display": "Time Interval",
+      "type": "TimeInterval",
+      "pytype": "int32"
+    },
+    {
+      "name": "DiagnosisNbr",
+      "display": "Diagnosis Number",
+      "type": "Number",
+      "pytype": "uint8"
+    },
+    {
+      "name": "Diagnosis",
+      "display": "Diagnosis",
+      "type": "Diagnosis",
+      "pytype": "uint8"
+    },
+    {
+      "name": "ExamType",
+      "display": "Type of Exam",
+      "type": "ExamType",
+      "pytype": "uint8"
     },
     {
       "name": "Region",
       "display": "Region",
       "type": "Region",
-      "pytype": "np.uint8"
+      "pytype": "uint8"
     },
     {
       "name": "Stage",
@@ -84,28 +101,26 @@
       "pytype": "str"
     },
     {
-      "name": "ExamType",
-      "display": "Type of Exam",
-      "type": "ExamType",
-      "pytype": "str"
+      "name": "Age",
+      "display": "Age",
+      "type": "Number",
+      "pytype": "int32"
     }
   ],
-
   "edge_attributes": [
     {
       "name": "TimeSinceLast",
       "display": "Time Interval",
       "type": "TimeInterval",
-      "pytype": "np.int32"
+      "pytype": "int32"
     },
     {
-      "name": "ExamType",
+      "name": "ExamInterval",
       "display": "Exam Interval",
       "type": "Number",
-      "pytype": "np.int32"
+      "pytype": "int32"
     }
   ],
-
   "types": {
     "Month": {
       "constraints": [
@@ -121,7 +136,6 @@
       "values": "months",
       "display": "months"
     },
-
     "Diagnosis": {
       "constraints": [
         [
@@ -271,7 +285,6 @@
         }
       }
     },
-
     "Region": {
       "constraints": [
         [
@@ -292,7 +305,6 @@
       },
       "display": "std"
     },
-
     "Stage": {
       "constraints": [
         [
@@ -324,7 +336,6 @@
       },
       "display": "std"
     },
-
     "ExamType": {
       "constraints": [
         [
@@ -337,14 +348,13 @@
         ]
       ],
       "values": {
-        "cyt": "Cytological Smear",
-        "hist": "Histological Sample",
-        "hpv": "HPV Test",
-        "cancer": "Cancer Diagnosis"
+        "11": "Cytological Smear",
+        "12": "Histological Sample",
+        "13": "HPV Test",
+        "14": "Cancer Test"
       },
       "display": "std"
     },
-
     "Number": {
       "constraints": [
         [
@@ -363,7 +373,6 @@
       "values": "number",
       "display": "none"
     },
-
     "TimeInterval": {
       "constraints": [
         [

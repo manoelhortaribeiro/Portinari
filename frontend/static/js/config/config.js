@@ -91,6 +91,7 @@ module.exports = {
         nodeRadius: 45,
         rectangleWidth: 40,
         delete: 68,
+
         /*Stuff adjustable in the back end*/
         datasets: databaseinfo.datasets.bind(databaseinfo),
         matching:  databaseinfo.matching.bind(databaseinfo),
@@ -105,6 +106,8 @@ module.exports = {
     },
 
     QUERY_FORM: {
+        /*Stuff adjustable in the back end*/
+        filename: databaseinfo.getFilename.bind(databaseinfo),
         outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
         id: databaseinfo.id.bind(databaseinfo)
     }
