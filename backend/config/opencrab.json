@@ -7,6 +7,18 @@
     "type": "Number",
     "pytype": "uint32"
   },
+  "edge_time_attribute": {
+    "name": "TimeSinceLast",
+    "display": "Time Interval",
+    "type": "TimeInterval",
+    "pytype": "int32"
+  },
+  "edge_hops_attribute": {
+    "name": "ExamInterval",
+    "display": "Exam Interval",
+    "type": "Number",
+    "pytype": "int32"
+  },
   "outcome_attributes": [
     {
       "name": "Diagnosis",
@@ -148,31 +160,18 @@
         ]
       ],
       "values": {
-        "0": "HPV: Positive",
-        "1": "HPV: Negative",
-        "9": "HPV: Unsatisfactory",
-        "11": "Cyt: Normal",
-        "12": "Cyt: ASC-US",
-        "13": "Cyt: LSIL",
-        "14": "Cyt: ASC-H",
-        "15": "Cyt: AGUS/ACIS",
-        "16": "Cyt: HSIL",
-        "17": "Cyt: Cancer",
-        "18": "Cyt: Metastasis",
-        "10": "Cyt/Hist: Unsatisfactory",
-        "20": "Hist: Benign",
-        "21": "Hist: Polyp",
-        "22": "Hist: Beningn without atypia",
-        "30": "Hist: Unsure B.",
-        "31": "Hist: CIN1",
-        "32": "Hist: CIN2",
-        "33": "Hist: CIN3",
-        "34": "Hist: Irregular",
-        "35": "Hist: ACIS",
-        "99": "Hist: Unknown Morphology",
-        "41": "Canc: Squamous cell carcinoma",
-        "42": "Adenocarcinoma",
-        "43": "Canc: Other Cancers"
+        "11": "HPV negative",
+        "12": "HPV positive",
+        "13": "HPV unsatisfactory",
+        "15": "Cyt: Normal",
+        "16": "Cyt: Low-grade",
+        "18": "Cyt: High-grade",
+        "19": "AGUS/ACIS",
+        "23": "Metastasis",
+        "25": "Hist: Normal",
+        "31": "Hist: High-grade",
+        "33": "Hist: Irregular cells",
+        "36": "Cancer"
       },
       "display": {
         "-2": {

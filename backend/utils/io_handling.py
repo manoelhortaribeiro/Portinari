@@ -2,8 +2,8 @@ import pandas
 import json
 import numpy as np
 
-class Dataset:
 
+class Dataset:
     def __init__(self):
         self.name, self.event_data, self.entity_data, self.config = None, None, None, None
 
@@ -14,7 +14,9 @@ class Dataset:
 
         # READS CONFIG
 
-        self.config = json.loads(open("./config/" + param + ".json", "r").read())
+        base = json.loads(open("./config/base.json", "r").read())
+        param_config = json.loads(open("./config/" + param + ".json", "r").read())
+        self.config = {key: value for (key, value) in (list(base.items()) + list(param_config.items()))}
 
         # READS EVENT DATA
 
@@ -22,7 +24,7 @@ class Dataset:
 
         # adds node attributes
         for node in self.config["node_attributes"]:
-            description[node["name"]] = getattr(np,  node["pytype"])
+            description[node["name"]] = getattr(np, node["pytype"])
 
         # id attribute
         description[self.config["id_attribute"]["name"]] = self.config["id_attribute"]["pytype"]

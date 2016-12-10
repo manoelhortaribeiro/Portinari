@@ -14,7 +14,7 @@ def make_int(src, desc):
         if col not in desc:
             table[col] = table[col].astype(np.int32)
 
-    table.to_csv(src)
+    table.to_csv(src,  mode='w', index=False)
 
 
 def make_tables(renaming_pa, renaming_ex, source, patient_dest, exams_dest, idv,
@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
     # OPENCRAB
 
-    _raw_dir, _name = "./data/opencrab/", "opencrab_sample.csv"
+    _raw_dir, _name = "./data/opencrab/", "opencrab.csv"
 
     _renaming_en = {'ID': 'PatientID', 'birthdate': 'Birthdate', 'censordate': 'CensorDate'}
 
@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
     # SURVEY BOTH
 
-    _raw_dir, _name = "./data/surveys/", "mixed_sample.csv"
+    _raw_dir, _name = "./data/surveys/", "mixed.csv"
 
     _drop_extra = ["c6b1lber"]
 
@@ -166,9 +166,10 @@ if __name__ == "__main__":
 
     make_all(_diag, _type, _drop_diag, _drop_col, _group, _raw_dir, _name, _idv, _renaming_en_both,
              _renaming_ev, _sincelast, _index_values, _index_display, extra_drop=_drop_extra)
+
     # SURVEY 1
 
-    _raw_dir, _name = "./data/surveys/", "s1_sample.csv"
+    _raw_dir, _name = "./data/surveys/", "s1.csv"
 
     _renaming_en_s1 = {"c6c2wine": "c6c2wine",
                        "c6b2beer": "c6b2beer",
@@ -188,9 +189,10 @@ if __name__ == "__main__":
 
     make_all(_diag, _type, _drop_diag, _drop_col, _group, _raw_dir, _name, _idv, _renaming_en_s1,
              _renaming_ev, _sincelast, _index_values, _index_display, extra_drop=_drop_extra)
+
     # SURVEY 2
 
-    _raw_dir, _name = "./data/surveys/", "s2_sample.csv"
+    _raw_dir, _name = "./data/surveys/", "s2.csv"
 
     _renaming_en_s2 = {"q5aagsto": "q5aagsto",
                        "q5esnu": "q5aagsto",

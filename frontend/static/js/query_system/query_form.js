@@ -391,6 +391,7 @@ function updateConstraints(form, current, element) {
                 form.qic.append("p").text("Select a node or edge to see its constraints");
 
             form.reactor.dispatchEvent("constraint_added");
+            form.reactor.dispatchEvent("update_graph");
         });
 }
 
