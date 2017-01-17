@@ -1,4 +1,4 @@
-from preprocessing.format_rows import to_unix, pre_process_exams_only, change_diagnosis
+from preprocessing.format_rows import to_unix, pre_process, change_diagnosis
 from preprocessing.format_rows import pre_process_exams_query, merge_groups_parallel
 import unittest
 import pandas
@@ -46,7 +46,7 @@ class TestFormatRows(unittest.TestCase):
 
         # does preprocessing
         change_diagnosis(input_file, tmp_file, diag, ntype)
-        pre_process_exams_only(tmp_file, output_file, group, drop)
+        pre_process(tmp_file, output_file, group, drop)
 
         # compare expected file with actual file
         output_dict = csv.DictReader(open(output_file, 'r'))

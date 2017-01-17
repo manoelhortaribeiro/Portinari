@@ -40,6 +40,8 @@ def index():
 @cross_origin()
 def config():
     param = read_config(request)
+
+    print(param)
     cf = get_config(param)
     return cf
 

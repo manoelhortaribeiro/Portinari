@@ -22,13 +22,9 @@
   "default_matching": "first_occurence",
   "datasets": [
     {
-      "display": "opencrab",
-      "name": "opencrab"
-    },
-    {
-      "display": "survey1",
-      "name": "opencrab"
+      "display": "surveyboth",
+      "name": "surveyboth"
     }
   ],
-  "default_dataset": "opencrab"
+  "default_dataset": "surveyboth"
 }

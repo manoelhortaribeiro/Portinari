@@ -4,7 +4,43 @@
 # This script simply separates the survey data three big files. Most specifically, containing the data on the first, the
 # second and the common questions of both surveys. It should be run separately from the make all function (for now).
 
-from preprocessing.format_rows import pre_process_exams_query
+
+def pre_process_exams_query(src, dest, s1_fields, s2_fields, undocumented):
+    """
+    This function receives a tuple with the path to the source of the surveys and its destination. It also receives the
+    fields for each distinct survey and the undocumented fields. It pre process it.
+
+    :param src: source csv files.
+    :param dest: destination csv files.
+    :param s1_fields: list of fields in the first survey.
+    :param s2_fields: list of fields in the second survey.
+    :param undocumented: list of undocumented fields.
+    :return:
+    """
+    # opens
+    survey_df = pandas.read_csv(src[0])
+
+    # finds outcomes in reg_data
+    reg_data = pandas.read_csv(src[1])
+
+    # merge both
+    survey_df = pandas.merge(survey_df, reg_data)
+
+    # separates survey1 and survey2
+    survey1 = survey_df[survey_df.study == 1].copy(deep=True)
+    survey1.drop(s2_fields + ['study'] + undocumented, axis=1, inplace=True)
+
+    survey2 = survey_df[survey_df.study == 2].copy(deep=True)
+    survey2.drop(s1_fields + ['study'] + undocumented, axis=1, inplace=True)
+
+    mixed = survey_df.copy(deep=True)
+    mixed.drop(s1_fields + s2_fields + ['study'] + undocumented, axis=1, inplace=True)
+
+    # saves
+    mixed.to_csv(dest[0] + dest[3], index=False)
+    survey1.to_csv(dest[0] + dest[1], index=False)
+    survey2.to_csv(dest[0] + dest[2], index=False)
+
 
 _original_name = "./data/surveys/surveydata.txt", \
                  "./data/surveys/regdata_update.txt"  # original data-sets

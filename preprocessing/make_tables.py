@@ -38,6 +38,7 @@ def make_individual_table(x, renam, sincelast, index_values, index_display):
     for key, item in renam.items():
         tmp[item] = get_first_pdseries(x[key])
 
+
     for val, disp in zip(index_values, index_display):
 
         string_rep = ""
@@ -49,6 +50,7 @@ def make_individual_table(x, renam, sincelast, index_values, index_display):
             gc.collect()
 
         tmp[disp] = [string_rep]
+
 
     return pd.DataFrame.from_dict(data=tmp)
 
