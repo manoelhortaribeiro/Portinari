@@ -1,3 +1,16 @@
+# # ---------------------------- # # # # #
+# # AUTHOR: MANOEL HORTA RIBEIRO # # # # #
+# # ---------------------------- # # # # #
+# This script does the whole preprocessing of the two files. It has a lot of handwritten information on it. Basically it
+# a) Rename the diagnosis numbers.
+# b) Rename the type numbers.
+# c) Rename the variable names.
+# d) creates a new variable called, sincelast, with relative time, and another one called age.
+# e) splits the big csv into two tables, an entity table and an event table.
+# f) creates indexes for the selected attributes in the events in the entity table.
+# g) drop entire columns, and possibly, events with certain diagnosis.
+
+
 from preprocessing.make_tables import parallel_parsing
 from preprocessing.format_rows import change_diagnosis, pre_process_exams_only, merge_groups_parallel
 import numpy as np
@@ -47,9 +60,8 @@ def make_rows(original_path, changed_diagnosis, diag, typ, preprocessed, group, 
     merge_groups_parallel(path=preprocessed, dest=grouped, drop=drop_col)
 
 
-def make_all(diag, typ, drop_diag, drop_col, group, raw_dir, name, idv, renaming_en,
-             renaming_ev, sincelast, index_values, index_display,
-             pre_dir="", final_dir="", int_steps=False, extra_drop=None):
+def make_all(diag, typ, drop_diag, drop_col, group, raw_dir, name, idv, renaming_en, renaming_ev, sincelast,
+             index_values, index_display, pre_dir="", final_dir="", int_steps=False, extra_drop=None):
     if pre_dir is "":
         pre_dir = raw_dir
     if final_dir is "":
@@ -75,17 +87,53 @@ def make_all(diag, typ, drop_diag, drop_col, group, raw_dir, name, idv, renaming
         os.remove(preprocessed)
         os.remove(grouped)
 
-
 if __name__ == "__main__":
-    _diag = {0: 11, 1: 12, 9: 13, 10: 14, 11: 15, 12: 16, 13: 17, 14: 18, 15: 19, 16: 21, 17: 22, 18: 23, 20: 25,
-             21: 26, 22: 27, 30: 28, 31: 29, 32: 31, 33: 32, 34: 33, 35: 34, 99: 35, 41: 36, 42: 37, 43: 38}
 
-    _type = {"cyt": 11, "hist": 12, "hpv": 13, "cancer": 14}
+    # renaming the diagnosis
+    _diag = {0: 11,   # HPV Negative
+             1: 12,   # HPV Positive
+             9: 13,   # HPV Unsatisfactory
+             10: 14,  # CYT/HIS Unsatisfactory
+             11: 15,  # CYT Normal
+             12: 16,  # CYT ASC-US
+             13: 17,  # CYT LSIL
+             14: 18,  # CYT ASC-H
+             15: 19,  # CYT AGUS/ACIS
+             16: 21,  # CYT HSIL
+             17: 22,  # CYT Cancer
+             18: 23,  # CYT Metastasis
+             20: 25,  # HIS NILM
+             31: 26,  # HIS CIN1
+             32: 27,  # HIS CIN2
+             33: 28,  # HIS CIN3
+             35: 29,  # HIS ACIS
+             99: 31,  # Unknown Morphology
+             41: 32,  # Squamous cell carcinoma
+             42: 33,  # Adenocarcinoma
+             43: 34}  # Other cancers
 
-    _drop_diag, _drop_col, _idv = [35, 14], ['stage'], 'ID'
+    # renaming the type
+    _type = {"cyt": 11,           # cytological smear
+             "biopsy": 12,        # biopsy or endocervical curretage (histology)
+             "cone": 13,          # cone treatment (histology)
+             "hyster": 14,        # hysterectomy (histology)
+             "HCII": 15,          # Hybrid Capture II (hpv test)
+             "Proofer": 16,       # PreTect HPV-Proofer (hpv test)
+             "Amplicor": 17,      # Amplicor (hpv test)
+             "Ventana": 18,       # Ventana Inform (hpv test)
+             "PAP13": 19,         # PAP 13 Tele-lab (hpv test)
+             "Paptype13": 20,     # Paptype 13 real time (hpv test)
+             "Cobas": 21,         # Cobas 4800 System (hpv test)
+             "Abbott": 22,        # Abbott RealTime High Risk (hpv test)
+             "BD Onclarity": 23,  # BD Onclarity HPV assay (hpv test)
+             "HPV other": 24,     # Other test type (hpv test)
+             "cancer": 25         # cancer diagnosis (histologically verified)
+            }
 
-    _group = {36: 36, 37: 36, 38: 36, 34: 31, 32: 31, 31: 31, 29: 25, 28: 25, 27: 25, 26: 25, 25: 25, 16: 16, 17: 16,
-              22: 18, 21: 18, 18: 18}
+    _drop_diag, _drop_col, _idv = [], [''], 'ID'
+
+    # TODO
+    _group = {}
 
     _renaming_ev = {'ID': 'PatientID',
                     'diagnosisdate': 'DiagnosisDate',
@@ -96,7 +144,8 @@ if __name__ == "__main__":
                     'stage': 'Stage',
                     'lab_nr': 'LaboratoryNbr',
                     'reg': 'Region',
-                    'sincelast': 'TimeSinceLast', 'age': 'Age'}
+                    'sincelast': 'TimeSinceLast',
+                    'age': 'Age'}
 
     _sincelast = "sincelast"
 

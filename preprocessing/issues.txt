@@ -1,0 +1,7 @@
+Questions and problems
+
+- what the hell is the field q14newpa in the surveys?
+
+- can't we have different values for CYTOLOGY Unsatisfactory and HISTOLOGY Unsatisfactory?
+
+- help grouping the labels.

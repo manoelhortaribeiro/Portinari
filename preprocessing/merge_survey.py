@@ -1,7 +1,16 @@
-from format_rows import pre_process_exams_query
+# # ---------------------------- # # # # #
+# # AUTHOR: MANOEL HORTA RIBEIRO # # # # #
+# # ---------------------------- # # # # #
+# This script simply separates the survey data three big files. Most specifically, containing the data on the first, the
+# second and the common questions of both surveys.
 
-_original_name = "./data/surveys/surveydata.csv", "./data/surveys/regdata.csv"  # original datasets
+from preprocessing.format_rows import pre_process_exams_query
+
+_original_name = "./data/surveys/surveydata.txt", \
+                 "./data/surveys/regdata_update.txt"  # original data-sets
+
 _pre_sv = "./data/surveys/"
+
 _srctmp = ["s1.csv", "s2.csv", "mixed.csv"]  # joins all data in one big stupid file
 
 _undocumented = ["q14newpa"]

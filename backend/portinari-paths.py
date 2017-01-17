@@ -1,7 +1,7 @@
-from utils.io_handling import Dataset, reads_params, get_config, read_config
+from backend.utils.io_handling import Dataset, reads_params, get_config, read_config
 from flask_cors import cross_origin
 from flask import Flask, request, jsonify
-from query_maker.get_individuals import get_individuals
+from backend.query_maker.get_individuals import get_individuals
 
 app = Flask(__name__)
 dataset = Dataset()
