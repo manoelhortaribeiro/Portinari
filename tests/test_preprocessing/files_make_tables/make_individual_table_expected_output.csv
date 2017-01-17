@@ -1,2 +1,2 @@
-PatientID,Birthdate,CensorDate,StringRep
-2,15.02.1927,15.06.2010,t0d11t609d11
+PatientID,Birthdate,CensorDate,StringRepDiagnosis,StringRepExamType
+2,0,200,t0d11t20d11,t0dcytt20dcyt

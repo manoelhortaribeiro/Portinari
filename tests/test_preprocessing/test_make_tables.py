@@ -1,4 +1,4 @@
-from make_tables import get_first_pdseries, make_individual_table, make_patient_tables, make_exams_tables
+from preprocessing.make_tables import get_first_pdseries, make_individual_table, make_patient_tables, make_exams_tables
 import unittest
 import pandas
 import os
@@ -19,6 +19,10 @@ class TestFormatRows(unittest.TestCase):
 
     def test_make_individual_table(self):
 
+        sincelast = "sincelast"
+        index_values = ["diagnosis1", "type"]
+        index_display = ["StringRepDiagnosis", "StringRepExamType"]
+
         # - Patients Table
         renaming = {'ID': 'PatientID', 'birthdate': 'Birthdate', 'censordate': 'CensorDate'}
 
@@ -27,8 +31,7 @@ class TestFormatRows(unittest.TestCase):
         expected_dataframe = pandas.read_csv('./files_make_tables/make_individual_table_expected_output.csv')
 
         # make individual table
-        individual_table = make_individual_table(dataframe, renaming)
-
+        individual_table = make_individual_table(dataframe, renaming, sincelast, index_values, index_display )
         # assert the two things are equal
         self.assertDictEqual(expected_dataframe.to_dict(), individual_table.to_dict())
 
@@ -36,6 +39,9 @@ class TestFormatRows(unittest.TestCase):
 
     def test_make_patient_tables(self):
         # auxiliary variables
+        sincelast = "sincelast"
+        index_values = ["diagnosis1", "type"]
+        index_display = ["StringRepDiagnosis", "StringRepExamType"]
         ran = (0, 3)
         rel_p = "./files_make_tables/"
         input_file, output_file = rel_p + "make_patient_tables_input.csv", rel_p + "make_patient_tables_output.csv"
@@ -48,7 +54,7 @@ class TestFormatRows(unittest.TestCase):
         dataframe = pandas.read_csv(input_file)
 
         # make table
-        make_patient_tables(ran, dataframe, output_file, renaming)
+        make_patient_tables(ran, dataframe, output_file, renaming, sincelast, index_values, index_display)
 
         # clean tmp files
         os.system('cat ' + output_file + 'r* > ' + output_file)

@@ -1,7 +1,14 @@
+# # ---------------------------- # # # # #
+# # AUTHOR: MANOEL HORTA RIBEIRO # # # # #
+# # ---------------------------- # # # # #
+# This python file contains functions that given a huge processed csv file, and
+# f) splits the big csv into two tables, an entity table and an event table.
+# g) creates indexes for the selected attributes in the events in the entity table.
+
+
 from multiprocessing import Pool
 import pandas as pd
 import functools
-import numpy as np
 import gc
 import os
 

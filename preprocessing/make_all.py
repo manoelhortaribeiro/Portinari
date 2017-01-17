@@ -6,9 +6,9 @@
 # b) Rename the type numbers.
 # c) Rename the variable names.
 # d) creates a new variable called, sincelast, with relative time, and another one called age.
-# e) splits the big csv into two tables, an entity table and an event table.
-# f) creates indexes for the selected attributes in the events in the entity table.
-# g) drop entire columns, and possibly, events with certain diagnosis.
+# e) drop entire columns, and possibly, events with certain diagnosis.
+# f) splits the big csv into two tables, an entity table and an event table.
+# g) creates indexes for the selected attributes in the events in the entity table.
 
 
 from preprocessing.make_tables import parallel_parsing
@@ -130,7 +130,7 @@ if __name__ == "__main__":
              "cancer": 25         # cancer diagnosis (histologically verified)
             }
 
-    _drop_diag, _drop_col, _idv = [], [''], 'ID'
+    _drop_diag, _drop_col, _idv = [], [], 'ID'
 
     # TODO
     _group = {}
@@ -155,12 +155,12 @@ if __name__ == "__main__":
 
     # OPENCRAB
 
-    _raw_dir, _name = "./data/opencrab/", "opencrab.csv"
-
-    _renaming_en = {'ID': 'PatientID', 'birthdate': 'Birthdate', 'censordate': 'CensorDate'}
-
-    make_all(_diag, _type, _drop_diag, _drop_col, _group, _raw_dir, _name, _idv, _renaming_en,
-             _renaming_ev, _sincelast, _index_values, _index_display)
+    # _raw_dir, _name = "./data/opencrab/", "opencrab.csv"
+    #
+    # _renaming_en = {'ID': 'PatientID', 'birthdate': 'Birthdate', 'censordate': 'CensorDate'}
+    #
+    # make_all(_diag, _type, _drop_diag, _drop_col, _group, _raw_dir, _name, _idv, _renaming_en,
+    #          _renaming_ev, _sincelast, _index_values, _index_display)
 
     # SURVEY BOTH
 

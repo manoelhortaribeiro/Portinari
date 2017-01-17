@@ -1,5 +1,16 @@
+# # ---------------------------- # # # # #
+# # AUTHOR: MANOEL HORTA RIBEIRO # # # # #
+# # ---------------------------- # # # # #
+# This python file contains functions that given a huge unprocessed csv file:
+# a) Rename the diagnosis numbers.
+# b) Rename the type numbers.
+# c) Rename the variable names.
+# d) creates a new variable called, sincelast, with relative time, and another one called age.
+# e) drop entire columns, and possibly, events with certain diagnosis.
+
 from multiprocessing import Pool
 import collections
+import numpy as np
 import functools
 import datetime
 import pandas
@@ -18,7 +29,7 @@ def to_unix(st):
     """
 
     day_ms = 86400
-    return "" if st == "" else int(int(time.mktime(datetime.datetime.strptime(st, "%d.%m.%Y").timetuple())) / day_ms)
+    return "" if st == "" else int(np.ceil(int(time.mktime(datetime.datetime.strptime(st, "%d.%m.%Y").timetuple())) / day_ms))
 
 
 def pre_process_exams_only(path, dest, group, drop, has_dateres=False):
@@ -230,7 +241,7 @@ def merge_groups(ran, df, dest):
 def merge_groups_parallel(path, dest, drop=None):
     df = pandas.read_csv(path)
 
-    if drop is not None:
+    if len(drop) is not 0 and drop is not None:
         df.drop(drop, axis=1, inplace=True)
 
     f = functools.partial(merge_groups, df=df, dest=dest, )

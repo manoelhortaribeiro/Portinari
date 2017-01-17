@@ -2,7 +2,7 @@
 # # AUTHOR: MANOEL HORTA RIBEIRO # # # # #
 # # ---------------------------- # # # # #
 # This script simply separates the survey data three big files. Most specifically, containing the data on the first, the
-# second and the common questions of both surveys.
+# second and the common questions of both surveys. It should be run separately from the make all function (for now).
 
 from preprocessing.format_rows import pre_process_exams_query
 
