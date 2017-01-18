@@ -19,7 +19,8 @@ import csv
 import os
 import gc
 
-# Helpers
+
+# ---- Helpers ----
 
 
 def time_flags(flag):
@@ -40,9 +41,13 @@ def time_flags(flag):
     return ms
 
 
-def type_flags(flag):
+def type_flags(flag, info=None):
     if flag == "int":
-        f = functools.partial(int)
+        if info is not None and type(info) is str and len(info) > 2 and info[-2:] == ".0":
+            f = lambda a: int(a[:-2])
+        else:
+            f = functools.partial(int)
+
     elif flag == "float":
         f = functools.partial(float)
     else:
@@ -67,7 +72,8 @@ def to_unix(st, flag, config):
             np.floor(int(time.mktime(datetime.datetime.strptime(st, "%d.%m.%Y").timetuple())) / ms))
 
 
-# Scripts
+# ---- Scripts ----
+
 
 def rename(path, dest, config):
     df = pandas.read_csv(path)
@@ -105,7 +111,6 @@ def pre_process(path, dest, config):
 
     for col in var:
         if "drop_col" in var[col] and var[col]["drop_col"] == "true":
-
             attr.remove(col)
 
     csv_out = csv.DictWriter(output_file, attr)
@@ -117,9 +122,13 @@ def pre_process(path, dest, config):
     for row in csv_in:
 
         # fills nans in the dataset with established default
-        names, types, drops, invalid_row = [], [], [], False
+        all_n, names, types, drops, invalid_row = [], [], [], [], False
 
         for col in var:
+
+            if "new_name" in var[col]:
+                all_n.append(var[col]["new_name"])
+
             if "new_name" in var[col] and "conversion" not in var[col]:
                 names.append(var[col]["new_name"])
                 types.append(var[col]["new_type"])
@@ -139,7 +148,7 @@ def pre_process(path, dest, config):
             continue
 
         for val in row:
-            if row[val] == "":
+            if row[val] == "" or row[val] == " ":
 
                 if val in names:
                     idx = names.index(val)
@@ -147,6 +156,10 @@ def pre_process(path, dest, config):
 
                 elif val not in drops:
                     row[val] = nan_flags(config["default_type"], config)
+
+            if val not in all_n:
+                f = type_flags(config["default_type"], info = row[val])
+                row[val] = f(row[val])
 
         # does type unix conversion, casting and grouping
         for col in var:
@@ -175,14 +188,14 @@ def pre_process(path, dest, config):
 
 
 def merge(table, config):
-    print()
     # Prints the progress and does garbage collection manually
     if table[config["id"]].head(1).values[0] % 50000 == 0:
-        print(config["id"].head(1).values[0])
+        print(table[config["id"]].head(1).values[0])
         gc.collect()
 
     # Copies the table
     tmp = table.copy(deep=False)
+    tmp.reset_index(drop=True)
     tmp[config["eventnumber"]] = range(1, len(tmp[config["id"]].values) + 1)
 
     # Creates the dictionary with date:row number
@@ -209,65 +222,68 @@ def merge(table, config):
 
     # Merge the events in a given day
     var = config["variables"]
-    all_master = []
-    all_slaves = {}
+    master_disp = ""
     master_name = ""
     slaves_names = []
+    to_drop = []
 
     for col in var:
         if "merge" in var[col] and var[col]["merge"] == "master":
-            master_name = var[col]["new_name"]
+            master_disp = var[col]["new_name"]
+            master_name = col
         if "merge" in var[col] and var[col]["merge"] == "slave":
             slaves_names.append(var[col]["new_name"])
 
-    print(master_name, slaves_names)
-
     for key, item in dictionary.items():
-        if len(item) < 2:
-            continue
-        print(key, item)
-
         master = []
         slaves = []
 
-        for slave in slaves_names:
+        for d in slaves_names:
             slaves.append([])
 
         for i in item:
             row_of_int = tmp[tmp[config["eventnumber"]] == i].iloc[0].values
-            loc_master = list(tmp.columns.values).index(master_name)
+            loc_master = list(tmp.columns.values).index(master_disp)
             ids = 0
             for slave in slaves_names:
                 loc_slave = list(tmp.columns.values).index(slave)
                 slaves[ids].append(str(int(row_of_int[loc_slave])))
-
+                ids += 1
 
             master.append(str(int(row_of_int[loc_master])))
-        print(master, slaves)
-        exit()
-    #
-    #     is_first = False
-    #     to_drop = []
-    #     for i in item:
-    #         if not is_first:
-    #             is_first = True
-    #         else:
-    #             to_drop.append(i)
-    #
-    #     tuples = list(zip(diagnosis1, types))
-    #     tuples = sorted(tuples, key=lambda a: a[0])
-    #     diagnosis1, types = list(list(zip(*tuples))[0]), list(list(zip(*tuples))[1])
-    #
-    #     all_types.append(int('0'.join(types)))
-    #     all_diagnosis.append(int('0'.join(diagnosis1)))
-    #
-    #     if len(to_drop) > 0:
-    #         tmp = tmp[~tmp[config["eventnumber"]].isin(to_drop)]
-    #
-    # tmp['Diagnosis'] = all_diagnosis
-    # tmp['Type'] = all_types
-    # tmp[config["eventnumber"]] = range(1, len(all_diagnosis) + 1)
-    # return tmp
+
+        merge_number, merge_order = var[master_name]["merge_number"], var[master_name]["merge_order"]
+        taken = np.array([False] * len(master))
+
+        for event in merge_order:
+            if merge_number == 0:
+                break
+
+            occurences = [i for i, val in enumerate(master) if val == event]
+
+            for i in occurences:
+                if merge_number == 0:
+                    break
+                taken[i] = True
+                merge_number -= 1
+
+        idx = list(taken).index(True)
+        to_drop = to_drop + item[:idx] + item[idx+1:]
+        master = list(np.array(master)[taken])
+        slaves = list(map(lambda slave: list(np.array(slave)[taken]), slaves))
+        tmp.set_value(tmp.index[idx], master_disp, '0'.join(master))
+
+        ids = 0
+        for slave in slaves_names:
+            tmp.set_value(tmp.index[idx], slave, '0'.join(slaves[ids]))
+            ids += 1
+
+    if len(to_drop) > 0:
+        to_drop = list(map(lambda a: a -1, to_drop))
+        tmp.drop(tmp.index[to_drop], inplace=True)
+
+    tmp[config["eventnumber"]] = range(1, len(tmp[config["id"]].values) + 1)
+    return tmp
 
 
 def merge_groups(ran, df, dest, config):
@@ -286,12 +302,12 @@ def merge_groups(ran, df, dest, config):
 def merge_groups_parallel(path, dest, config):
     df = pandas.read_csv(path)
 
-    f = functools.partial(merge_groups, df=df, dest=dest, config=config )
+    f = functools.partial(merge_groups, df=df, dest=dest, config=config)
 
     range_of = list(zip(list(range(0, 1000000, 25000)), list(range(25000, 1000000, 25000))))
 
-    with Pool(3) as p:
-        p.map(f, range_of)
+    with Pool(2) as p:
+        list(map(f, range_of))
 
     os.system('cat ' + dest + 'r* > ' + dest)
     os.system('rm ' + dest + 'r*')

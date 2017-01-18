@@ -1,3 +1,0 @@
-ID,birthdate,diagnosisdate,diagnosisnumber,type,diagnosis1,diagnosis2,stage,lab_nr,reg,censordate,sincelast
-2,0,130,1,cyt,11,100,999,8,3,200,0
-2,0,150,2,cyt,11,100,999,8,3,200,20
