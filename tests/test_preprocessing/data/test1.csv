@@ -1,0 +1,8 @@
+preID,preEventDate,preEventObs,preEntityInfo,preEntityCreation,preEventObs2,preUndocumentedEventAttr,preUndocumentedEntityAttr
+1,24.08.1995,a,male,24.08.1994,1,1,1
+1,25.08.1995,e,male,24.08.1994,2,2,3
+1,26.08.1995,f,male,24.08.1994,3,3,4
+1,25.09.1995,f,male,24.08.1994,4,3,2
+1,26.09.1995,i,male,24.08.1994,5,3,1
+2,24.09.1996,f,fema,21.09.1992,5,3,4
+2,30.09.1996,i,fema,21.09.1992,5,3,4
