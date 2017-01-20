@@ -1,0 +1,74 @@
+{
+  "variables": {
+    "preID": {
+      "new_name": "ID",
+      "new_type": "int",
+      "event": "true",
+      "entity": "true"
+    },
+    "preEventDate": {
+      "new_name": "EventDate",
+      "new_type": "int",
+      "conversion": "to_month",
+      "event": "true"
+    },
+    "preEventObs": {
+      "new_name": "EventObs",
+      "new_type": "int",
+      "event": "true",
+      "renaming": {
+        "a": "3",
+        "e": "2",
+        "f": "1",
+        "i": "4"
+      },
+      "index": "true",
+      "index_name": "Index",
+      "merge": "master",
+      "merge_number": "3",
+      "merge_order": [
+        "3",
+        "1",
+        "2",
+        "4"
+      ],
+      "event": "true"
+    },
+    "preEntityInfo": {
+      "new_name": "EntityInfo",
+      "new_type": "string"
+    },
+    "preEntityCreation": {
+      "new_name": "EntityCreation",
+      "new_type": "int",
+      "conversion": "to_month"
+
+    },
+    "preEventObs2": {
+      "new_name": "EventObs2",
+      "new_type": "int",
+      "index": "true",
+      "index_name": "Index2",
+      "merge": "slave",
+      "event": "true"
+    },
+    "preUndocumentedEventAttr": {
+      "drop_col": "true"
+    }
+  },
+  "id": "ID",
+  "sincelast": "SinceLast",
+  "age": "Age",
+  "eventdate": "EventDate",
+  "eventnumber": "EventNumber",
+  "entitycreation": "EntityCreation",
+  "groupsize": "GroupSize",
+  "default": "entity",
+  "directory": "./data/",
+  "name": "test2.csv",
+  "nan_int": -999999999,
+  "nan_float": -999999999,
+  "nan_str": "NaN",
+  "default_type": "int",
+  "time_format": "%d.%m.%Y"
+}

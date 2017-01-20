@@ -65,6 +65,7 @@
 #  - Renaming takes place before dropping the values
 #  - Dropping values take place before filling in NaN, so you can't drop NaN in this script
 #  - All indexable variables have to be of the type:
+#  - There can't be indexes without sincelast attribute
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 
@@ -500,7 +501,9 @@ def make_tables_parallel(source, patient_dest, exams_dest, config):
     os.system('rm ' + patient_dest + 'r*')
     main_df = pd.read_csv(patient_dest)
     main_df.drop(
-        drop_cols(config["default"], "entity", config["variables"], main_df.columns, index_disp=index_disp),
+        drop_cols(config["default"], "entity", config["variables"], main_df.columns,
+                  index_disp=index_disp, age=config["age"], sincelast=config["sincelast"],
+                  groupsize=config["groupsize"], dnumber=config["eventnumber"]),
         axis=1, inplace=True)
     main_df.to_csv(patient_dest, mode='w', index=False)
 

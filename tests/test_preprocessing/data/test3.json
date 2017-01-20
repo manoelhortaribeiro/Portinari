@@ -1,0 +1,148 @@
+{
+  "variables": {
+    "diagnosis1": {
+      "new_name": "Diagnosis",
+      "new_type": "int",
+      "renaming": {
+        "0": "11",
+        "1": "12",
+        "9": "13",
+        "10": "14",
+        "11": "15",
+        "12": "16",
+        "13": "17",
+        "14": "18",
+        "15": "19",
+        "16": "21",
+        "17": "22",
+        "18": "23",
+        "20": "25",
+        "31": "26",
+        "32": "27",
+        "33": "28",
+        "35": "29",
+        "99": "31",
+        "41": "32",
+        "42": "33",
+        "43": "34"
+      },
+      "merge": "master",
+      "merge_number": "2",
+      "merge_order": [
+        "13",
+        "17",
+        "11",
+        "14",
+        "15",
+        "16",
+        "12",
+        "18",
+        "19",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "31",
+        "32",
+        "33",
+        "34"
+      ],
+      "event": "true",
+      "index": "true",
+      "index_name": "DiagnosisIndex"
+    },
+    "ID": {
+      "new_name": "PatientID",
+      "new_type": "int",
+      "event": "true",
+      "entity": "true"
+    },
+    "diagnosisdate": {
+      "new_name": "DiagnosisDate",
+      "new_type": "int",
+      "conversion": "to_month",
+      "event": "true"
+    },
+    "type": {
+      "new_name": "Type",
+      "new_type": "int",
+      "renaming": {
+        "cyt": "11",
+        "biopsy": "12",
+        "cone": "13",
+        "hyster": "14",
+        "HCII": "15",
+        "Proofer": "16",
+        "Amplicor": "17",
+        "Ventana": "18",
+        "PAP13": "19",
+        "Paptype13": "20",
+        "Cobas": "21",
+        "Abbott": "22",
+        "BD Onclarity": "23",
+        "HPV other": "24",
+        "cancer": "25"
+      },
+      "merge": "slave",
+      "event": "true",
+      "index": "true",
+      "index_name": "TypeIndex"
+    },
+    "diagnosis2": {
+      "drop_col": "true"
+    },
+    "stage": {
+      "drop_col": "true"
+    },
+    "lab_nr": {
+      "new_name": "LaboratoryNbr",
+      "new_type": "int",
+      "event": "true"
+    },
+    "reg": {
+      "new_name": "Region",
+      "new_type": "int",
+      "event": "true",
+      "merge":"slave"
+    },
+    "birthdate": {
+      "new_name": "Birthdate",
+      "new_type": "int",
+      "conversion": "to_month"
+    },
+    "censordate": {
+      "new_name": "CensorDate",
+      "new_type": "int",
+      "conversion": "to_month"
+    },
+    "dateres": {
+      "new_name": "DateResult",
+      "new_type": "int",
+      "conversion": "to_month"
+    },
+    "typeres": {
+      "new_name": "TypeResult",
+      "new_type": "int"
+    }
+  },
+  "id": "PatientID",
+  "sincelast": "SinceLast",
+  "age": "Age",
+  "eventdate": "DiagnosisDate",
+  "eventnumber": "DiagnosisNumber",
+  "entitycreation": "Birthdate",
+  "groupsize": "GroupSize",
+  "default": "entity",
+  "directory": "./data/",
+  "name": "test3.csv",
+  "nan_int": -999999999,
+  "nan_float": -999999999,
+  "nan_str": "NaN",
+  "default_type": "int",
+  "time_format": "%d.%m.%Y"
+}
