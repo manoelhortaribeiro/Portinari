@@ -5,13 +5,13 @@
 /* Forms */
 /* -- General Website -- */
 body {
-  font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+  font-family: "Raleway", sans-serif;
   margin: 0;
   padding: 0;
   border: 0;
   background-color: rgba(255, 255, 255, 0.9); }
   body p {
-    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+    font-family: "Raleway", sans-serif;
     font-size: 10px;
     margin: 0;
     padding: 0;
@@ -29,7 +29,7 @@ body {
     text-rendering: optimizeLegibility;
     letter-spacing: .05em; }
   body h2 {
-    font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
     font-weight: bolder;
     line-height: 30%;
@@ -44,7 +44,7 @@ body {
     padding: 0;
     max-height: 40px; }
   body text {
-    font-family: "Raleway", sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 16px;
     font-weight: 800;
     text-transform: uppercase;
@@ -164,7 +164,7 @@ body {
       #query-system #forms-menu .current li {
         background-color: #e8f0ff;
         font-size: 10px;
-        font-family: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+        font-family: "Raleway", sans-serif;
         display: inline-block;
         border: solid lightgrey 1px;
         color: #202020;

@@ -429,7 +429,7 @@ def merge_groups_parallel(path, dest, config):
     range_of = list(zip(list(range(0, 1000000, 25000)), list(range(25000, 1000000, 25000))))
 
     with Pool(2) as p:
-        list(map(f, range_of))
+        p.map(f, range_of)
 
     os.system('cat ' + dest + 'r* > ' + dest)
     os.system('rm ' + dest + 'r*')
@@ -495,7 +495,7 @@ def make_tables_parallel(source, patient_dest, exams_dest, config):
     range_of = list(zip(list(range(0, 1000000, 100000)), list(range(100000, 1100000, 100000))))
 
     with Pool(2) as p:
-        list(map(f, range_of))
+        p.map(f, range_of)
 
     os.system('cat ' + patient_dest + 'r* > ' + patient_dest)
     os.system('rm ' + patient_dest + 'r*')
