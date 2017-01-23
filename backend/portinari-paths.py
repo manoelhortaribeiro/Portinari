@@ -14,17 +14,16 @@ def index():
     response = jsonify({'some': 'data'})
 
     # Reads the parameters from the query
-    nodes, edges, outcomes, global_v, future_nodes, prediction_attr, id_attr, matching, ds = reads_params(request)
-
-    # print("prediction attr:", prediction_attr)
-    # print("future nodes:", future_nodes)
-    # print("outcomes:", outcomes)
-    # print("matching:", matching)
-    # print("globals:", global_v)
-    # print("id_attr:", id_attr)
-    # print("Nodes:", nodes)
-    # print("Edges:", edges)
-    # print("dataset:", ds)
+    nodes, edges, outcome, global_attr, future_nodes, prediction_attr, id_attr, matching, ds = reads_params(request)
+    print("prediction attr:", prediction_attr)
+    print("future nodes:", future_nodes)
+    print("outcomes:", outcomes)
+    print("matching:", matching)
+    print("globals:", global_v)
+    print("id_attr:", id_attr)
+    print("Nodes:", nodes)
+    print("Edges:", edges)
+    print("dataset:", ds)
 
     dataset.get_instance(ds)
 
@@ -33,7 +32,6 @@ def index():
 
     return response
 
-    # Makes Sankey diagram
 
 
 @app.route('/config/', methods=['POST'])

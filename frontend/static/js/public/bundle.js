@@ -707,7 +707,6 @@ function make_form_dataset(form, current, name, attributes, thisForm) {
 
     $(".query_" + name).bind("submit", function (event) {
         event.preventDefault();
-        //location.reload();
         var data = $("#new_" + name).serializeArray();
         json_config.QUERY_SYSTEM.changeDataset(data[0].value);
         thisForm.updateForm(undefined)

@@ -38,14 +38,16 @@ class Dataset:
 
         # adds global attributes
         for node in self.config["global_attributes"]:
-            description[node["name"]] = node["pytype"]
+            description[node["name"]] = getattr(np, node["pytype"])
 
         # id attribute
-        description[self.config["id_attribute"]["name"]] = self.config["id_attribute"]["pytype"]
+        description[self.config["id_attribute"]["name"]] = getattr(np, self.config["id_attribute"]["pytype"])
 
         # adds indexes
         for outcome in self.config["outcome_attributes"]:
             description[outcome["index"]] = getattr(np, outcome["index_pytype"])
+
+        print(description)
 
         self.entity_data = pandas.read_csv(self.config["individuals_table_name"], sep=',',
                                            index_col=False, dtype=description, engine='c')
