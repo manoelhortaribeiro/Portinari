@@ -1,4 +1,6 @@
-var $ = require("../external/jquery.min.js");
+var $ = require("../external/jquery.min.js"),
+    d3 = require("../external/d3.min.v4.js");
+require("../external/date.js");
 
 function DBI() {
     var thisDatabaseInfo = this;
@@ -6,11 +8,11 @@ function DBI() {
     thisDatabaseInfo.conf_file = null;
     thisDatabaseInfo.getDataSet();
     thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
-    thisDatabaseInfo.matching_default =thisDatabaseInfo.conf_file["default_matching"];
+    thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
     thisDatabaseInfo.getDataSet();
 }
 
-DBI.prototype.getFilename = function (){
+DBI.prototype.getFilename = function () {
     return this.filename;
 };
 
@@ -72,6 +74,77 @@ DBI.prototype.matchingDefault = function () {
 };
 
 
+DBI.prototype.typeValueHandling = function (type_name, name, sel) {
+    var data = $("#new_" + name).serializeArray();
+    var attr = [data[0].value, data[1].value, data[2].value];
+    var type_name = d3.select("#attr_name_" + name + " [value=" + sel + "]").attr("type");
+
+    switch (type_name) {
+        case "Month":
+            attr[1] = (Date.parseExact(attr[2], "yyyy-MM-dd").set({day: 15}) / 1000 | 0) / 2628000 | 0;
+            break;
+        default:
+            break;
+    }
+
+    return attr;
+};
+
+DBI.prototype.typeFormHandling = function (type_name, select_value, name, types) {
+    switch (type_name) {
+        case "Number":
+            select_value.append("input")
+                .classed("styled_form", true)
+                .attr("id", "value_field_" + name)
+                .attr("name", "value")
+                .attr("type", "text")
+                .attr("placeholder", "Value");
+            break;
+
+        case "Month":
+            select_value.append("input")
+                .classed("styled_form", true)
+                .attr("id", "value_field_" + name)
+                .attr("name", "value")
+                .attr("type", "date")
+                .attr("placeholder", "month");
+            break;
+
+        case "TimeInterval":
+            select_value.append("input")
+                .classed("styled_form", true)
+                .attr("id", "value_field_" + name)
+                .attr("name", "value")
+                .attr("type", "text")
+                .attr("placeholder", "Value");
+            break;
+
+        default:
+            select_value = select_value.append("select")
+                .classed("styled_form", true)
+                .attr("id", "value_field_" + name)
+                .attr("name", "value");
+
+            select_value.append("option")
+                .classed("styled_form", true)
+                .classed("disabled", true)
+                .classed("hidden", true)
+                .attr("style", true)
+                .attr("value", "Value");
+
+            var keys = Object.keys(types.values);
+            var keys_values = keys.map(function (v) {
+                return [v, types.values[v]];
+            });
+            keys_values.forEach(function (op) {
+                select_value.append("option")
+                    .attr("value", op[0])
+                    .text(op[1]);
+            });
+    }
+};
+
+
 var databaseinfo = new DBI();
 
 module.exports = {
@@ -94,15 +167,19 @@ module.exports = {
 
         /*Stuff adjustable in the back end*/
         datasets: databaseinfo.datasets.bind(databaseinfo),
-        matching:  databaseinfo.matching.bind(databaseinfo),
-        matchingDefault:  databaseinfo.matchingDefault.bind(databaseinfo),
+        matching: databaseinfo.matching.bind(databaseinfo),
+        matchingDefault: databaseinfo.matchingDefault.bind(databaseinfo),
         changeDataset: databaseinfo.changeDataSet.bind(databaseinfo),
         outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
         globalAttributes: databaseinfo.global_attributes.bind(databaseinfo),
         nodeAttributes: databaseinfo.node_attributes.bind(databaseinfo),
         edgeAttributes: databaseinfo.edge_attributes.bind(databaseinfo),
         types: databaseinfo.types.bind(databaseinfo),
-        filename: databaseinfo.getFilename.bind(databaseinfo)
+        filename: databaseinfo.getFilename.bind(databaseinfo),
+
+        /*Helpers*/
+        typeValueHandling: databaseinfo.typeValueHandling,
+        typeFormHandling: databaseinfo.typeFormHandling
     },
 
     QUERY_FORM: {

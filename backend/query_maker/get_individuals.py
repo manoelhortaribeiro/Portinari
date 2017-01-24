@@ -1,4 +1,16 @@
-from query_interpreter.graph_maker import Graph
+# ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
+# ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
+#                                     # / ---------------------------- \ #                                             #
+#                                     # | AUTHOR: MANOEL HORTA RIBEIRO | #                                             #
+#                                     # \ ---------------------------- / #                                             #
+#                                                                                                                      #
+# This file the function ´get_individuals´, which interprets the query made by the interface and returns all of the    #
+# individuals who match the query made. Notice that the matching of the indexes is done according to the specification.#
+# ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
+# ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
+
+
+from backend.query_interpreter.graph_maker import Graph
 from query_maker.find_and_compare import match_time_sequence
 import numpy as np
 import functools
@@ -6,21 +18,41 @@ import pandas
 from joblib import Parallel, delayed
 import multiprocessing
 
+DEBUG_QUERY_MATCHING = True
 
-def apply_parallel(df_grouped, func):
-    ret_list = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(val) for val in df_grouped)
+
+def apply_parallel(df, func):
+    """ Applies a function on a parallel function in a pandas data frame.
+    :param df: data frame of interest.
+    :param func: function to be applied.
+    :return: whatever the function returns. """
+    ret_list = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(val) for val in df)
+
     return ret_list
 
 
 def get_constraint(key_values, name, operator, not_found_return):
+    """ Given a key value, a name, an operator and a not_found value, returns the first constrained value found.
+    :param key_values: values on the node attribute.
+    :param name: value of the node attribute of interest.
+    :param operator:  operator of interest.
+    :param not_found_return: custom value.
+    :return: value of the not_found_return, or of the constraint. """
     for constraint in key_values:
         if constraint[0] == name and constraint[1] == operator:
             return constraint[2]
+
     return not_found_return
 
 
 def get_query_matching_values(graph, paths, config, prediction_attr):
-    diags, times, exams = [], [], []
+    """ This function extracts the index values of the expected outcome, the time constraints and the hops constraints.
+    :param graph: Query graph.
+    :param paths: Maximal paths on the graph.
+    :param config: Config file.
+    :param prediction_attr: Attribute of interest.
+    :return: index values, time constraint values, hop constraints values. """
+    index_v, times, hops = [], [], []
 
     for path in paths:
         is_first = True
@@ -31,17 +63,18 @@ def get_query_matching_values(graph, paths, config, prediction_attr):
             jnode1, jnode2 = graph.get_node(node1), graph.get_node(node2)
             # gets the first diagnosis
             if is_first:
-                diagnosis = get_constraint(jnode1['key_op_value'], prediction_attr, '==', config["no_indexed_event"])
-                diag.append(int(diagnosis))
+                interest_node = jnode1
+            else:
+                interest_node = jnode2
                 is_first = False
 
             # gets the i-th diagnosis
-            diagnosis = get_constraint(jnode2['key_op_value'], prediction_attr, '==', config["no_indexed_event"])
+            diagnosis = get_constraint(interest_node['key_op_value'], prediction_attr, '==', config["no_indexed_event"])
             diag.append(int(diagnosis))
 
             jedge = graph.get_edge(node1, node2)
 
-            # gets the (i-1th,i-th) exams bound
+            # gets the (i-1th,i-th) hops bound
             exam_lb = get_constraint(jedge['key_op_value'], config["edge_hops_attribute"]["name"],
                                      '>', config["event_min"])
             exam_ub = get_constraint(jedge['key_op_value'], config["edge_hops_attribute"]["name"],
@@ -55,12 +88,21 @@ def get_query_matching_values(graph, paths, config, prediction_attr):
                                      '<', config["time_max"])
             time.append((int(time_lb), int(time_ub)))
 
-        diags.append(diag), times.append(time), exams.append(exam)
+        index_v.append(diag), times.append(time), hops.append(exam)
 
-    return diags, times, exams
+    return index_v, times, hops
 
 
 def filter_by_attributes(graph, paths, dataset, config, prediction_attr):
+    """
+
+    :param graph:
+    :param paths:
+    :param dataset:
+    :param config:
+    :param prediction_attr:
+    :return:
+    """
     # Filter by attributes
     individuals = None
     has_constraint = False
@@ -91,20 +133,32 @@ def filter_by_attributes(graph, paths, dataset, config, prediction_attr):
 
 
 def get_individuals(nodes, edges, dataset, prediction_attr):
+
     # First creates the graph and the desired paths
     graph = Graph(nodes, edges)
     paths = graph.make_maximal_paths()
 
     # Get query matching string
-    diags, times, exams = get_query_matching_values(graph, paths, dataset.config, prediction_attr)
+    index_v, times, exams = get_query_matching_values(graph, paths, dataset.config, prediction_attr)
+
+    if DEBUG_QUERY_MATCHING:
+        print(index_v)
+        print(times)
+        print(exams)
 
     rs = []
 
     # Filter by attributes
-    for d, t, e in zip(diags, times, exams):
-        patients_of_interest = filter_by_attributes(graph, paths, dataset, dataset.config, prediction_attr)
-        print(patients_of_interest)
-        # f = functools.partial(match_time_sequence, diagnosis=d, time=t, exams_range=e)
-        # rs.append(apply_parallel(pandas.DataFrame(patients_of_interest)['StringRep'], f))
+    for i, t, e in zip(index_v, times, exams):
+        if i == dataset.config["no_indexed_event"]:
+            continue
 
-    return rs
+        patients_of_interest = filter_by_attributes(graph, paths, dataset, dataset.config, prediction_attr)
+
+        f = functools.partial(match_time_sequence, diagnosis=i, time=t, exams_range=e)
+        print(patients_of_interest)
+        ##rs.append(apply_parallel(pandas.DataFrame(patients_of_interest)['DiagnosisIndex'], f))
+
+    print(rs)
+
+    return 12

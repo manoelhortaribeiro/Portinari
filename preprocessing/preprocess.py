@@ -3,6 +3,7 @@
 #                                     # / ---------------------------- \ #                                             #
 #                                     # | AUTHOR: MANOEL HORTA RIBEIRO | #                                             #
 #                                     # \ ---------------------------- / #                                             #
+#                                                                                                                      #
 # This script does the whole preprocessing of the two files. Basically it:                                             #
 #                                                                                                                      #
 # 1. rename         - Rename the categorical values of some attributes as specified by config file.                    #
@@ -61,11 +62,11 @@
 #  "directory": path to directory where the data is, MBD,                                                              #
 #  "name": name of the file, MBD,                                                                                      #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
-#  Some relevant observations are that:
-#  - Renaming takes place before dropping the values
-#  - Dropping values take place before filling in NaN, so you can't drop NaN in this script
-#  - All indexable variables have to be of the type:
-#  - There can't be indexes without sincelast attribute
+#  Some relevant observations are that:                                                                                #
+#  - Renaming takes place before dropping the values                                                                   #
+#  - Dropping values take place before filling in NaN, so you can't drop NaN in this script                            #
+#  - All indexable variables have to be of the type:                                                                   #
+#  - There can't be indexes without sincelast attribute                                                                #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 

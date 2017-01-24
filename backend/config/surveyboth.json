@@ -341,6 +341,21 @@
       "pytype": "int32"
     }
   ],
+  "edge_attributes": [
+    {
+      "name": "TimeSinceLast",
+      "display": "Time Interval",
+      "type": "TimeInterval",
+      "pytype": "int32"
+    },
+    {
+      "name": "ExamInterval",
+      "display": "Exam Interval",
+      "type": "Number",
+      "pytype": "int32"
+    }
+  ],
+  "index_attributes": ["TypeIndex", "StringRe"],
   "types": {
     "Month": {
       "constraints": [
@@ -920,6 +935,5 @@
       },
       "display": "std"
     }
-
   }
 }

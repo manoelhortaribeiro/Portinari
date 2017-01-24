@@ -55,6 +55,3 @@ class TestPreprocessing(unittest.TestCase):
 
         os.remove("./data/entity_test3.csv")
         os.remove("./data/events_test3.csv")
-
-
-

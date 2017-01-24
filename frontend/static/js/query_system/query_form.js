@@ -215,59 +215,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
         // ** FORM Pt3 value_field **
 
-        var select_value = form;
-
-        switch (type_name) {
-            case "Number":
-                select_value.append("input")
-                    .classed("styled_form", true)
-                    .attr("id", "value_field_" + name)
-                    .attr("name", "value")
-                    .attr("type", "text")
-                    .attr("placeholder", "Value");
-                break;
-
-            case "Month":
-                select_value.append("input")
-                    .classed("styled_form", true)
-                    .attr("id", "value_field_" + name)
-                    .attr("name", "value")
-                    .attr("type", "date")
-                    .attr("placeholder", "month");
-                break;
-
-            case "TimeInterval":
-                select_value.append("input")
-                    .classed("styled_form", true)
-                    .attr("id", "value_field_" + name)
-                    .attr("name", "value")
-                    .attr("type", "text")
-                    .attr("placeholder", "Value");
-                break;
-
-            default:
-                select_value = select_value.append("select")
-                    .classed("styled_form", true)
-                    .attr("id", "value_field_" + name)
-                    .attr("name", "value");
-
-                select_value.append("option")
-                    .classed("styled_form", true)
-                    .classed("disabled", true)
-                    .classed("hidden", true)
-                    .attr("style", true)
-                    .attr("value", "Value");
-
-                var keys = Object.keys(types.values);
-                var keys_values = keys.map(function (v) {
-                    return [v, types.values[v]];
-                });
-                keys_values.forEach(function (op) {
-                    select_value.append("option")
-                        .attr("value", op[0])
-                        .text(op[1]);
-                });
-        }
+        thisForm.config.typeFormHandling(type_name, form, name, types);
 
         form.append("input")
             .classed("styled_form", true)
@@ -279,17 +227,22 @@ function make_form(form, current, name, attributes, thisForm, callback) {
     $(".query_" + name).unbind();
 
     $(".query_" + name).bind("submit", function (event) {
+
         event.preventDefault();
 
-        var data = $("#new_" + name).serializeArray();
-        var attr = [data[0].value, data[1].value, data[2].value];
-        var disp = attr_getter("#attr_name_" + name, "#oper_field_" + name, "#value_field_" + name);
+        var sel = $("#attr_name_" + name).val();
+        var type_name = d3.select("#attr_name_" + name + " [value=" + sel + "]").attr("type");
+        thisForm.config.typeValueHandling(type_name, name, sel);
 
+        var attr = thisForm.config.typeValueHandling(type_name, name, sel);
+
+        var disp = attr_getter("#attr_name_" + name, "#oper_field_" + name, "#value_field_" + name);
 
         callback(attr, disp, current, thisForm)
 
     });
 }
+
 
 function global_form_callback(attr, disp, current, thisForm) {
 
