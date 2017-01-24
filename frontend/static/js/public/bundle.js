@@ -82,7 +82,7 @@ DBI.prototype.typeValueHandling = function (type_name, name, sel) {
 
     switch (type_name) {
         case "Month":
-            attr[1] = (Date.parseExact(attr[2], "yyyy-MM-dd").set({day: 15}) / 1000 | 0) / 2628000 | 0;
+            attr[2] = String((Date.parseExact(attr[2], "yyyy-MM-dd").set({day: 15}) / 1000 | 0) / 2628000 | 0);
             break;
         default:
             break;

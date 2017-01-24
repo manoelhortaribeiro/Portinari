@@ -16,7 +16,7 @@ app = Flask(__name__)
 dataset = Dataset()
 
 # DEBUG VARIABLES
-DEBUG_PARAMETERS = False
+DEBUG_PARAMETERS = True
 DEBUG_CONFIG = False
 
 
@@ -27,7 +27,7 @@ def index():
     response = jsonify({'some': 'data'})
 
     # Reads the parameters from the query
-    nodes, edges, outcomes, global_attr, future_nodes, prediction_attr, id_attr, matching, ds = reads_params(request)
+    nodes, edges, global_attr, outcomes, future_nodes, prediction_attr, id_attr, matching, ds = reads_params(request)
 
     if DEBUG_PARAMETERS:
         print("prediction attr:", prediction_attr)
@@ -43,7 +43,7 @@ def index():
     dataset.get_instance(ds)
 
     # Gets individual
-    individuals = get_individuals(nodes, edges, dataset, prediction_attr)
+    individuals = get_individuals(nodes, edges, dataset, global_attr, prediction_attr)
 
     return response
 
