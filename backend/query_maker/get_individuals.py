@@ -6,7 +6,7 @@
 #                                                                                                                      #
 # This file the function ´get_individuals´, which interprets the query made by the interface and returns all of the    #
 # individuals who match the query made. Notice that the matching of the indexes is done according to the specification.#
-#                                                                                                                      #
+# A. filter_attributes                                                                                                 #
 # 1. It is important that we have different behaviour for different attributes:                                        #
 #                                                                                                                      #
 #   - For those called range attributes, where the selection is made using operators such as < and >, we have:         #
@@ -21,7 +21,6 @@
 
 
 from backend.query_interpreter.graph_maker import Graph
-from query_maker.find_and_compare import match_time_sequence
 import numpy as np
 import functools
 import pandas
@@ -31,130 +30,20 @@ import multiprocessing
 DEBUG_QUERY_MATCHING = True
 
 
-# def apply_parallel(df, func):
-#     """ Applies a function on a parallel function in a pandas data frame.
-#     :param df: data frame of interest.
-#     :param func: function to be applied.
-#     :return: whatever the function returns. """
-#     ret_list = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(val) for val in df)
-#
-#     return ret_list
-#
-#
-# def get_constraint(key_values, name, operator, not_found_return):
-#     """ Given a key value, a name, an operator and a not_found value, returns the first constrained value found.
-#     :param key_values: values on the node attribute.
-#     :param name: value of the node attribute of interest.
-#     :param operator:  operator of interest.
-#     :param not_found_return: custom value.
-#     :return: value of the not_found_return, or of the constraint. """
-#     for constraint in key_values:
-#         if constraint[0] == name and constraint[1] == operator:
-#             return constraint[2]
-#
-#     return not_found_return
-#
-#
-# def get_query_matching_values(graph, paths, config, prediction_attr):
-#     """ This function extracts the index values of the expected outcome, the time constraints and the hops constraints.
-#     :param graph: Query graph.
-#     :param paths: Maximal paths on the graph.
-#     :param config: Config file.
-#     :param prediction_attr: Attribute of interest.
-#     :return: index values, time constraint values, hop constraints values. """
-#     index_v, times, hops = [], [], []
-#
-#     for path in paths:
-#         is_first = True
-#
-#         diag, time, exam = [], [], []
-#
-#         for node1, node2 in zip(path[:-1], path[1:]):
-#             jnode1, jnode2 = graph.get_node(node1), graph.get_node(node2)
-#             # gets the first diagnosis
-#             if is_first:
-#                 interest_node = jnode1
-#             else:
-#                 interest_node = jnode2
-#                 is_first = False
-#
-#             # gets the i-th diagnosis
-#             diagnosis = get_constraint(interest_node['key_op_value'], prediction_attr, '==', config["no_indexed_event"])
-#             diag.append(int(diagnosis))
-#
-#             jedge = graph.get_edge(node1, node2)
-#
-#             # gets the (i-1th,i-th) hops bound
-#             exam_lb = get_constraint(jedge['key_op_value'], config["edge_hops_attribute"]["name"],
-#                                      '>', config["event_min"])
-#             exam_ub = get_constraint(jedge['key_op_value'], config["edge_hops_attribute"]["name"],
-#                                      '<', config["event_max"])
-#             exam.append((int(exam_lb), int(exam_ub)))
-#
-#             # gets the (i-1th,i-th) time bound
-#             time_lb = get_constraint(jedge['key_op_value'], config["edge_time_attribute"]["name"],
-#                                      '>', config["time_min"])
-#             time_ub = get_constraint(jedge['key_op_value'], config["edge_time_attribute"]["name"],
-#                                      '<', config["time_max"])
-#             time.append((int(time_lb), int(time_ub)))
-#
-#         index_v.append(diag), times.append(time), hops.append(exam)
-#
-#     return index_v, times, hops
-#
-#
-# def filter_by_attributes(graph, paths, dataset, config, prediction_attr):
-#
-#     # Filter by attributes
-#     individuals = None
-#     has_constraint = False
-#
-#     # Get the data tables
-#     exa_table = dataset.event_data
-#     ind_table = dataset.entity_data
-#
-#     for path in paths:
-#         for node in path:
-#             json_node = graph.get_node(node)
-#             for constraint in json_node['key_op_value']:
-#                 query = constraint[0] + constraint[1] + constraint[2]
-#                 tmp = exa_table.query(query)[config["id_attribute"]["name"]].values
-#                 if individuals is None:
-#                     individuals = tmp
-#                 else:
-#                     individuals = np.intersect1d(tmp, individuals)
-#
-#     if individuals is not None:
-#         ind = ind_table[ind_table[config["id_attribute"]["name"]].isin(individuals)]
-#     elif not has_constraint:
-#         ind = ind_table
-#     else:
-#         ind = None
-#
-#     return ind
-#
-#
-
-def filter_attributes(data, attr, config):
+def filter_attributes(data, attr, config, flag=False):
     """ This function receives the dataset object, the list of attributes and filters people based on them (no order).
-    :param dataset: dataset object.
+    :param data: dataset object.
     :param attr: list of attributes.
-    :return: filtered dataframe. """
-
-    names = {}
+    :param config: config file.
+    :param flag: alters return value.
+    :return: ids of filtered entities if flag = False, otherwise, return the indexes"""
 
     for name, op, value in attr:
-
         # Treat NaNs
         data = data[eval("data[\"" + name + "\"]" + "!=" + str(config["nan_int"]))]
-        if name not in names:
-            names[name] = [[],[], "categorical"]
 
-        names[name][0].append(op)
-        names[name][1].append(value)
-
-        if op == "<" or op == ">":
-            names[name][2] = "range"
+    # Gets constraints
+    names = appending_help(attr)
 
     # Treat constraints
     for key, item in names.items():
@@ -168,53 +57,168 @@ def filter_attributes(data, attr, config):
             filter_v = " | ".join(strings)
         data = data[eval(filter_v)]
 
-    return data
+    if flag:
+        return data[config["id_attribute"]["name"]].index
+    else:
+        return data[config["id_attribute"]["name"]].values
 
 
-def get_individuals(nodes, edges, dataset, global_attr, prediction_attr):
+def filter_local_attributes_unordered(data, graph, paths, config):
+    """ This function simply ensures that all the entities selected have atleast one instance of all the required local
+    events. It unites the individuals matched for each one of the paths. For a given path, it  uses the function
+    ´filter_attributes´ for the constraints of each node, and intersect the results of all nodes in the path.
+    :param data:
+    :param graph:
+    :param paths:
+    :param config:
+    :return:
+    """
+    union_indexes = []
+    for path in paths:
 
-    # Filter global attributes
-    dataframe = filter_attributes(dataset.entity_data, global_attr, config)
+        inter_indexes = []
+
+        for node in path:
+            inter_indexes.append(filter_attributes(data, graph.get_node(node)["key_op_value"], config))
+
+        if len(inter_indexes) == 0:
+            continue
+
+        intersection = np.unique(inter_indexes[0])
+
+        for idx in inter_indexes[1:]:
+            intersection = np.intersect1d(intersection, np.unique(idx), assume_unique=True)
+
+        union_indexes.append(intersection)
+
+    if len(union_indexes) != 0:
+        index_ev = union_indexes[0]
+
+        for idx in union_indexes[1:]:
+            index_ev = np.union1d(idx, index_ev)
+    else:
+        index_ev = np.unique(data[config["id_attribute"]["name"]].values)
+
+    return index_ev
+
+
+def appending_help(attr):
+    acc = {}
+
+    for name, op, value in attr:
+        if name not in acc:
+            acc[name] = [[], [], "categorical"]
+
+        acc[name][0].append(op)
+        acc[name][1].append(value)
+
+        if op == "<" or op == ">":
+            acc[name][2] = "range"
+
+    return acc
+
+
+def get_tuple(config, edge, min, max, attr):
+    tuple_v = [min, max]
+
+    if config[attr] != "" and config[attr]["name"] in edge:
+        for o, v in zip(edge[config[attr]["name"]][0], edge[config[attr]["name"]][1]):
+            print(o, v)
+            if o == ">" and eval(v) > tuple_v[0]:
+                tuple_v[0] = eval(v)
+            if o == "<" and eval(v) < tuple_v[1]:
+                tuple_v[1] = eval(v)
+
+        edge.pop(config[attr]["name"])
+
+    return tuple_v
+
+
+def filter_local_attributes_ordered(data, graph, paths, config):
+    for path in paths:
+        path_nodes = []
+        t_time = []
+        t_hop = []
+
+        # gets all constraints of the node
+        for n in path:
+            attr = graph.get_node(n)["key_op_value"]
+            path_nodes.append(attr)
+
+        # gets all constraints on the edges
+        for n1, n2 in zip(path[:-1], path[1:]):
+            attr = graph.get_edge(n1, n2)["key_op_value"]
+            edge = appending_help(attr)
+            # gets the time constraints
+            t_time.append(get_tuple(config, edge, config["time_min"], config["time_max"], "edge_time_attribute"))
+            t_hop.append(get_tuple(config, edge, config["event_min"], config["event_max"], "edge_hops_attribute"))
+
+        # gets all
+        print(path_nodes)
+        print(t_time, t_hop)
+        f = functools.partial(recursive_check, path_nodes=path_nodes, t_time=t_time, t_hop=t_hop, config=config)
+        print(data.groupby("PatientID").apply(f))
+
+    return False
+
+
+def recursive_check(x, path_nodes, t_time, t_hop, config, p=0, first=True, flag="first_event"):
+    # case 1: pattern ended, returns true
+    if len(path_nodes) == 0:
+        return True, p
+
+    # case 2: data ended, returns false
+    if len(x) == 0:
+        return False, p
+
+    # Get pandas series
+    tmp = filter_attributes(x, path_nodes[0], config, flag=True).values
+
+    # case 3: no match, return false
+    if len(tmp) == 0:
+        return False, p
+
+    # case 4: no first match in first_event
+    if first and flag == "first_event" and x.head(1).index[0] != tmp[0]:
+        return False, p
+
+    # case 5: recursively calls itself
+    for i in tmp:
+
+        # calculates time/hop constraint or first
+        match, path_position = False, p
+
+        # case 4: if time_constraint or first
+        # does recursive call "taking the exam"
+        if True:
+            idx = x.index.values
+            idx = idx[idx > i]
+            match, pos = recursive_check(x.iloc[idx], path_nodes[int(first):],
+                                         t_time[int(first):], t_hop[int(first):],
+                                         config, p=p + 1, first=False, flag=flag)
+
+
+def filter_data_id(data, index, config):
+    return data[data[config["id_attribute"]["name"]].isin(index)]
+
+
+def get_individuals(nodes, edges, dataset, global_attr, prediction_attr, matching):
+    dataframe_en = dataset.entity_data
+    dataframe_ev = dataset.event_data
 
     # First creates the graph and the desired paths
     graph = Graph(nodes, edges)
     paths = graph.make_maximal_paths()
 
-    # Get query matching string
-    index_v, times, exams = get_query_matching_values(graph, paths, dataset.config, prediction_attr)
-
-    if DEBUG_QUERY_MATCHING:
-        print(index_v)
-        print(times)
-        print(exams)
+    # Filter global attributes
+    index_en = filter_attributes(dataframe_en, global_attr, dataset.config)
+    dataframe_ev = filter_data_id(dataframe_ev, index_en, dataset.config)
 
     # Filter local attributes
+    index_en_ev = filter_local_attributes_unordered(dataframe_ev, graph, paths, dataset.config)
+    dataframe_ev = filter_data_id(dataframe_ev, index_en_ev, dataset.config)
 
+    # Filter non-indexed ordered attributes
+    index_order = filter_local_attributes_ordered(dataframe_ev, graph, paths, dataset.config)
 
-    # Filter indexed order
-
-
-    # Filter non-indexed order
-
-
-
-    #
-    #
-    #     ent[eval("ent[\"" + name + "\"]"  + op + value))]
-
-
-    # rs = []
-    #
-    # # Filter by attributes
-    # for i, t, e in zip(index_v, times, exams):
-    #     if i == dataset.config["no_indexed_event"]:
-    #         continue
-    #
-    #     patients_of_interest = filter_by_attributes(graph, paths, dataset, dataset.config, prediction_attr)
-    #
-    #     f = functools.partial(match_time_sequence, diagnosis=i, time=t, exams_range=e)
-    #     print(patients_of_interest)
-    #     ##rs.append(apply_parallel(pandas.DataFrame(patients_of_interest)['DiagnosisIndex'], f))
-
-
-    return 12
+    return index_order

@@ -43,7 +43,7 @@ def index():
     dataset.get_instance(ds)
 
     # Gets individual
-    individuals = get_individuals(nodes, edges, dataset, global_attr, prediction_attr)
+    individuals = get_individuals(nodes, edges, dataset, global_attr, prediction_attr, matching)
 
     return response
 
