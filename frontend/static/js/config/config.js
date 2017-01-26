@@ -20,7 +20,7 @@ DBI.prototype.changeDataSet = function (new_name) {
     var thisDatabaseInfo = this;
     console.log(thisDatabaseInfo.conf_file);
     thisDatabaseInfo.filename = new_name;
-    thisDatabaseInfo.getDataSet()
+    thisDatabaseInfo.getDataSet();
 };
 
 DBI.prototype.getDataSet = function () {

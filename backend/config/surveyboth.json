@@ -8,14 +8,14 @@
     "pytype": "uint32"
   },
   "edge_time_attribute": {
-    "name": "TimeSinceLast",
+    "name": "SinceLast",
     "display": "Time Interval",
     "type": "TimeInterval",
     "pytype": "int32"
   },
   "edge_hops_attribute": {
     "name": "ExamInterval",
-    "display": "Exam Interval",
+    "display": "Event Interval",
     "type": "Number",
     "pytype": "int32"
   },
@@ -343,14 +343,14 @@
   ],
   "edge_attributes": [
     {
-      "name": "TimeSinceLast",
+      "name": "SinceLast",
       "display": "Time Interval",
       "type": "TimeInterval",
       "pytype": "int32"
     },
     {
       "name": "ExamInterval",
-      "display": "Exam Interval",
+      "display": "Event Interval",
       "type": "Number",
       "pytype": "int32"
     }

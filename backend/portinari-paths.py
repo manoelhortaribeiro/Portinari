@@ -45,6 +45,7 @@ def index():
     # Gets individual
     individuals = get_individuals(nodes, edges, dataset, global_attr, prediction_attr, matching)
 
+    print(individuals)
     return response
 
 

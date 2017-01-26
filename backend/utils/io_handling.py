@@ -45,7 +45,6 @@ class Dataset:
         base = json.loads(open("./config/base.json", "r").read())
         param_config = json.loads(open("./config/" + param + ".json", "r").read())
         self.config = {key: value for (key, value) in (list(base.items()) + list(param_config.items()))}
-
         # READS EVENT DATA
 
         description = {}
