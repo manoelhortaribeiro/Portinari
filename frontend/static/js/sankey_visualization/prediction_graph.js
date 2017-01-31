@@ -3,31 +3,21 @@ var d3 = require("../external/d3.min.v4.js"),
 
 require("../external/sankey.js");
 
-function PredictionGraph(svg1, svg2, reactor) {
+function PredictionGraph(svg, reactor) {
 
     var thisResult = this;
 
-    thisResult.config = json_config.VIEW_PREDICTION_GRAPH;
+    thisResult.svgtext = svg;
+    thisResult.aspect = [0, 0, 1600, 900];
 
-    thisResult.svg1text = svg1;
-    thisResult.svg2text = svg2;
-
-    thisResult.svg1 = svg1.append("svg")
-        .classed("shadow-box", true)
-        .classed("grid-svg", true)
-        .attr("width", "600px")
-        .attr("height", "825px")
+    thisResult.svg = svg.append("svg")
+        .attr("viewBox", thisResult.aspect[0] + " " +
+            thisResult.aspect[1] + " " +
+            thisResult.aspect[2] + " " +
+            thisResult.aspect[3])
+        .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("visibility", "hidden");
 
-    thisResult.svg2 = svg2.append("svg")
-        .classed("shadow-box", true)
-        .classed("grid-svg", true)
-        .attr("width", "600px")
-        .attr("height", "825px")
-        .attr("visibility", "hidden");
-
-    thisResult.svg = null;
-    thisResult.svgtext = null;
 
     thisResult.start = 0;
     thisResult.queryNumber = 1;
@@ -40,43 +30,6 @@ PredictionGraph.prototype.updateResult = function (graph) {
 
     var thisResult = this;
 
-    var width = parseInt(d3.select("#query-results1 svg").attr("width")) - 10;
-    var height = parseInt(d3.select("#query-results1 svg").attr("height")) - 10;
-
-    if (thisResult.start == 0) {
-        this.svg = this.svg1;
-        this.svgtext = this.svg1text;
-    }
-    else {
-        this.svg = this.svg2;
-        this.svgtext = this.svg2text;
-    }
-
-
-    this.svgtext.select("p").remove();
-
-    this.svgtext.insert("p", ":first-child")
-        .text("query: " + this.queryNumber.toString() +
-            ", attr: " + graph.pred_attr.toString() +
-            ", steps: " + graph.future_nodes.toString() +
-            ", time range: [" + graph.begin_date.toString() + "," + graph.end_date.toString() + "]");
-
-    this.svg.attr("visibility", "visible");
-    this.svg.select("*").remove();
-
-    var svg = this.svg.append("g");
-
-    var sankey = d3.sankey()
-        .nodeWidth(25)
-        .nodePadding(20)
-        .size([width, height]);
-
-    var path = sankey.link();
-
-    sankey.nodes(graph.nodes)
-        .links(graph.links)
-        .layout(32);
-
     var units = "individuals";
 
     var formatNumber = d3.format(",.0f"),    // zero decimal places
@@ -84,64 +37,60 @@ PredictionGraph.prototype.updateResult = function (graph) {
             return formatNumber(d) + " " + units;
         };
 
+    var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+    var width = 900 - 10;
+
+    var height = 1600 - 10;
+
+    // House keeping
+    this.svg.attr("visibility", "visible");
+    this.svg.select("*").remove();
+    var svg = this.svg.append("g");
+
+    // Makes Sankey Diagram
+
+    var my_sankey = d3.sankey()
+        .nodeWidth(25)
+        .nodePadding(20)
+        .size([width, height]);
+
+    var path = my_sankey.link();
+
+    my_sankey.nodes(graph.nodes)
+        .links(graph.links)
+        .layout(32);
+
     // add in the links
-    var link = svg.append("g").selectAll(".sankey_link")
+    var link = svg.append("g").selectAll(".link")
         .data(graph.links)
-        .enter()
-        .append("path")
-        .attr("class", "sankey_link")
+        .enter().append("path")
+        .attr("class", "link")
         .attr("d", path)
         .style("stroke-width", function (d) {
             return Math.max(1, d.dy);
-        }).sort(function (a, b) {
-            if (a.target.name == -1 || a.source.name == -1) {
-                return -1;
-            }
-            else if (b.target.name == -1 || b.source.name == -1) {
-                return 1;
-            }
-            else {
-                return b.dy - a.dy;
-            }
+        })
+        .sort(function (a, b) {
+            return b.dy - a.dy;
         });
-
-    link.each(function (p) {
-        if (p.target.name == -1) {
-            d3.select(this)
-                .attr("visibility", "hidden");
-        }
-    });
 
     // add the link titles
     link.append("title")
         .text(function (d) {
-            var array = d.source.sourceLinks;
-            var value = 0;
-            var last = 0;
-            array.forEach(function (p) {
-                value += p.value;
-                if (p.target.name == -1) {
-                    last += p.value;
-                }
-            });
-
-            var round_abs = Math.round((d.value / value) * 10000) / 100;
-            var round_rel = Math.round((d.value / (value - last)) * 10000) / 100;
-
-
-            return thisResult.config.display[d.source.name.toString()].text + " → " +
-                thisResult.config.display[d.target.name.toString()].text + "\n" + format(d.value) + "\n" +
-                "(" + round_abs + "% of total) \n" +
-                "(" + round_rel + "% of taken exams)";
+            return d.source.name + " → " +
+                d.target.name + "\n" + format(d.value);
         });
 
     // add in the nodes
-    var node = svg.append("g").selectAll(".sankey_node")
+    var node = svg.append("g").selectAll(".node")
         .data(graph.nodes)
         .enter().append("g")
-        .attr("class", "sankey_node")
+        .attr("class", "node")
         .attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
+        })
+        .on("start", function () {
+            this.parentNode.appendChild(this);
         });
 
     // add the rectangles for the nodes
@@ -149,49 +98,16 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .attr("height", function (d) {
             return d.dy;
         })
-        .attr("width", sankey.nodeWidth())
+        .attr("width", my_sankey.nodeWidth())
         .style("fill", function (d) {
-            return d.color = thisResult.config.display[d.name.toString()].color;
+            return d.color = color(d.name.replace(/ .*/, ""));
         })
         .style("stroke", function (d) {
             return d3.rgb(d.color).darker(2);
         })
         .append("title")
         .text(function (d) {
-            var value = 0;
-            var last = 0;
-            var array = [];
-            var aux = false;
-            if (d.sourceLinks.length == 0) {
-                array = d.targetLinks;
-            }
-            else {
-                array = d.sourceLinks;
-                aux = true;
-            }
-
-            if (d.name == -2) {
-                aux = false;
-            }
-
-            array.forEach(function (p) {
-                value += p.value;
-                if (p.target.name == -1) {
-                    last += p.value;
-                }
-            });
-
-            var round = Math.round((last / value) * 10000) / 100;
-            var title = "";
-
-            title += thisResult.config.display[d.name.toString()].text;
-            title += "\n";
-            title += value.toString() + " Individuals \n";
-            if (aux == true) {
-                title += last.toString() + " didn't follow up (" + round.toString() + "%)";
-            }
-
-            return title;
+            return d.name + "\n" + format(d.value);
         });
 
     // add in the title for the nodes
@@ -204,23 +120,15 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .attr("text-anchor", "end")
         .attr("transform", null)
         .text(function (d) {
-            return thisResult.config.display[d.name.toString()].text;
+            return d.name;
         })
         .filter(function (d) {
             return d.x < width / 2;
         })
-        .attr("x", 6 + sankey.nodeWidth())
+        .attr("x", 6 + my_sankey.nodeWidth())
         .attr("text-anchor", "start");
 
-    node.each(function (p) {
-        if (p.name == -1) {
-            d3.select(this)
-                .attr("visibility", "hidden");
-        }
-    });
 
-    this.start = (this.start + 1) % 2;
-    this.queryNumber += 1;
 };
 
 module.exports = PredictionGraph;

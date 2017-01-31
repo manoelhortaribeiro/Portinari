@@ -310,7 +310,6 @@ def pre_process(path, dest, config):
 def merge(table, config):
     # Prints the progress and does garbage collection manually
     if table[config["id"]].head(1).values[0] % 50000 == 0:
-        print(table[config["id"]].head(1).values[0])
         gc.collect()
 
     # Copies the table
@@ -544,6 +543,6 @@ def make_all(config, r_rename=True, r_preprocess=True, r_grouped=True):
         os.remove(grouped)
 
 
-if __name__ == "__main__":
-    mixed_config = json.loads(open("./data/surveys/meta/survey_both.json", "r").read())
-    make_all(mixed_config)
+# if __name__ == "__main__":
+#     mixed_config = json.loads(open("./data/surveys/meta/survey_both.json", "r").read())
+#     make_all(mixed_config)

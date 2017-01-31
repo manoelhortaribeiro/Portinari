@@ -75,8 +75,6 @@ def get_tuple(config, edge, min_v, max_v, attr):
     :return: tuple with min max. """
     tuple_v = [min_v, max_v]
 
-    print(edge)
-
     if config[attr] != "" and config[attr]["name"] in edge:
         for o, v in zip(edge[config[attr]["name"]][0], edge[config[attr]["name"]][1]):
             if o == ">" and eval(v) > tuple_v[0]:
@@ -117,23 +115,33 @@ def check_time(t_time, t_hop, acc_hop, acc_tim):
 
 
 def apply_parallel(dfgrouped, func):
+    """ This applies a function in parallel.
+    :param dfgrouped: dataframe grouped.
+    :param func: function to be used
+    :return: applied dataframe. """
     ret_lst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(group) for name, group in dfgrouped)
     return pandas.concat(ret_lst)
 
 
 def to_df(pos, idx, pid):
+    """ Creates a dataframe with index pid and two rows.
+    :param pos: position matched.
+    :param idx: index of position matched.
+    :param pid: patient id.
+    :return: dataframe with all this things.
+    """
     return pandas.DataFrame(data={"Position": [pos], "IDX": [idx]}, index=[pid])
 
 
 # ---- Unordered Filtering ----
 
-
+# TODO: COMPOSITE ATTRIBUTES (405)
 def filter_attributes(data, attr, config, flag=False):
-    """ This function receives the dataset object, the list of attributes and filters people based on them (no order).
-    :param data: dataset object.
+    """ This function receives a dataframe, the list of attributes and filters people based on them (no order).
+    :param data: dataframe object.
     :param attr: list of attributes.
     :param config: config file.
-    :param flag: alters return value.
+    :param flag: alters return value, if true, return the indexes, if false, the IDS.
     :return: ids of filtered entities if flag = False, otherwise, return the indexes. """
 
     for name, op, value in attr:
@@ -148,7 +156,7 @@ def filter_attributes(data, attr, config, flag=False):
         strings = []
         filter_v = ""
         for op, val in zip(item[0], item[1]):
-            strings.append("(data[\"" + name + "\"]" + op + val + ").values")
+            strings.append("(data[\"" + key + "\"]" + op + val + ").values")
         if item[2] == "range":
             filter_v = " & ".join(strings)
         elif item[2] == "categorical":
@@ -158,7 +166,7 @@ def filter_attributes(data, attr, config, flag=False):
     if flag:
         return data[config["id_attribute"]["name"]].index
     else:
-        return data[config["id_attribute"]["name"]].values
+        return np.unique(data[config["id_attribute"]["name"]].values)
 
 
 def filter_local_attributes_unordered(data, graph, paths, config, flag=True):
@@ -169,18 +177,19 @@ def filter_local_attributes_unordered(data, graph, paths, config, flag=True):
     :param graph: graph object.
     :param paths: maximal path in the graphs.
     :param config: config file.
-    :return: index of filtered entities. """
+    :param flag: if flag, gets only the first edge
+    :return: index of filtered entities, or unique IDs of the patient, depending on flag. """
     union_indexes = []
     for path in paths:
 
         inter_indexes = []
 
         if flag:
-            inter_indexes.append(filter_attributes(data, graph.get_node(path[0])["key_op_value"], config))
+            inter_indexes.append(filter_attributes(data, graph.get_node(path[0])["key_op_value"], config, flag=False))
         else:
             for node in path:
-                inter_indexes.append(filter_attributes(data, graph.get_node(node)["key_op_value"], config))
-
+                filter_attributes(data, graph.get_node(node)["key_op_value"], config, flag=False)
+                inter_indexes.append(filter_attributes(data, graph.get_node(node)["key_op_value"], config, flag=False))
         if len(inter_indexes) == 0:
             continue
 
@@ -204,13 +213,17 @@ def filter_local_attributes_unordered(data, graph, paths, config, flag=True):
 # ---- Ordered Filtering ----
 
 
-def filter_local_attributes_ordered(data, graph, paths, config):
+def filter_local_attributes_ordered(data, graph, paths, config, matching):
     """ Filter the local attributes concerning the order of the node constraints and the edges constraints.
     :param data: event data frames.
     :param graph: graph object.
     :param paths: maximal paths in the graph.
     :param config: config file.
+    :param matching: first_event or first_occurence.
     :return: indexes and positions failure. """
+
+    entity_matching = {}
+
     for path in paths:
         path_nodes = []
         t_time = []
@@ -230,20 +243,48 @@ def filter_local_attributes_ordered(data, graph, paths, config):
             t_hop.append(get_tuple(config, edge, config["event_min"], config["event_max"], "edge_hops_attribute"))
 
         # gets all matching values
-        f = functools.partial(rec_match, pt_nd=path_nodes, t_tim=t_time, t_hop=t_hop, config=config)
+        f = functools.partial(rec_match, pt_nd=path_nodes, t_tim=t_time, t_hop=t_hop, config=config, flg=matching)
 
-        print(len(data), len(np.unique(data["PatientID"].values)))
+        # print(len(data), len(np.unique(data["PatientID"].values)))
 
         start = time.time()
         result = apply_parallel(data.groupby(config["id_attribute"]["name"]), f)
         # result.index = result.index.droplevel(1)
         end = time.time()
-        print(end - start, 1000 * (end - start) / len(np.unique(data["PatientID"].values)))
+        print(end - start)
 
-    return result
+        path_r = list.copy(path)
+        path_r.reverse()
+        acc = None
 
 
-def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=0, pid=0, first=True, flg="first_event", acc_hop=0, acc_tim=0):
+        for idx, n in enumerate(path_r):
+            to_app = result[result["Position"] == idx + 1]["IDX"]
+
+            if acc is None:
+                acc = to_app
+            else:
+                acc = acc.append(to_app)
+            print(to_app)
+            acc.append(to_app)
+            print(acc)
+
+            if n in entity_matching:
+                entity_matching[n] = entity_matching[n].append(acc)
+                entity_matching[n] = entity_matching[n].drop_duplicates()
+            else:
+                entity_matching[n] = acc
+
+
+    for k, i in entity_matching.items():
+        print(k, len(i))
+
+    return entity_matching
+
+
+def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=True,
+              flg="first_event", acc_hop=0, acc_tim=0):
+
     if DEBUG_QUERY_MATCHING:
         if first:
             print("-" * 30)
@@ -255,7 +296,6 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=0, pid=0, first=True, f
         print(t_hop)
 
     if first:
-        idval = x.head(1).index[0]
         pid = x.head(1)[config["id_attribute"]["name"]].values[0]
 
     # case 1: pattern ended, returns true
@@ -279,7 +319,7 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=0, pid=0, first=True, f
     tmp = filter_attributes(x, pt_nd[0], config, flag=True).values
 
     if DEBUG_QUERY_MATCHING:
-        print("index matchings:", tmp)
+        print("index matching:", tmp)
 
     # case 3: no match, return false
     if len(tmp) == 0:
@@ -306,6 +346,11 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=0, pid=0, first=True, f
 
     # case 5: recursively calls itself
     for i in tmp:
+
+        if first:
+            idval = (i, i)
+        else:
+            idval = (idval[0], i)
 
         if DEBUG_QUERY_MATCHING:
             print("->", i, tmp)
@@ -338,14 +383,14 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=0, pid=0, first=True, f
                            config, p=p, first=False, flg=flg,
                            acc_hop=acc_hop + mod_hop,
                            acc_tim=acc_tim + mod_tim,
-                           idval=i, pid=pid)
-            if df.iloc[0]["Match"] == 0:
+                           idval=idval, pid=pid)
+            if df.iloc[0]["Position"] == p + len(pt_nd[1:]):
                 return df
 
     return to_df(p, idval, pid=pid)
 
 
-def get_individuals(nodes, edges, dataset, global_attr, prediction_attr, matching):
+def get_individuals(nodes, edges, dataset, global_attr, prediction_attr, matching, typ):
     dataframe_en = dataset.entity_data
     dataframe_ev = dataset.event_data
 
@@ -357,11 +402,15 @@ def get_individuals(nodes, edges, dataset, global_attr, prediction_attr, matchin
     index_en = filter_attributes(dataframe_en, global_attr, dataset.config)
     dataframe_ev = filter_data_id(dataframe_ev, index_en, dataset.config)
 
-    # Filter local attributes
-    index_en_ev = filter_local_attributes_unordered(dataframe_ev, graph, paths, dataset.config)
+    # Filter local attributes, in cohort, flag = true, otherwise, false
+    if typ == "cohort":
+        index_en_ev = filter_local_attributes_unordered(dataframe_ev, graph, paths, dataset.config, flag=True)
+    else:
+        index_en_ev = filter_local_attributes_unordered(dataframe_ev, graph, paths, dataset.config, flag=False)
+
     dataframe_ev = filter_data_id(dataframe_ev, index_en_ev, dataset.config)
 
     # Filter non-indexed ordered attributes
-    index_order = filter_local_attributes_ordered(dataframe_ev, graph, paths, dataset.config)
+    entity_matching = filter_local_attributes_ordered(dataframe_ev, graph, paths, dataset.config, matching)
 
-    return index_order
+    return entity_matching, paths

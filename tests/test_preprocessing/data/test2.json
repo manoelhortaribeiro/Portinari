@@ -64,7 +64,7 @@
   "entitycreation": "EntityCreation",
   "groupsize": "GroupSize",
   "default": "entity",
-  "directory": "./data/",
+  "directory": "./test_preprocessing/data/",
   "name": "test2.csv",
   "nan_int": -999999999,
   "nan_float": -999999999,

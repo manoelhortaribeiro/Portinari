@@ -76,9 +76,6 @@ var PredictionForm = require("./sankey_visualization/prediction_form.js"),
 // Creates prediction form interface
 var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
 
-// reactor.registerEvent('query_successful');
-// var future_form_selection = d3.select("#form-future-nodes");
-// var prediction_graph_selection1 = d3.select("#query-results1");
-// var prediction_graph_selection2 = d3.select("#query-results2");
+var cohort_result = d3.select("#cohort-result");
 // Append the svg canvas to the page
-// var prediction_graph = new PredictionGraph(prediction_graph_selection1, prediction_graph_selection2, reactor);
+var prediction_graph = new PredictionGraph(cohort_result, reactor);

@@ -11,12 +11,8 @@
       "name": "first_occurence"
     },
     {
-      "display": "First Exam",
-      "name": "first_exam"
-    },
-    {
-      "display": "All Exams",
-      "name": "all_exams"
+      "display": "First Event",
+      "name": "first_event"
     }
   ],
   "default_matching": "first_occurence",

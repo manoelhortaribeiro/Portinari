@@ -76,7 +76,8 @@ function PredictionForm(future_form_selection, graph, reactor) {
             'future_nodes': JSON.stringify(attr[1]),
             'begin_date': JSON.stringify(attr[2]),
             'end_date': JSON.stringify(attr[3]),
-            'id': JSON.stringify(thisForm.config.id())
+            'id': JSON.stringify(thisForm.config.id()),
+            'type': JSON.stringify("cohort")
         };
 
         console.log(posted_data);
@@ -88,6 +89,17 @@ function PredictionForm(future_form_selection, graph, reactor) {
             url: "http://localhost:5000/",
             data: posted_data,
             success: function (data) {
+                var graph = JSON.parse(data);
+
+                graph.pred_attr = attr[0];
+                graph.future_nodes = attr[1];
+                graph.begin_date = attr[2];
+                graph.end_date = attr[3];
+
+                console.log("graph");
+                console.log(graph);
+
+                thisForm.reactor.dispatchEvent("query_successful", graph);
             },
             async: true
         });

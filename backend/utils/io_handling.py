@@ -97,8 +97,9 @@ def reads_params(request):
     edges = jload(request.form['edges'])
     ds = jload(request.form['datasets'])
     id_attr = jload(request.form['id'])
+    typ = jload(request.form['type'])
 
-    return nodes, edges, global_attr, outcomes, future_nodes, prediction_attr, id_attr, matching, ds
+    return nodes, edges, global_attr, outcomes, future_nodes, prediction_attr, id_attr, matching, ds, typ
 
 
 def read_config(request):
