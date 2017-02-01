@@ -40,8 +40,6 @@
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 
-
-from backend.query_interpreter.graph_maker import Graph
 import numpy as np
 import functools
 import pandas
@@ -51,6 +49,22 @@ import time
 
 DEBUG_QUERY_MATCHING = False
 
+
+def get_rr(events, individuals, config, outcomes):
+
+    rr = {}
+
+    for key, ind in individuals.items():
+        print(events[config["id_attribute"]["name"]])
+        print(ind.index)
+        exposed = events[events[config["id_attribute"]["name"]].isin(ind.index)]
+        not_exposed = events[~events[config["id_attribute"]["name"]].isin(ind.index)]
+        exposed_true =filter_attributes(exposed, outcomes, config, flag=False)
+        not_exposed_true =filter_attributes(not_exposed, outcomes, config, flag=False)
+
+        rr[key] = (len(exposed_true)/len(exposed))/(len(not_exposed_true)/len(not_exposed))
+
+    return rr
 
 # ---- Helpers ----
 
@@ -245,8 +259,6 @@ def filter_local_attributes_ordered(data, graph, paths, config, matching):
         # gets all matching values
         f = functools.partial(rec_match, pt_nd=path_nodes, t_tim=t_time, t_hop=t_hop, config=config, flg=matching)
 
-        # print(len(data), len(np.unique(data["PatientID"].values)))
-
         start = time.time()
         result = apply_parallel(data.groupby(config["id_attribute"]["name"]), f)
         # result.index = result.index.droplevel(1)
@@ -265,19 +277,13 @@ def filter_local_attributes_ordered(data, graph, paths, config, matching):
                 acc = to_app
             else:
                 acc = acc.append(to_app)
-            print(to_app)
             acc.append(to_app)
-            print(acc)
 
             if n in entity_matching:
                 entity_matching[n] = entity_matching[n].append(acc)
                 entity_matching[n] = entity_matching[n].drop_duplicates()
             else:
                 entity_matching[n] = acc
-
-
-    for k, i in entity_matching.items():
-        print(k, len(i))
 
     return entity_matching
 
@@ -390,13 +396,9 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=Tr
     return to_df(p, idval, pid=pid)
 
 
-def get_individuals(nodes, edges, dataset, global_attr, prediction_attr, matching, typ):
+def get_individuals(dataset, global_attr, prediction_attr, matching, typ, graph, paths):
     dataframe_en = dataset.entity_data
     dataframe_ev = dataset.event_data
-
-    # First creates the graph and the desired paths
-    graph = Graph(nodes, edges)
-    paths = graph.make_maximal_paths()
 
     # Filter global attributes
     index_en = filter_attributes(dataframe_en, global_attr, dataset.config)
@@ -413,4 +415,4 @@ def get_individuals(nodes, edges, dataset, global_attr, prediction_attr, matchin
     # Filter non-indexed ordered attributes
     entity_matching = filter_local_attributes_ordered(dataframe_ev, graph, paths, dataset.config, matching)
 
-    return entity_matching, paths
+    return entity_matching

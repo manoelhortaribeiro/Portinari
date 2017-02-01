@@ -1749,7 +1749,7 @@ function PredictionGraph(svg, reactor) {
     var thisResult = this;
 
     thisResult.svgtext = svg;
-    thisResult.aspect = [0, 0, 1600, 900];
+    thisResult.aspect = [0, 0, 1200, 800];
 
     thisResult.svg = svg.append("svg")
         .attr("viewBox", thisResult.aspect[0] + " " +
@@ -1780,9 +1780,8 @@ PredictionGraph.prototype.updateResult = function (graph) {
 
     var color = d3.scaleOrdinal(d3.schemeCategory20);
 
-    var width = 900 - 10;
-
-    var height = 1600 - 10;
+    var width = 1200 - 10;
+    var height = 800 - 10;
 
     // House keeping
     this.svg.attr("visibility", "visible");

@@ -29,9 +29,9 @@
       "index_pytype": "str"
     },
     {
-      "name": "ExamType",
+      "name": "Type",
       "display": "Type of Exam",
-      "type": "ExamType",
+      "type": "Type",
       "pytype": "uint8",
       "index": "StringRepExamType",
       "index_pytype": "str"
@@ -275,8 +275,8 @@
   ],
   "node_attributes": [
     {
-      "name": "diagnosisgroupsize",
-      "display": "Concurrent Exams",
+      "name": "GroupSize",
+      "display": "Concurrent Events",
       "type": "Number",
       "pytype": "int32"
     },
@@ -317,9 +317,9 @@
       "pytype": "uint8"
     },
     {
-      "name": "ExamType",
+      "name": "Type",
       "display": "Type of Exam",
-      "type": "ExamType",
+      "type": "Type",
       "pytype": "uint8"
     },
     {
@@ -355,7 +355,7 @@
       "pytype": "int32"
     }
   ],
-  "index_attributes": ["TypeIndex", "StringRe"],
+  "index_attributes": "None",
   "types": {
     "Month": {
       "constraints": [
@@ -396,116 +396,7 @@
         "33": "Hist: Irregular cells",
         "36": "Cancer"
       },
-      "display": {
-        "-2": {
-          "text": "Origin",
-          "color": "#00ffff"
-        },
-        "-1": {
-          "text": "Nothing",
-          "color": "#00cccc"
-        },
-        "0": {
-          "text": "HPV+",
-          "color": "#cc0066"
-        },
-        "1": {
-          "text": "HPV-",
-          "color": "#ff80bf"
-        },
-        "9": {
-          "text": "HPV?",
-          "color": "#5c8a8a"
-        },
-        "11": {
-          "text": "Cyt: Normal",
-          "color": "#d6e0f5"
-        },
-        "12": {
-          "text": "Cyt: ASC-US",
-          "color": "#98b1e6"
-        },
-        "13": {
-          "text": "Cyt: LSIL",
-          "color": "#6f92dc"
-        },
-        "14": {
-          "text": "Cyt: ASC-H",
-          "color": "#4673d2"
-        },
-        "15": {
-          "text": "Cyt: AGUS/ACIS",
-          "color": "#2d59b9"
-        },
-        "16": {
-          "text": "Cyt: HSIL",
-          "color": "#234590"
-        },
-        "17": {
-          "text": "Cyt: Cancer",
-          "color": "#193167"
-        },
-        "18": {
-          "text": "Cyt: Metastasis",
-          "color": "#0f1e3e"
-        },
-        "10": {
-          "text": "Cyt/Hist?",
-          "color": "#5c8a8a"
-        },
-        "20": {
-          "text": "Hist: Benign",
-          "color": "#5353c6"
-        },
-        "21": {
-          "text": "Hist: Polyp",
-          "color": "#3939ac"
-        },
-        "22": {
-          "text": "Hist: Benign w/ a",
-          "color": "#2d2d86"
-        },
-        "30": {
-          "text": "Hist: Unsure B.",
-          "color": "#5c8a8a"
-        },
-        "31": {
-          "text": "Hist: CIN1",
-          "color": "#19194d"
-        },
-        "32": {
-          "text": "Hist: CIN2",
-          "color": "#131339"
-        },
-        "33": {
-          "text": "Hist: CIN3",
-          "color": "#0d0d26"
-        },
-        "34": {
-          "text": "Hist: Irregular",
-          "color": "#3d0099"
-        },
-        "99": {
-          "text": "Hist: Unknown",
-          "color": "#330080"
-        },
-        "35": {
-          "text": "Hist: ACIS",
-          "color": "#330080"
-        },
-        "41": {
-          "text": "Cancer: SCC",
-          "color": "#336600"
-        },
-        "42": {
-          "text": "Adenocarcinoma",
-          "color": "#264d00"
-        },
-        "43": {
-          "text": "Cancer: Other",
-          "color": "#1a3300"
-        }
-      }
+      "display": "std"
     },
     "Region": {
       "constraints": [
@@ -558,7 +449,7 @@
       },
       "display": "std"
     },
-    "ExamType": {
+    "Type": {
       "constraints": [
         [
           "==",

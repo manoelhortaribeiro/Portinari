@@ -1,13 +1,13 @@
+import numpy as np
 import unittest
 import pandas
-import numpy as np
-
 
 def function(df):
     df['b'] **= 2
     return df
 
 
+# TODO: test_filter_local_attributes_unordered & integration
 class TestFindAndCompare(unittest.TestCase):
     def test_filter_data_id(self):
         from backend.query_maker.get_individuals import filter_data_id
@@ -164,4 +164,3 @@ class TestFindAndCompare(unittest.TestCase):
         self.assertTrue(np.array_equal(f(a, graph, paths, config, flag=False), np.array([1, 2])))
 
         print(">> backend.query_maker.test_filter_local_attributes_unordered - OK")
-

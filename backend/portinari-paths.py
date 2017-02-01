@@ -5,12 +5,14 @@
 #                                     # \ ---------------------------- / #                                             #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
+
 from backend.utils.io_handling import Dataset, reads_params, get_config, read_config
 from backend.query_maker.get_individuals import get_individuals
 from backend.visualization_maker.make_sankey import new_sankey
+from backend.query_interpreter.graph_maker import Graph
 from flask import Flask, request, jsonify
 from flask_cors import cross_origin
-
+from backend.mining.util import get_rr
 app = Flask(__name__)
 
 # STARTS A DATASET SINGLETON
@@ -41,14 +43,22 @@ def index():
         print("dataset:", ds)
         print("type:", typ)
 
+    # Gets dataset
     dataset.get_instance(ds)
 
+    # Gets graph and paths
+    graph = Graph(nodes, edges)
+    paths = graph.make_maximal_paths()
+
     # Gets individual
-    individuals, paths = get_individuals(nodes, edges, dataset, glob_att, prediction_attr, matching, typ)
+    individuals = get_individuals(dataset, glob_att, prediction_attr, matching, typ, graph, paths)
 
-    response = new_sankey(individuals, paths)
+    rr = get_rr(dataset.event_data, individuals, dataset.config, outcomes)
 
-    print(response)
+    # Sankey
+    response = new_sankey(individuals, graph, paths, dataset.config)
+
+    print(rr)
     return response
 
 
