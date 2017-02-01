@@ -6,18 +6,35 @@
 #                                                                                                                      #
 # This script does the whole preprocessing of the two files. Basically it:                                             #
 #                                                                                                                      #
-# 1. rename         - Rename the categorical values of some attributes as specified by config file.                    #
+# 0. discretize     - To be done                                                                                       #
+#                                                                                                                      #
+# 1. rename         - Rename the categorical values of some attrs as specified by config file. Must be numbers wo 0.   #
+#                   * Uses the optional "rename":{"old":"new",...} field on each attribute.                            #
 #                                                                                                                      #
 # 2. preprocess     - Creates two attributes ´age´ and ´sincelast´, derived from ´eventdate´ and ´entitycreation´.     #
+#                   * Uses the mandatory "eventdate" & "entitycreation" fields on each attribute.                      #
+#                                                                                                                      #
 #                   - Fill empty attributes as specified by the config file.                                           #
+#                   * Uses the mandatory "nan_int" & "nan_float" & "nan_str" fields on each attribute.                 #
+#                                                                                                                      #
 #                   - Drop columns as specified by the config file.                                                    #
+#                   * Uses the optional field "drop_col":"true" on each attribute                                      #
+#                                                                                                                      #
 #                   - Ignore rows with invalid values as specified by the config file.                                 #
+#                   * Uses the optional field "drop_col":"true" on each attribute                                      #
+#                                                                                                                      #
 #                   - Group distinct categorical attributes as specified by the config file.                           #
+#                   * Uses the optional "group ":{"old":"new",...} field on each attribute.                            #
+#                                                                                                                      #
 #                   - Does the conversion from date string to int as specified by config file.                         #
+#                   * Uses the optional "conversion" field on each attribute & the mandatory "timeformat" attribute.   #
+#                                                                                                                      #
 #                   - Does type casting as specified by the config file.                                               #
+#                   * Uses the mandatory "new_type" field on each attribute. (will be deprecated)                      #
 #                                                                                                                      #
-# 3. merge          - Merge categorical attr in order, w/ number of max elements and priority sppec by config file.    #
-#                                                                                                                      #
+# 3. merge          - Merge categorical attr in order, w/ number of max elements and priority spec by config file.     #
+#                   * Merges events that happened at the same moment. You need to declare "merge":"master" in one attr
+#                     and "merge":"slave" in all others where the merge should occur.                                  #                                                                                                                      #
 # 4. make_tables    -  Make relational-like tables. The separation betw. events and entity is spec by config file.     #
 #                                                                                                                      #
 #                                                                                                                      #
@@ -65,7 +82,7 @@
 #  Some relevant observations are that:                                                                                #
 #  - Renaming takes place before dropping the values                                                                   #
 #  - Dropping values take place before filling in NaN, so you can't drop NaN in this script                            #
-#  - All indexable variables have to be of the type:                                                                   #
+#  - All indexable variables have to be of the type integer with no 0s                                                 #
 #  - There can't be indexes without sincelast attribute                                                                #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
@@ -153,35 +170,17 @@ def time_flags(flag):
     return ms
 
 
-def type_flags(flag, info=None):
-    if flag == "int":
-        if info is not None and type(info) is str and len(info) > 2 and info[-2:] == ".0":
-            f = lambda a: int(a[:-2])
-        else:
-            f = functools.partial(int)
-
-    elif flag == "float":
-        f = functools.partial(float)
-    else:
-        f = functools.partial(str)
-    return f
-
-
-def nan_flags(flag, config):
-    if flag == "int":
-        nan = config["nan_int"]
-    elif flag == "float":
-        nan = config["nan_float"]
-    else:
-        nan = config["nan_string"]
-    return nan
-
-
 def to_unix(st, flag, config):
     ms = time_flags(flag)
 
-    return config["nan_int"] if st == "" else int(
-            np.floor(int(time.mktime(datetime.datetime.strptime(st, config["time_format"]).timetuple())) / ms))
+    if st == config["nan"]:
+        return st
+    else:
+        return int(np.floor(int(time.mktime(datetime.datetime.strptime(st, config["time_format"]).timetuple())) / ms))
+
+
+# def to_bin(value, bins):
+#     return np.argmax(bins > value)
 
 
 # ---- Scripts ----
@@ -501,14 +500,47 @@ def make_tables_parallel(source, patient_dest, exams_dest, config):
     os.system('rm ' + patient_dest + 'r*')
     main_df = pd.read_csv(patient_dest)
     main_df.drop(
-        drop_cols(config["default"], "entity", config["variables"], main_df.columns,
-                  index_disp=index_disp, age=config["age"], sincelast=config["sincelast"],
-                  groupsize=config["groupsize"], dnumber=config["eventnumber"]),
-        axis=1, inplace=True)
+            drop_cols(config["default"], "entity", config["variables"], main_df.columns,
+                      index_disp=index_disp, age=config["age"], sincelast=config["sincelast"],
+                      groupsize=config["groupsize"], dnumber=config["eventnumber"]),
+            axis=1, inplace=True)
     main_df.to_csv(patient_dest, mode='w', index=False)
 
 
 # all together in nice way
+
+
+def drop_row_cols(df, config):
+    for key, var in config["variables"].items():
+        # Drop Columns
+        if "drop_col" in var and var["drop_col"] == "true":
+            del df[key]
+        elif "drop_val" in var:
+            df = df[~df[key].isin(var["drop_val"])]
+
+    return df
+
+
+def time_conversion(df, config):
+    for key, var in config["variables"].items():
+        if "conversion" in var:
+            f = functools.partial(to_unix, flag=var["conversion"], config=config)
+            df[key] = df[key].apply(f)
+
+    return df
+
+
+def fill_na(df, config):
+    return df.fillna(config["nan"])
+
+
+# def discretize(df, config):
+#     for key, var in config["variables"].items():
+#         if "unbounded" in var and var["unbounded"] == "true":
+#             qt, values = np.array(list(map(float, df[key].values)))
+#             f = functools.partial(to_bin, bins=values)
+#             df[key] = df[key].apply(f)
+#     return df
 
 
 def make_all(config, r_rename=True, r_preprocess=True, r_grouped=True):
@@ -516,24 +548,26 @@ def make_all(config, r_rename=True, r_preprocess=True, r_grouped=True):
     name = config["name"]
 
     # paths
-    original_path = raw_dir + name
-    changed_diagnosis = raw_dir + "rename_" + name
-    preprocessed = raw_dir + "pre_" + name
-    grouped = raw_dir + "grouped_" + name
-    entity_dest = raw_dir + "entity_" + name
-    event_dest = raw_dir + "events_" + name
+    df = pandas.read_csv(raw_dir + name, dtype=object)
+
+    # fill na
+    df = fill_na(df=df, config=config)
 
     # change diagnosis
-    rename(path=original_path, dest=changed_diagnosis, config=config)
+    df = drop_row_cols(df=df, config=config)
 
-    # # pre-process the tables
-    pre_process(path=changed_diagnosis, dest=preprocessed, config=config)
+    # time_conversion
+    df = time_conversion(df=df, config=config)
 
-    # # group different diagnosis, drop rows
-    merge_groups_parallel(path=preprocessed, dest=grouped, config=config)
 
-    # # makes tables
-    make_tables_parallel(source=grouped, patient_dest=entity_dest, exams_dest=event_dest, config=config)
+    # # # pre-process the tables
+    # pre_process(path=changed_diagnosis, dest=preprocessed, config=config)
+    #
+    # # # group different diagnosis, drop rows
+    # merge_groups_parallel(path=preprocessed, dest=grouped, config=config)
+    #
+    # # # makes tables
+    # make_tables_parallel(source=grouped, patient_dest=entity_dest, exams_dest=event_dest, config=config)
 
     if r_rename is True:
         os.remove(changed_diagnosis)
@@ -543,6 +577,6 @@ def make_all(config, r_rename=True, r_preprocess=True, r_grouped=True):
         os.remove(grouped)
 
 
-# if __name__ == "__main__":
-#     mixed_config = json.loads(open("./data/surveys/meta/survey_both.json", "r").read())
-#     make_all(mixed_config)
+if __name__ == "__main__":
+    mixed_config = json.loads(open("./data/surveys/meta/surveyboth_export.json", "r").read())
+    make_all(mixed_config, r_rename=False, r_preprocess=False, r_grouped=False)

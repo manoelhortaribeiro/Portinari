@@ -9,10 +9,14 @@ function toggle_button(b_id, b_class, b_desc) {
     });
 }
 
-function toggle_if_visible(b_id) {
+function toggle_if_visible(b_id, div_id) {
     /* Toggles button if the section is visible! */
-    $(b_id + ":visible").click();
+    var display = $(div_id).css("display");
+    if (display == "block"){
+        $(b_id).click();
+    }
 }
+
 
 module.exports = {
     toggleButton: toggle_button,

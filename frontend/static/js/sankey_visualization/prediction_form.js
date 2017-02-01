@@ -3,7 +3,7 @@ var d3 = require("../external/d3.min.v4.js"),
     json_config = require("../config/config.js"),
     Utils = require("../util/util.js");
 
-function PredictionForm(future_form_selection, graph, reactor) {
+function PredictionForm(cohort_form, graph, reactor) {
 
     // ** Config
     var thisForm = this;
@@ -11,59 +11,18 @@ function PredictionForm(future_form_selection, graph, reactor) {
     thisForm.reactor = reactor;
     thisForm.config = json_config.QUERY_FORM;
 
-    // ** Model
-    thisForm.futureNodes = [1, 2, 3, 4, 5];
 
-    var values = [];
-    thisForm.config.outcomeAttributes().forEach(function (attr) {
-        values.push([attr.name, attr.display]);
-    });
-
-    var dataInput = future_form_selection.append("form");
+    var dataInput = cohort_form.append("form");
 
     //- builds form! -
-    dataInput.classed("triggerquery", true)
-        .attr("id", "queryval");
-    var select_attr = dataInput.append("select")
-        .classed("styled_form", true)
-        .attr("name", "attribute");
-
-    values.forEach(function (value) {
-        select_attr.append("option")
-            .attr("value", value[0])
-            .text(value[1]);
-    });
-
-    var future_nodes = dataInput.append("select")
-        .classed("styled_form", true)
-        .attr("name", "operator");
-
-    thisForm.futureNodes.forEach(function (op) {
-        future_nodes.append("option")
-            .attr("value", op)
-            .text(op);
-    });
+    dataInput .attr("id", "query-cohort");
 
     dataInput.append("input")
         .classed("styled_form", true)
-        .attr("name", "begin_date")
-        .attr("type", "text")
-        .attr("placeholder", "Start");
+        .attr("type", "submit")
+        .attr("value", "Get Cohort");
 
-    dataInput.append("input")
-        .classed("styled_form", true)
-        .attr("name", "end_date")
-        .attr("type", "text")
-        .attr("placeholder", "End");
-
-    dataInput.append("input")
-        .classed("styled_form", true)
-        .attr("type", "submit");
-
-    $(".triggerquery").bind("submit", function (event) {
-        var data = $("#queryval").serializeArray();
-
-        var attr = [data[0].value, data[1].value, data[2].value, data[3].value];
+    $("#query-cohort").bind("submit", function (event) {
 
         var posted_data = {
             'nodes': JSON.stringify(thisForm.graph.nodes),
@@ -72,17 +31,17 @@ function PredictionForm(future_form_selection, graph, reactor) {
             'globals': JSON.stringify(thisForm.graph.global_key_op_value),
             'matching': JSON.stringify(thisForm.graph.matching),
             'datasets': JSON.stringify(thisForm.config.filename()),
-            'prediction_attr': JSON.stringify(attr[0]),
-            'future_nodes': JSON.stringify(attr[1]),
-            'begin_date': JSON.stringify(attr[2]),
-            'end_date': JSON.stringify(attr[3]),
+            'prediction_attr': JSON.stringify([]),
+            'future_nodes': JSON.stringify([]),
+            'begin_date': JSON.stringify([]),
+            'end_date': JSON.stringify([]),
             'id': JSON.stringify(thisForm.config.id()),
             'type': JSON.stringify("cohort")
         };
 
         console.log(posted_data);
 
-        Utils.toggleIfVisible("#expand-query-button");
+        Utils.toggleIfVisible("#expand-query-button", "#query-system");
 
         $.ajax({
             type: 'POST',
@@ -90,15 +49,6 @@ function PredictionForm(future_form_selection, graph, reactor) {
             data: posted_data,
             success: function (data) {
                 var graph = JSON.parse(data);
-
-                graph.pred_attr = attr[0];
-                graph.future_nodes = attr[1];
-                graph.begin_date = attr[2];
-                graph.end_date = attr[3];
-
-                console.log("graph");
-                console.log(graph);
-
                 thisForm.reactor.dispatchEvent("query_successful", graph);
             },
             async: true

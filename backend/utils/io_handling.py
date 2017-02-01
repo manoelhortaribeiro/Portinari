@@ -18,10 +18,9 @@
 #  - We need to preprocess the inputs that come on the month form, this could have been done here, but I chose the FE  #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 
-
+import numpy as np
 import pandas
 import json
-import numpy as np
 
 
 class Dataset:
@@ -45,6 +44,7 @@ class Dataset:
         base = json.loads(open("./config/base.json", "r").read())
         param_config = json.loads(open("./config/" + param + ".json", "r").read())
         self.config = {key: value for (key, value) in (list(base.items()) + list(param_config.items()))}
+
         # READS EVENT DATA
 
         description = {}

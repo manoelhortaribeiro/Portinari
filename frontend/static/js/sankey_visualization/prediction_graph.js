@@ -39,8 +39,8 @@ PredictionGraph.prototype.updateResult = function (graph) {
 
     var color = d3.scaleOrdinal(d3.schemeCategory20);
 
-    var width = 1200 - 10;
-    var height = 800 - 10;
+    var width = 1200 - 15;
+    var height = 800 - 15;
 
     // House keeping
     this.svg.attr("visibility", "visible");
@@ -48,10 +48,9 @@ PredictionGraph.prototype.updateResult = function (graph) {
     var svg = this.svg.append("g");
 
     // Makes Sankey Diagram
-
     var my_sankey = d3.sankey()
-        .nodeWidth(25)
-        .nodePadding(20)
+        .nodeWidth(35)
+        .nodePadding(10)
         .size([width, height]);
 
     var path = my_sankey.link();

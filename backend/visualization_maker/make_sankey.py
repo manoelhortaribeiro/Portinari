@@ -1,7 +1,7 @@
 from json import dumps
 
 
-def new_sankey(individuals, graph, paths, config):
+def new_sankey(individuals, graph, paths, config, rr):
     sankey = {"nodes": [], "links": []}
     acc, mapping = 1, {}
 
@@ -14,7 +14,8 @@ def new_sankey(individuals, graph, paths, config):
                 print(graph.get_node_desc(node))
                 sankey["nodes"].append({"node": acc,
                                         "name": graph.get_node_desc(node),
-                                        "identifier": node})
+                                        "identifier": node,
+                                        "rr": rr[node]})
                 mapping[node] = acc
                 acc += 1
 

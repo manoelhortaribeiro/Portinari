@@ -7,12 +7,11 @@
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 
 from backend.utils.io_handling import Dataset, reads_params, get_config, read_config
-from backend.query_maker.get_individuals import get_individuals
+from backend.query_maker.get_individuals import get_individuals, get_rr
 from backend.visualization_maker.make_sankey import new_sankey
 from backend.query_interpreter.graph_maker import Graph
-from flask import Flask, request, jsonify
 from flask_cors import cross_origin
-from backend.mining.util import get_rr
+from flask import Flask, request
 app = Flask(__name__)
 
 # STARTS A DATASET SINGLETON
@@ -56,9 +55,8 @@ def index():
     rr = get_rr(dataset.event_data, individuals, dataset.config, outcomes)
 
     # Sankey
-    response = new_sankey(individuals, graph, paths, dataset.config)
+    response = new_sankey(individuals, graph, paths, dataset.config, rr)
 
-    print(rr)
     return response
 
 
