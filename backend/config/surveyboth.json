@@ -1,284 +1,235 @@
 {
-  "event_table_name": "./data/events_mixed.csv",
-  "individuals_table_name": "./data/entity_mixed.csv",
+  "event_table_name": "./data/mixed_event",
+  "individuals_table_name": "./data/mixed_entity",
   "id_attribute": {
     "name": "PatientID",
     "display": "ID",
-    "type": "Number",
-    "pytype": "uint32"
+    "type": "Number"
   },
   "edge_time_attribute": {
     "name": "SinceLast",
     "display": "Time Interval",
-    "type": "TimeInterval",
-    "pytype": "int32"
+    "type": "TimeInterval"
   },
   "edge_hops_attribute": {
     "name": "ExamInterval",
     "display": "Event Interval",
-    "type": "Number",
-    "pytype": "int32"
+    "type": "Number"
   },
   "outcome_attributes": [
     {
       "name": "Diagnosis",
       "display": "Diagnosis",
-      "type": "Diagnosis",
-      "pytype": "uint8",
-      "index": "StringRepDiagnosis",
-      "index_pytype": "str"
+      "type": "Diagnosis"
     },
     {
       "name": "Type",
       "display": "Type of Exam",
-      "type": "Type",
-      "pytype": "uint8",
-      "index": "StringRepExamType",
-      "index_pytype": "str"
+      "type": "Type"
     }
   ],
   "global_attributes": [
     {
       "name": "CensorDate",
       "display": "Censor Date",
-      "type": "Month",
-      "pytype": "int32"
+      "type": "Month"
     },
     {
       "name": "Birthdate",
       "display": "Birthdate",
-      "type": "Month",
-      "pytype": "int32"
+      "type": "Month"
     },
     {
       "name": "TypeResult",
       "display": "Type of Result",
-      "type": "TypeResult",
-      "pytype": "uint8"
+      "type": "TypeResult"
     },
     {
       "name": "q2amarit",
       "display": "Marital status",
-      "type": "q2amarit",
-      "pytype": "uint8"
+      "type": "q2amarit"
     },
     {
       "name": "q3school",
       "display": "Years of Schooling",
-      "type": "q3school",
-      "pytype": "uint8"
+      "type": "q3school"
     },
     {
       "name": "q4health",
       "display": "Self-reported health status",
-      "type": "q4health",
-      "pytype": "uint8"
+      "type": "q4health"
     },
     {
       "name": "q5asmoke",
       "display": "Smoking status",
-      "type": "q5asmoke",
-      "pytype": "uint8"
+      "type": "q5asmoke"
     },
     {
       "name": "q5bagsmk",
       "display": "Age start smoking",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     },
     {
       "name": "q5clgsmk",
       "display": "Number of years smoking",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     },
     {
       "name": "q5d1cig",
       "display": "Number cigarettes per day (< 13 years)",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     },
     {
       "name": "q5d2cig",
       "display": "Number cigarettes per day (13-16 years)",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     },
     {
       "name": "q5d3cig",
       "display": "Number cigarettes per day (17-20 years)",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     },
     {
       "name": "q5d4cig",
       "display": "Number cigarettes per day (21-24 years)",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     },
     {
       "name": "q5d5cig",
       "display": "Number cigarettes per day (25-29 years)",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     },
     {
       "name": "q5d6cig",
       "display": "Number cigarettes per day (30-34 years)",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     },
     {
       "name": "q5d7cig",
       "display": "Number cigarettes per day (35-39 years)",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     },
     {
       "name": "q5d8cig",
       "display": "Number cigarettes per day (40-45 years)",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     },
     {
       "name": "q6bbeer",
       "display": "Beer consumption",
-      "type": "q6bbeer",
-      "pytype": "uint8"
+      "type": "q6bbeer"
     },
     {
       "name": "q6bvodk",
       "display": "Vodka consumption",
-      "type": "q6bvodk",
-      "pytype": "uint8"
+      "type": "q6bvodk"
     },
     {
       "name": "q6csixdr",
       "display": "How often > 6 drinks",
-      "type": "q6csixdr",
-      "pytype": "uint8"
+      "type": "q6csixdr"
     },
     {
       "name": "q7apregn",
       "display": "Have you been pregnant",
-      "type": "q7apregn",
-      "pytype": "uint8"
+      "type": "q7apregn"
     },
     {
       "name": "q7bbirth",
       "display": "How many pregnancies",
-      "type": "Number",
-      "pytype": "int8"
+      "type": "Number"
     },
     {
       "name": "q8acontr",
       "display": "Have you used hormonal contraception",
-      "type": "q8acontr",
-      "pytype": "uint8"
+      "type": "q8acontr"
     },
     {
       "name": "q9condom",
       "display": "Have you used condoms",
-      "type": "q9condom",
-      "pytype": "uint8"
+      "type": "q9condom"
     },
     {
       "name": "q9agecon",
       "display": "Age at first condom use",
-      "type": "Number",
-      "pytype": "uint8"
+      "type": "Number"
     },
     {
       "name": "q11asx",
       "display": "Have you ever had sexual intercourse",
-      "type": "q11asx",
-      "pytype": "uint8"
+      "type": "q11asx"
     },
     {
       "name": "q11aagsx",
       "display": "Age at first intercourse",
-      "type": "Number",
-      "pytype": "uint8"
+      "type": "Number"
     },
     {
       "name": "q11aagpa",
       "display": "Partner's age at first intercourse",
-      "type": "Number",
-      "pytype": "uint8"
+      "type": "Number"
     },
     {
       "name": "q12totpa",
       "display": "Lifetime number of sexual partners",
-      "type": "Number",
-      "pytype": "uint8"
+      "type": "Number"
     },
     {
       "name": "q15chla",
       "display": "Have you ever had chlamydia",
-      "type": "q15",
-      "pytype": "uint8"
+      "type": "q15"
     },
     {
       "name": "q15herp",
       "display": "Have you ever had herpes",
-      "type": "q15",
-      "pytype": "uint8"
+      "type": "q15"
     },
     {
       "name": "q15tric",
       "display": "Have you ever had trichomonas",
-      "type": "q15",
-      "pytype": "uint8"
+      "type": "q15"
     },
     {
       "name": "q15gono",
       "display": "Have you ever had gonorrhoea",
-      "type": "q15",
-      "pytype": "uint8"
+      "type": "q15"
     },
     {
       "name": "q16heard",
       "display": "Have you ever had HPV",
-      "type": "q16heard",
-      "pytype": "uint8"
+      "type": "q16heard"
     },
     {
       "name": "q17hadgw",
       "display": "Have you ever had genital warts",
-      "type": "q17hadgw",
-      "pytype": "uint8"
+      "type": "q17hadgw"
     },
     {
       "name": "q17aggw",
       "display": "Age at first genital warts diagnosis",
-      "type": "Number",
-      "pytype": "uint8"
+      "type": "Number"
     },
     {
       "name": "q18trtgw",
       "display": "How many genital warts treatments in the past 12 months",
-      "type": "Number",
-      "pytype": "uint8"
+      "type": "Number"
     },
     {
       "name": "q20know",
       "display": "Did you know about the CC screening programme?",
-      "type": "q20know",
-      "pytype": "uint8"
+      "type": "q20know"
     },
     {
       "name": "q21necc",
       "display": "Do you think screening is necessary for you?",
-      "type": "q21necc",
-      "pytype": "uint8"
+      "type": "q21necc"
     }
   ],
   "node_attributes": [
     {
       "name": "GroupSize",
       "display": "Concurrent Events",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     },
     {
       "name": "MorphologyCode",
@@ -289,73 +240,56 @@
     {
       "name": "DiagnosisDate",
       "display": "Diagnosis Date",
-      "type": "Month",
-      "pytype": "int32"
+      "type": "Month"
     },
     {
       "name": "LaboratoryNbr",
       "display": "Laboratory Number",
-      "type": "Number",
-      "pytype": "uint8"
+      "type": "Number"
     },
     {
       "name": "TimeSinceLast",
       "display": "Time Interval",
-      "type": "TimeInterval",
-      "pytype": "int32"
+      "type": "TimeInterval"
     },
     {
       "name": "DiagnosisNbr",
       "display": "Diagnosis Number",
-      "type": "Number",
-      "pytype": "uint8"
+      "type": "Number"
     },
     {
       "name": "Diagnosis",
       "display": "Diagnosis",
-      "type": "Diagnosis",
-      "pytype": "uint8"
+      "type": "Diagnosis"
     },
     {
       "name": "Type",
       "display": "Type of Exam",
-      "type": "Type",
-      "pytype": "uint8"
+      "type": "Type"
     },
     {
       "name": "Region",
       "display": "Region",
-      "type": "Region",
-      "pytype": "uint8"
-    },
-    {
-      "name": "Stage",
-      "display": "Stage",
-      "type": "Stage",
-      "pytype": "str"
+      "type": "Region"
     },
     {
       "name": "Age",
       "display": "Age",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     }
   ],
   "edge_attributes": [
     {
       "name": "SinceLast",
       "display": "Time Interval",
-      "type": "TimeInterval",
-      "pytype": "int32"
+      "type": "TimeInterval"
     },
     {
       "name": "ExamInterval",
       "display": "Event Interval",
-      "type": "Number",
-      "pytype": "int32"
+      "type": "Number"
     }
   ],
-  "index_attributes": "None",
   "types": {
     "Month": {
       "constraints": [

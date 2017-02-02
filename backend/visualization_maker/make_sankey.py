@@ -6,7 +6,7 @@ def new_sankey(individuals, graph, paths, config, rr):
     acc, mapping = 1, {}
 
     # Adds no-return node
-    sankey["nodes"].append({"node": 0, "name": "None", "identifier": config["nan_int"]})
+    sankey["nodes"].append({"node": 0, "name": "None", "identifier": config["nan"]})
 
     for path in paths:
         for node in path:

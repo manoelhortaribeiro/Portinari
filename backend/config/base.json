@@ -1,10 +1,8 @@
 {
-  "no_indexed_event": 99,
-  "time_min": 0,
   "time_max": 10000000,
+  "default_matching": "first_occurence",
+  "default_dataset": "surveyboth",
   "event_min": 0,
-  "event_max": 50,
-  "nan_int": -999999999,
   "matching_options": [
     {
       "display": "First Occurence",
@@ -15,12 +13,18 @@
       "name": "first_event"
     }
   ],
-  "default_matching": "first_occurence",
   "datasets": [
     {
       "display": "surveyboth",
       "name": "surveyboth"
+    },
+    {
+      "display": "mixed_sample",
+      "name": "mixed_sample"
     }
   ],
-  "default_dataset": "surveyboth"
+  "time_min": 0,
+  "nan": -999999999,
+  "no_indexed_event": 99,
+  "event_max": 50
 }

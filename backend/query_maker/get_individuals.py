@@ -133,7 +133,9 @@ def apply_parallel(dfgrouped, func):
     :param dfgrouped: dataframe grouped.
     :param func: function to be used
     :return: applied dataframe. """
-    ret_lst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(group) for name, group in dfgrouped)
+    #ret_lst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(group) for name, group in dfgrouped)
+    ret_lst = [func(group) for name, group in dfgrouped]
+    print(ret_lst)
     return pandas.concat(ret_lst)
 
 
@@ -160,7 +162,7 @@ def filter_attributes(data, attr, config, flag=False):
 
     for name, op, value in attr:
         # Treat NaNs
-        data = data[eval("data[\"" + name + "\"]" + "!=" + str(config["nan_int"]))]
+        data = data[eval("data[\"" + name + "\"]" + "!=" + str(config["nan"]))]
 
     # Gets constraints
     names = appending_help(attr)
@@ -402,6 +404,8 @@ def get_individuals(dataset, global_attr, prediction_attr, matching, typ, graph,
 
     # Filter global attributes
     index_en = filter_attributes(dataframe_en, global_attr, dataset.config)
+
+    print(index_en)
     dataframe_ev = filter_data_id(dataframe_ev, index_en, dataset.config)
 
     # Filter local attributes, in cohort, flag = true, otherwise, false

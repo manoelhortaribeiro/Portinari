@@ -1,8 +1,35 @@
 from questionnaire import Questionnaire
 import numpy as np
 import pandas
+import json
 import os
 
+
+def init_config_backend(name_json, _path_config):
+    # if base exists, add dataset
+    base = os.path.join(_path_config, "base.json")
+    if os.path.exists(base):
+        config_backend = json.loads(open(base, "r").read())
+        if {"display": name_json, "name": name_json} not in config_backend["datasets"]:
+            config_backend["datasets"].append({"display": name_json, "name": name_json})
+        config_backend["default_dataset"] = name_json
+
+    # otherwise, create everything
+    else:
+        config_backend = dict
+        config_backend["no_indexed_event"] = 99,
+        config_backend["time_min"] = 0,
+        config_backend["time_max"] = 10000000,
+        config_backend["event_min"] = 0,
+        config_backend["event_max"] = 50,
+        config_backend["nan"] = -999999999,
+        config_backend["matching_options"] = [{"display": "First Occurence", "name": "first_occurence"},
+                                              {"display": "First Event", "name": "first_event"}]
+        config_backend["default_matching"] = "first_occurence"
+        config_backend["datasets"] = [{"display": name_json, "name": name_json}]
+        config_backend["default_dataset"] = name_json
+
+    open(base, "w").write(json.dumps(config_backend))
 
 def init_config_importer(path, df):
     config_importer = {}
@@ -22,7 +49,6 @@ def init_config_importer(path, df):
 
 
 def get_global_import_var(config_importer, df):
-
     q1 = "Select the identifier of your entity, e.g. PatientID"
 
     q2 = "Select the creation date of your entity, e.g. BirthDate"
@@ -49,32 +75,15 @@ def get_global_import_var(config_importer, df):
 
 
 def get_drop_cols(config_importer, df):
-    drop_cols_q = Questionnaire()
-
     q1 = "Do you want to drop any columns?"
-    o1 = ["Yes", "No"]
+    q2 = "Select columns to drop?"
+    k1 = 'drop_col'
+    attr = 'drop_col'
 
-    q2 = "Select columns to drop"
-    rows = list(df.columns.values)
-    rows.remove(config_importer["id"])
-    rows.remove(config_importer["entitycreation"])
-    rows.remove(config_importer["eventdate"])
-
-    drop_cols_q.add_question('drop_col', prompt=q1, options=o1)
-
-    drop_cols_q.add_question(q2, options=rows, prompter="multiple").add_condition(keys=['drop_col'], vals=['Yes'])
-
-    drop_cols_ans = drop_cols_q.run()
-
-    if drop_cols_ans["drop_col"] == "Yes":
-        for var in drop_cols_ans[q2]:
-            config_importer["variables"][var]["drop_col"] = "true"
-            del df[var]
+    generic_selector(config_importer, df, q1, k1, attr)
 
 
 def get_renaming_vars(config_importer, df):
-
-    renaming_hash = {}
     rows = list(df.columns.values)
 
     while True:
@@ -135,8 +144,8 @@ def get_renaming_vals(config_importer, df):
             idx_val = list(enumerate(answers[q2]))
 
             for idx, var in idx_val:
-
                 dst = list(map(str, np.unique(df[var].values)))
+                dst = list(filter(lambda a: a != str(config_importer["nan"]), dst))
                 dst.sort()
                 dsp = ",".join(dst)
 
@@ -149,7 +158,9 @@ def get_renaming_vals(config_importer, df):
             answers = q.run()
             for idx, var in idx_val:
                 old_values = list(map(str, np.unique(df[var].values)))
-                dst.sort()
+                old_values = list(filter(lambda a: a != str(config_importer["nan"]), old_values))
+                old_values.sort()
+
                 new_values = answers[var].split(",")
                 acc = {}
                 for i, j in zip(old_values, new_values):
@@ -157,11 +168,80 @@ def get_renaming_vals(config_importer, df):
                 config_importer["variables"][var]["rename"] = acc
 
 
-_path = "./data/surveys/mixed_sample.csv"
-_df = pandas.read_csv(_path, dtype=object)
+def generic_selector(config_importer, df, q1, q2, k1, attr, flag=False):
+    q = Questionnaire()
 
-_config_importer = init_config_importer(_path, _df)
+    o1 = ["Yes", "No"]
 
+    q2 = q2
+    rows = list(df.columns.values)
+    rows.remove(config_importer["id"])
+    rows.remove(config_importer["entitycreation"])
+    rows.remove(config_importer["eventdate"])
+
+    q.add_question(k1, prompt=q1, options=o1)
+
+    q.add_question(q2, options=rows, prompter="multiple").add_condition(keys=k1, vals=['Yes'])
+
+    ans = q.run()
+
+    if flag:
+        return ans
+
+    if ans[k1] == "Yes":
+        for var in ans[q2]:
+            config_importer["variables"][var][attr] = "true"
+            del df[var]
+
+
+def get_string_attr(config_importer, df):
+    q1 = "Are any of the attributes strings?"
+    q2 = "Select string attributes?"
+    k1 = "string_attr"
+    attr = "is_str"
+
+    ans = generic_selector(config_importer, df, q1, q2, k1, attr, flag=True)
+
+    tmp = {}
+
+    if ans[k1] == "Yes":
+        for var in ans[q2]:
+            old_values = list(map(str, np.unique(df[var].values)))
+            old_values = list(filter(lambda a: a != str(config_importer["nan"]), old_values))
+            old_values.sort()
+            new_values = list(range(len(old_values)))
+            acc = {}
+            for i, j in zip(old_values, new_values):
+                acc[i] = j
+            config_importer["variables"][var]["rename"] = acc
+            tmp[var]["rename"] = acc
+    return tmp
+
+
+def get_event_attr(config_importer, df):
+    q1 = "Does the event contain more entities other than the Event Date?"
+    q2 = "Select event attributes:"
+    k1 = "is_event"
+    attr = "event"
+
+    generic_selector(config_importer, df, q1, q2, k1, attr)
+
+
+_path_csv = "./data/surveys/mixed_sample.csv"
+
+_path_config = "../backend/config/"
+
+_name = "mixed_sample"
+
+_df = pandas.read_csv(_path_csv, dtype=object, na_values=" ")
+
+_config_importer = init_config_importer(_path_csv, _df)
+
+_df = _df.fillna(_config_importer["nan"])
+
+init_config_backend(_name, _path_config)
+
+exit()
 # global import var
 get_global_import_var(_config_importer, _df)
 
@@ -174,5 +254,8 @@ get_renaming_vars(_config_importer, _df)
 # get renaming vals
 get_renaming_vals(_config_importer, _df)
 
+# select string attr
+string_mapping = get_string_attr(_config_importer, _df)
 
-
+# select event attributes attr
+get_event_attr(_config_importer, df)

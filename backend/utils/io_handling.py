@@ -20,6 +20,7 @@
 
 import numpy as np
 import pandas
+import pickle
 import json
 
 
@@ -40,45 +41,17 @@ class Dataset:
             return self.entity_data, self.event_data
 
         # READS CONFIG
-
         base = json.loads(open("./config/base.json", "r").read())
         param_config = json.loads(open("./config/" + param + ".json", "r").read())
         self.config = {key: value for (key, value) in (list(base.items()) + list(param_config.items()))}
 
         # READS EVENT DATA
-
-        description = {}
-
-        # adds node attributes
-        for node in self.config["node_attributes"]:
-            description[node["name"]] = getattr(np, node["pytype"])
-
-        # id attribute
-        description[self.config["id_attribute"]["name"]] = self.config["id_attribute"]["pytype"]
-
-        self.event_data = pandas.read_csv(self.config["event_table_name"], sep=',',
-                                          index_col=False, dtype=description, engine='c')
+        self.event_data = pickle.load(open(self.config["event_table_name"], "rb"))
 
         # READS ENTITY DATA
-
-        description = {}
-
-        # adds global attributes
-        for node in self.config["global_attributes"]:
-            description[node["name"]] = getattr(np, node["pytype"])
-
-        # id attribute
-        description[self.config["id_attribute"]["name"]] = getattr(np, self.config["id_attribute"]["pytype"])
-
-        # adds indexes
-        for outcome in self.config["outcome_attributes"]:
-            description[outcome["index"]] = getattr(np, outcome["index_pytype"])
-
-        self.entity_data = pandas.read_csv(self.config["individuals_table_name"], sep=',',
-                                           index_col=False, dtype=description, engine='c')
+        self.entity_data = pickle.load(open(self.config["individuals_table_name"], "rb"))
 
         # READS NAME
-
         self.name = param
 
 
