@@ -50,8 +50,9 @@ def index():
     paths = graph.make_maximal_paths()
 
     # Gets individual
-    individuals = get_individuals(dataset, glob_att, prediction_attr, matching, typ, graph, paths)
+    individuals = get_individuals(dataset, glob_att, matching, typ, graph, paths)
 
+    # Gets Relative Risk
     rr = get_rr(dataset.event_data, individuals, dataset.config, outcomes)
 
     # Sankey

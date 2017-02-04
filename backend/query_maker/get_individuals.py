@@ -55,8 +55,6 @@ def get_rr(events, individuals, config, outcomes):
     rr = {}
 
     for key, ind in individuals.items():
-        print(events[config["id_attribute"]["name"]])
-        print(ind.index)
         exposed = events[events[config["id_attribute"]["name"]].isin(ind.index)]
         not_exposed = events[~events[config["id_attribute"]["name"]].isin(ind.index)]
         exposed_true =filter_attributes(exposed, outcomes, config, flag=False)
@@ -95,6 +93,9 @@ def get_tuple(config, edge, min_v, max_v, attr):
                 tuple_v[0] = eval(v)
             if o == "<" and eval(v) < tuple_v[1]:
                 tuple_v[1] = eval(v)
+            if o == "==":
+                tuple_v = (eval(v),eval(v))
+
         edge.pop(config[attr]["name"])
 
     return tuple_v
@@ -135,7 +136,6 @@ def apply_parallel(dfgrouped, func):
     :return: applied dataframe. """
     #ret_lst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(group) for name, group in dfgrouped)
     ret_lst = [func(group) for name, group in dfgrouped]
-    print(ret_lst)
     return pandas.concat(ret_lst)
 
 
@@ -258,12 +258,14 @@ def filter_local_attributes_ordered(data, graph, paths, config, matching):
             t_time.append(get_tuple(config, edge, config["time_min"], config["time_max"], "edge_time_attribute"))
             t_hop.append(get_tuple(config, edge, config["event_min"], config["event_max"], "edge_hops_attribute"))
 
+        if DEBUG_QUERY_MATCHING:
+            print(t_time, t_hop)
+
         # gets all matching values
         f = functools.partial(rec_match, pt_nd=path_nodes, t_tim=t_time, t_hop=t_hop, config=config, flg=matching)
 
         start = time.time()
         result = apply_parallel(data.groupby(config["id_attribute"]["name"]), f)
-        # result.index = result.index.droplevel(1)
         end = time.time()
         print(end - start)
 
@@ -271,9 +273,10 @@ def filter_local_attributes_ordered(data, graph, paths, config, matching):
         path_r.reverse()
         acc = None
 
+        print(path, path_r)
 
         for idx, n in enumerate(path_r):
-            to_app = result[result["Position"] == idx + 1]["IDX"]
+            to_app = result[result["Position"] == len(path) - idx]["IDX"]
 
             if acc is None:
                 acc = to_app
@@ -308,6 +311,8 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=Tr
 
     # case 1: pattern ended, returns true
     if len(pt_nd) == 0:
+        if DEBUG_QUERY_MATCHING:
+            print("case 1: true, matching is completed")
         return to_df(p, idval, pid=pid)
 
     if DEBUG_QUERY_MATCHING:
@@ -315,6 +320,8 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=Tr
 
     # case 2: data ended, returns false
     if len(x) == 0:
+        if DEBUG_QUERY_MATCHING:
+            print("case 2: true, matching is uncompleted")
         return to_df(p, idval, pid=pid)
 
     if DEBUG_QUERY_MATCHING:
@@ -331,6 +338,8 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=Tr
 
     # case 3: no match, return false
     if len(tmp) == 0:
+        if DEBUG_QUERY_MATCHING:
+            print("case 3: true, matching is uncompleted")
         return to_df(p, idval, pid=pid)
 
     if DEBUG_QUERY_MATCHING:
@@ -398,14 +407,13 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=Tr
     return to_df(p, idval, pid=pid)
 
 
-def get_individuals(dataset, global_attr, prediction_attr, matching, typ, graph, paths):
+def get_individuals(dataset, global_attr, matching, typ, graph, paths):
     dataframe_en = dataset.entity_data
     dataframe_ev = dataset.event_data
 
     # Filter global attributes
     index_en = filter_attributes(dataframe_en, global_attr, dataset.config)
 
-    print(index_en)
     dataframe_ev = filter_data_id(dataframe_ev, index_en, dataset.config)
 
     # Filter local attributes, in cohort, flag = true, otherwise, false
@@ -418,5 +426,7 @@ def get_individuals(dataset, global_attr, prediction_attr, matching, typ, graph,
 
     # Filter non-indexed ordered attributes
     entity_matching = filter_local_attributes_ordered(dataframe_ev, graph, paths, dataset.config, matching)
+
+    print(entity_matching)
 
     return entity_matching

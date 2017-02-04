@@ -11,7 +11,6 @@ def new_sankey(individuals, graph, paths, config, rr):
     for path in paths:
         for node in path:
             if node not in mapping:
-                print(graph.get_node_desc(node))
                 sankey["nodes"].append({"node": acc,
                                         "name": graph.get_node_desc(node),
                                         "identifier": node,
@@ -28,9 +27,6 @@ def new_sankey(individuals, graph, paths, config, rr):
         for n1, n2 in zip(path[:-1], path[1:]):
             v_n1 = len(individuals[n1])
             v_n2 = len(individuals[n2])
-
-            print(mapping[n1], mapping[n1], v_n1)
-            print(mapping[n1], mapping[n2], v_n2)
 
             sankey["links"].append({"source": mapping[n1],
                                     "target": mapping[n2],
