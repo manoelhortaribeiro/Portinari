@@ -704,15 +704,17 @@ var query_form = new QueryForm(query_local_form_selection, query_local_current_s
     dataset_choice, matching_choice, reactor);
 
 /* ------------------------------------ */
-/* ---  Prognosis Prediction System --- */
-/* ------------------------------------ */
+/* ---  Corhort Inspection System  --- */
+/* ----------------------------------- */
 
 /* ---Internal Query System Events--- */
 reactor.registerEvent('query_successful');
+reactor.registerEvent('cohort_sankey_selected');
+reactor.registerEvent('cohort_sankey_unselected');
 /* ---------------------------------- */
 
 // Creates needed selections
-var future_form_selection = d3.select("#form-future-nodes");
+var future_form_selection = d3.select("#form-get-cohort");
 
 // Import modules
 var PredictionForm = require("./sankey_visualization/prediction_form.js"),
@@ -1639,7 +1641,6 @@ function PredictionForm(cohort_form, graph, reactor) {
     thisForm.reactor = reactor;
     thisForm.config = json_config.QUERY_FORM;
 
-
     var dataInput = cohort_form.append("form");
 
     //- builds form! -
@@ -1730,8 +1731,8 @@ PredictionGraph.prototype.updateResult = function (graph) {
 
     var color = d3.scaleOrdinal(d3.schemeCategory20);
 
-    var width = 1200 - 15;
-    var height = 800 - 15;
+    var width = 1200 - 20;
+    var height = 800 - 20;
 
     // House keeping
     this.svg.attr("visibility", "visible");
@@ -1757,32 +1758,37 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .attr("class", "link")
         .attr("d", path)
         .style("stroke-width", function (d) {
-            return Math.max(1, d.dy);
+            return Math.max(10, d.dy);
         })
         .sort(function (a, b) {
-            return b.dy - a.dy;
+            return b.dy - a.dy ;
         });
 
-    // add the link titles
+    // --- LINK TITLES ---
     link.append("title")
         .text(function (d) {
             return d.source.name + " → " +
                 d.target.name + "\n" + format(d.value);
         });
 
-    // add in the nodes
+    link.each(function (p) {
+         if (p.target.name == "None") {
+             d3.select(this)
+                 .attr("visibility", "hidden");
+         }
+     });
+
+
+    // --- NODES TITLES ---
     var node = svg.append("g").selectAll(".node")
         .data(graph.nodes)
         .enter().append("g")
         .attr("class", "node")
         .attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
-        })
-        .on("start", function () {
-            this.parentNode.appendChild(this);
         });
 
-    // add the rectangles for the nodes
+    // --- NODE RECTANGLES ---
     node.append("rect")
         .attr("height", function (d) {
             return d.dy;
@@ -1811,11 +1817,15 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .text(function (d) {
             return d.name;
         })
-        .filter(function (d) {
-            return d.x < width / 2;
-        })
         .attr("x", 6 + my_sankey.nodeWidth())
         .attr("text-anchor", "start");
+
+     node.each(function (p) {
+         if (p.name == "None") {
+             d3.select(this)
+                 .attr("visibility", "hidden");
+         }
+     });
 
 
 };

@@ -11,7 +11,6 @@ function PredictionForm(cohort_form, graph, reactor) {
     thisForm.reactor = reactor;
     thisForm.config = json_config.QUERY_FORM;
 
-
     var dataInput = cohort_form.append("form");
 
     //- builds form! -

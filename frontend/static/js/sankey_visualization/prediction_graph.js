@@ -39,8 +39,8 @@ PredictionGraph.prototype.updateResult = function (graph) {
 
     var color = d3.scaleOrdinal(d3.schemeCategory20);
 
-    var width = 1200 - 15;
-    var height = 800 - 15;
+    var width = 1200 - 20;
+    var height = 800 - 20;
 
     // House keeping
     this.svg.attr("visibility", "visible");
@@ -66,32 +66,37 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .attr("class", "link")
         .attr("d", path)
         .style("stroke-width", function (d) {
-            return Math.max(1, d.dy);
+            return Math.max(10, d.dy);
         })
         .sort(function (a, b) {
-            return b.dy - a.dy;
+            return b.dy - a.dy ;
         });
 
-    // add the link titles
+    // --- LINK TITLES ---
     link.append("title")
         .text(function (d) {
             return d.source.name + " → " +
                 d.target.name + "\n" + format(d.value);
         });
 
-    // add in the nodes
+    link.each(function (p) {
+         if (p.target.name == "None") {
+             d3.select(this)
+                 .attr("visibility", "hidden");
+         }
+     });
+
+
+    // --- NODES TITLES ---
     var node = svg.append("g").selectAll(".node")
         .data(graph.nodes)
         .enter().append("g")
         .attr("class", "node")
         .attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
-        })
-        .on("start", function () {
-            this.parentNode.appendChild(this);
         });
 
-    // add the rectangles for the nodes
+    // --- NODE RECTANGLES ---
     node.append("rect")
         .attr("height", function (d) {
             return d.dy;
@@ -120,11 +125,15 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .text(function (d) {
             return d.name;
         })
-        .filter(function (d) {
-            return d.x < width / 2;
-        })
         .attr("x", 6 + my_sankey.nodeWidth())
         .attr("text-anchor", "start");
+
+     node.each(function (p) {
+         if (p.name == "None") {
+             d3.select(this)
+                 .attr("visibility", "hidden");
+         }
+     });
 
 
 };

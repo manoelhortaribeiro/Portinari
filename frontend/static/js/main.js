@@ -59,15 +59,17 @@ var query_form = new QueryForm(query_local_form_selection, query_local_current_s
     dataset_choice, matching_choice, reactor);
 
 /* ------------------------------------ */
-/* ---  Prognosis Prediction System --- */
-/* ------------------------------------ */
+/* ---  Corhort Inspection System  --- */
+/* ----------------------------------- */
 
 /* ---Internal Query System Events--- */
 reactor.registerEvent('query_successful');
+reactor.registerEvent('cohort_sankey_selected');
+reactor.registerEvent('cohort_sankey_unselected');
 /* ---------------------------------- */
 
 // Creates needed selections
-var future_form_selection = d3.select("#form-future-nodes");
+var future_form_selection = d3.select("#form-get-cohort");
 
 // Import modules
 var PredictionForm = require("./sankey_visualization/prediction_form.js"),

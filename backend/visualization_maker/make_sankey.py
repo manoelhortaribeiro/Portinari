@@ -25,14 +25,11 @@ def new_sankey(individuals, graph, paths, config, rr):
 
     for path in paths:
         for n1, n2 in zip(path[:-1], path[1:]):
-            v_n1 = len(individuals[n1])
-            v_n2 = len(individuals[n2])
-
             sankey["links"].append({"source": mapping[n1],
                                     "target": mapping[n2],
-                                    "value": v_n2,
-                                    "name": graph.get_edge_desc(n1,n2)})
-            ind_number[n1] -= v_n2
+                                    "value": len(individuals[n2]),
+                                    "name": graph.get_edge_desc(n1, n2)})
+            ind_number[n1] -= len(individuals[n2])
 
     for path in paths:
         for n in path[:-1]:
