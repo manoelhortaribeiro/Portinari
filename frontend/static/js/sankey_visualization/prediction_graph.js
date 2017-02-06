@@ -69,7 +69,7 @@ PredictionGraph.prototype.updateResult = function (graph) {
             return Math.max(10, d.dy);
         })
         .sort(function (a, b) {
-            return b.dy - a.dy ;
+            return b.dy - a.dy;
         });
 
     // --- LINK TITLES ---
@@ -80,11 +80,11 @@ PredictionGraph.prototype.updateResult = function (graph) {
         });
 
     link.each(function (p) {
-         if (p.target.name == "None") {
-             d3.select(this)
-                 .attr("visibility", "hidden");
-         }
-     });
+        if (p.target.name == "None") {
+            d3.select(this)
+                .attr("visibility", "hidden");
+        }
+    });
 
 
     // --- NODES TITLES ---
@@ -94,14 +94,20 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .attr("class", "node")
         .attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
+        })
+        .on("start", function () {
+            this.parentNode.appendChild(this);
         });
-
     // --- NODE RECTANGLES ---
     node.append("rect")
         .attr("height", function (d) {
             return d.dy;
         })
         .attr("width", my_sankey.nodeWidth())
+        .on("mousedown", function (d) {
+            console.log(d);
+            console.log(this);
+        })
         .style("fill", function (d) {
             return d.color = color(d.name.replace(/ .*/, ""));
         })
@@ -110,8 +116,9 @@ PredictionGraph.prototype.updateResult = function (graph) {
         })
         .append("title")
         .text(function (d) {
-            return d.name + "\n" + format(d.value);
+            return d.name + "\n" + format(d.value) + "\n" + format(d.rr);
         });
+
 
     // add in the title for the nodes
     node.append("text")
@@ -125,15 +132,18 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .text(function (d) {
             return d.name;
         })
+        .filter(function (d) {
+            return d.x < width / 2;
+        })
         .attr("x", 6 + my_sankey.nodeWidth())
         .attr("text-anchor", "start");
 
-     node.each(function (p) {
-         if (p.name == "None") {
-             d3.select(this)
-                 .attr("visibility", "hidden");
-         }
-     });
+    node.each(function (p) {
+        if (p.name == "None") {
+            d3.select(this)
+                .attr("visibility", "hidden");
+        }
+    });
 
 
 };

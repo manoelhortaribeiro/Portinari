@@ -23,6 +23,14 @@
       "name": "mixed_sample"
     }
   ],
+  "visualization_options": [{
+      "display": "Linear Edges",
+      "name": "linear"
+    }],
+  "mining_algorithms": [{
+      "display": "CHARM",
+      "name": "charm"
+    }],
   "time_min": 0,
   "nan": -999999999,
   "no_indexed_event": 99,

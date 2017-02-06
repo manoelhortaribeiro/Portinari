@@ -18,7 +18,9 @@ var reactor = new Reactor();
 var Utils = require("./util/util.js");
 
 // Configures query button
-Utils.toggleButton("#expand-query-button", ".content_query", "Query");
+Utils.toggleButton("#expand-query-button",
+    ".content_query",
+    "Query");
 
 /* --------------------- */
 /* ---  Query System --- */
@@ -53,13 +55,17 @@ var QueryForm = require("./query_system/query_form.js"),
 var query_graph = new QueryGraph(query_graph_selection, reactor);
 
 // Creates query form interface
-var query_form = new QueryForm(query_local_form_selection, query_local_current_selection,
-    query_global_form_selection, query_global_current_selection,
-    outcomes_form_selection, outcomes_current_selection,
+var query_form = new QueryForm(
+    query_local_form_selection,
+    query_local_current_selection,
+    query_global_form_selection,
+    query_global_current_selection,
+    outcomes_form_selection,
+    outcomes_current_selection,
     dataset_choice, matching_choice, reactor);
 
 /* ------------------------------------ */
-/* ---  Corhort Inspection System  --- */
+/* ---  Cohort Inspection System  --- */
 /* ----------------------------------- */
 
 /* ---Internal Query System Events--- */
@@ -69,15 +75,25 @@ reactor.registerEvent('cohort_sankey_unselected');
 /* ---------------------------------- */
 
 // Creates needed selections
-var future_form_selection = d3.select("#form-get-cohort");
+var form_get_cohort = d3.select("#form-get-cohort"),
+    nodes_info_cohort_selection = d3.select("#nodes-info-cohort"),
+    get_patterns_cohort = d3.select("#get-patterns-cohort"),
+    show_patterns_cohort = d3.select("#show-patterns-cohort"),
+    cohort_result = d3.select("#cohort-result");
 
 // Import modules
 var PredictionForm = require("./sankey_visualization/prediction_form.js"),
     PredictionGraph = require("./sankey_visualization/prediction_graph.js");
 
 // Creates prediction form interface
-var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
+var prediction_form = new PredictionForm(
+    form_get_cohort,
+    nodes_info_cohort_selection,
+    get_patterns_cohort,
+    show_patterns_cohort,
+    query_graph.graph, reactor);
 
-var cohort_result = d3.select("#cohort-result");
 // Append the svg canvas to the page
-var prediction_graph = new PredictionGraph(cohort_result, reactor);
+var prediction_graph = new PredictionGraph(
+    cohort_result,
+    reactor);

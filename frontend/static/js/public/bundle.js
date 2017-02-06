@@ -70,6 +70,15 @@ DBI.prototype.matching = function () {
     return this.conf_file['matching_options']
 };
 
+DBI.prototype.visualization = function () {
+    return this.conf_file['visualization_options']
+};
+
+DBI.prototype.mining_algorithms = function () {
+    return this.conf_file['mining_algorithms']
+};
+
+
 DBI.prototype.matchingDefault = function () {
     return this.matching_default;
 };
@@ -145,7 +154,6 @@ DBI.prototype.typeFormHandling = function (type_name, select_value, name, types)
     }
 };
 
-
 var databaseinfo = new DBI();
 
 module.exports = {
@@ -185,8 +193,10 @@ module.exports = {
 
     QUERY_FORM: {
         /*Stuff adjustable in the back end*/
-        filename: databaseinfo.getFilename.bind(databaseinfo),
         outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
+        visualizationOptions: databaseinfo.visualization.bind(databaseinfo),
+        miningAlgorithms: databaseinfo.mining_algorithms.bind(databaseinfo),
+        filename: databaseinfo.getFilename.bind(databaseinfo),
         id: databaseinfo.id.bind(databaseinfo)
     }
 };
@@ -663,7 +673,9 @@ var reactor = new Reactor();
 var Utils = require("./util/util.js");
 
 // Configures query button
-Utils.toggleButton("#expand-query-button", ".content_query", "Query");
+Utils.toggleButton("#expand-query-button",
+    ".content_query",
+    "Query");
 
 /* --------------------- */
 /* ---  Query System --- */
@@ -698,13 +710,17 @@ var QueryForm = require("./query_system/query_form.js"),
 var query_graph = new QueryGraph(query_graph_selection, reactor);
 
 // Creates query form interface
-var query_form = new QueryForm(query_local_form_selection, query_local_current_selection,
-    query_global_form_selection, query_global_current_selection,
-    outcomes_form_selection, outcomes_current_selection,
+var query_form = new QueryForm(
+    query_local_form_selection,
+    query_local_current_selection,
+    query_global_form_selection,
+    query_global_current_selection,
+    outcomes_form_selection,
+    outcomes_current_selection,
     dataset_choice, matching_choice, reactor);
 
 /* ------------------------------------ */
-/* ---  Corhort Inspection System  --- */
+/* ---  Cohort Inspection System  --- */
 /* ----------------------------------- */
 
 /* ---Internal Query System Events--- */
@@ -714,18 +730,28 @@ reactor.registerEvent('cohort_sankey_unselected');
 /* ---------------------------------- */
 
 // Creates needed selections
-var future_form_selection = d3.select("#form-get-cohort");
+var form_get_cohort = d3.select("#form-get-cohort"),
+    nodes_info_cohort_selection = d3.select("#nodes-info-cohort"),
+    get_patterns_cohort = d3.select("#get-patterns-cohort"),
+    show_patterns_cohort = d3.select("#show-patterns-cohort"),
+    cohort_result = d3.select("#cohort-result");
 
 // Import modules
 var PredictionForm = require("./sankey_visualization/prediction_form.js"),
     PredictionGraph = require("./sankey_visualization/prediction_graph.js");
 
 // Creates prediction form interface
-var prediction_form = new PredictionForm(future_form_selection, query_graph.graph, reactor);
+var prediction_form = new PredictionForm(
+    form_get_cohort,
+    nodes_info_cohort_selection,
+    get_patterns_cohort,
+    show_patterns_cohort,
+    query_graph.graph, reactor);
 
-var cohort_result = d3.select("#cohort-result");
 // Append the svg canvas to the page
-var prediction_graph = new PredictionGraph(cohort_result, reactor);
+var prediction_graph = new PredictionGraph(
+    cohort_result,
+    reactor);
 
 },{"./config/config.js":1,"./external/d3.min.v4.js":2,"./external/reactor.js":5,"./query_system/query_form.js":8,"./query_system/query_graph.js":9,"./sankey_visualization/prediction_form.js":11,"./sankey_visualization/prediction_graph.js":12,"./util/util.js":13}],8:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
@@ -1633,59 +1659,99 @@ var d3 = require("../external/d3.min.v4.js"),
     json_config = require("../config/config.js"),
     Utils = require("../util/util.js");
 
-function PredictionForm(cohort_form, graph, reactor) {
-
+function PredictionForm(form_get_cohort,
+                        nodes_info_cohort_selection,
+                        get_patterns_cohort,
+                        show_patterns_cohort,
+                        graph,
+                        reactor) {
     // ** Config
     var thisForm = this;
     thisForm.graph = graph;
     thisForm.reactor = reactor;
     thisForm.config = json_config.QUERY_FORM;
 
-    var dataInput = cohort_form.append("form");
+    make_simple_form(thisForm,
+        form_get_cohort,
+        thisForm.config.visualizationOptions(),
+        get_outcome_cohort,
+        "query-cohort",
+        "Obtain new cohort");
 
-    //- builds form! -
-    dataInput .attr("id", "query-cohort");
+    make_simple_form(thisForm,
+        get_patterns_cohort,
+        thisForm.config.miningAlgorithms(),
+        get_patterns,
+        "get-patterns-cohort",
+        "Get patterns");
+}
+
+
+function make_simple_form(thisForm, form, options, submit_f, id_v, submit) {
+
+    var dataInput = form.append("form");
+
+    dataInput.attr("id", id_v);
+
+    var select_attr = dataInput.append("select")
+        .attr("id", "attr_name_" + id_v)
+        .attr("name", "attribute");
+
+    options.forEach(function (op) {
+        select_attr.append("option")
+            .attr("value", op.name)
+            .attr("type", op.type)
+            .text(op.display);
+    });
 
     dataInput.append("input")
         .classed("styled_form", true)
         .attr("type", "submit")
-        .attr("value", "Get Cohort");
+        .attr("value", submit);
 
-    $("#query-cohort").bind("submit", function (event) {
-
-        var posted_data = {
-            'nodes': JSON.stringify(thisForm.graph.nodes),
-            'edges': JSON.stringify(thisForm.graph.edges),
-            'outcomes': JSON.stringify(thisForm.graph.outcome_key_op_value),
-            'globals': JSON.stringify(thisForm.graph.global_key_op_value),
-            'matching': JSON.stringify(thisForm.graph.matching),
-            'datasets': JSON.stringify(thisForm.config.filename()),
-            'prediction_attr': JSON.stringify([]),
-            'future_nodes': JSON.stringify([]),
-            'begin_date': JSON.stringify([]),
-            'end_date': JSON.stringify([]),
-            'id': JSON.stringify(thisForm.config.id()),
-            'type': JSON.stringify("cohort")
-        };
-
-        console.log(posted_data);
-
-        Utils.toggleIfVisible("#expand-query-button", "#query-system");
-
-        $.ajax({
-            type: 'POST',
-            url: "http://localhost:5000/",
-            data: posted_data,
-            success: function (data) {
-                var graph = JSON.parse(data);
-                thisForm.reactor.dispatchEvent("query_successful", graph);
-            },
-            async: true
-        });
-
+    $("#" + id_v).bind("submit", function (event) {
+        submit_f(thisForm);
         event.preventDefault();
     });
 }
+
+function get_outcome_cohort(thisForm) {
+
+    var posted_data = {
+        'nodes': JSON.stringify(thisForm.graph.nodes),
+        'edges': JSON.stringify(thisForm.graph.edges),
+        'outcomes': JSON.stringify(thisForm.graph.outcome_key_op_value),
+        'globals': JSON.stringify(thisForm.graph.global_key_op_value),
+        'matching': JSON.stringify(thisForm.graph.matching),
+        'datasets': JSON.stringify(thisForm.config.filename()),
+        'prediction_attr': JSON.stringify([]),
+        'future_nodes': JSON.stringify([]),
+        'begin_date': JSON.stringify([]),
+        'end_date': JSON.stringify([]),
+        'id': JSON.stringify(thisForm.config.id()),
+        'type': JSON.stringify("cohort")
+    };
+
+    Utils.toggleIfVisible("#expand-query-button", "#query-system");
+
+    $.ajax({
+        type: 'POST',
+        url: "http://localhost:5000/",
+        data: posted_data,
+        success: function (data) {
+            var graph = JSON.parse(data);
+            thisForm.reactor.dispatchEvent("query_successful", graph);
+        },
+        async: true
+    });
+
+}
+
+function get_patterns(thisForm) {
+
+    // TO FILL
+}
+
 
 module.exports = PredictionForm;
 
@@ -1761,7 +1827,7 @@ PredictionGraph.prototype.updateResult = function (graph) {
             return Math.max(10, d.dy);
         })
         .sort(function (a, b) {
-            return b.dy - a.dy ;
+            return b.dy - a.dy;
         });
 
     // --- LINK TITLES ---
@@ -1772,11 +1838,11 @@ PredictionGraph.prototype.updateResult = function (graph) {
         });
 
     link.each(function (p) {
-         if (p.target.name == "None") {
-             d3.select(this)
-                 .attr("visibility", "hidden");
-         }
-     });
+        if (p.target.name == "None") {
+            d3.select(this)
+                .attr("visibility", "hidden");
+        }
+    });
 
 
     // --- NODES TITLES ---
@@ -1786,14 +1852,20 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .attr("class", "node")
         .attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
+        })
+        .on("start", function () {
+            this.parentNode.appendChild(this);
         });
-
     // --- NODE RECTANGLES ---
     node.append("rect")
         .attr("height", function (d) {
             return d.dy;
         })
         .attr("width", my_sankey.nodeWidth())
+        .on("mousedown", function (d) {
+            console.log(d);
+            console.log(this);
+        })
         .style("fill", function (d) {
             return d.color = color(d.name.replace(/ .*/, ""));
         })
@@ -1802,8 +1874,9 @@ PredictionGraph.prototype.updateResult = function (graph) {
         })
         .append("title")
         .text(function (d) {
-            return d.name + "\n" + format(d.value);
+            return d.name + "\n" + format(d.value) + "\n" + format(d.rr);
         });
+
 
     // add in the title for the nodes
     node.append("text")
@@ -1817,15 +1890,18 @@ PredictionGraph.prototype.updateResult = function (graph) {
         .text(function (d) {
             return d.name;
         })
+        .filter(function (d) {
+            return d.x < width / 2;
+        })
         .attr("x", 6 + my_sankey.nodeWidth())
         .attr("text-anchor", "start");
 
-     node.each(function (p) {
-         if (p.name == "None") {
-             d3.select(this)
-                 .attr("visibility", "hidden");
-         }
-     });
+    node.each(function (p) {
+        if (p.name == "None") {
+            d3.select(this)
+                .attr("visibility", "hidden");
+        }
+    });
 
 
 };

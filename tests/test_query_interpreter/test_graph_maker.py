@@ -72,7 +72,7 @@ class TestGraphMaker(unittest.TestCase):
         self.assertEqual(len(graph.nodes[1][2]), 1)
         print(">> backend.query_interpreter.graph_maker.creator - OK")
 
-        # Checks the accessors
+        # Checks the getters
         self.assertEqual(graph.get_node(0), nodes[0])
         self.assertEqual(graph.get_node(1), nodes[1])
         self.assertEqual(graph.get_edge(0, 1), edges[0])

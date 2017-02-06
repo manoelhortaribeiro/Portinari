@@ -109,13 +109,29 @@
 
     <!-- Navigation Contents -->
     <div class="tab-content">
-        <div id="vis-prog" class="tab-pane fade in active">
-            <div class="col-md-4">
-                <div id="cohort-edit">
-                    <div id="form-get-cohort" class="form"></div>
+        <div id="vis-prog" class="tab-pane fade in active cohort">
+            <div class="col-md-4" id="cohort-edit">
 
-
+                <h2>get cohort</h2>
+                <div id="form-get-cohort" class="form">
+                    <!-- gets the sankey diagram, possibly some visualization option -->
                 </div>
+
+                <h2>nodes info</h2>
+                <div id="nodes-info-cohort" class="form">
+                    <!-- show information about the selected nodes -->
+                </div>
+
+                <h2>mine patterns</h2>
+                <div id="get-patterns-cohort" class="form">
+                    <!-- presents option for mining patterns -->
+                </div>
+
+                <h2>show patterns</h2>
+                <div id="show-patterns-cohort" class="current">
+                    <!-- present mined patterns -->
+                </div>
+
             </div>
             <div class="col-md-8">
                 <div id="cohort-result"></div>

@@ -69,6 +69,15 @@ DBI.prototype.matching = function () {
     return this.conf_file['matching_options']
 };
 
+DBI.prototype.visualization = function () {
+    return this.conf_file['visualization_options']
+};
+
+DBI.prototype.mining_algorithms = function () {
+    return this.conf_file['mining_algorithms']
+};
+
+
 DBI.prototype.matchingDefault = function () {
     return this.matching_default;
 };
@@ -144,7 +153,6 @@ DBI.prototype.typeFormHandling = function (type_name, select_value, name, types)
     }
 };
 
-
 var databaseinfo = new DBI();
 
 module.exports = {
@@ -184,8 +192,10 @@ module.exports = {
 
     QUERY_FORM: {
         /*Stuff adjustable in the back end*/
-        filename: databaseinfo.getFilename.bind(databaseinfo),
         outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
+        visualizationOptions: databaseinfo.visualization.bind(databaseinfo),
+        miningAlgorithms: databaseinfo.mining_algorithms.bind(databaseinfo),
+        filename: databaseinfo.getFilename.bind(databaseinfo),
         id: databaseinfo.id.bind(databaseinfo)
     }
 };

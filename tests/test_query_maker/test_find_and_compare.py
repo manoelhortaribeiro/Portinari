@@ -2,6 +2,7 @@ import numpy as np
 import unittest
 import pandas
 
+
 def function(df):
     df['b'] **= 2
     return df
@@ -9,6 +10,7 @@ def function(df):
 
 # TODO: test_filter_local_attributes_unordered & integration
 class TestFindAndCompare(unittest.TestCase):
+
     def test_filter_data_id(self):
         from backend.query_maker.get_individuals import filter_data_id
 

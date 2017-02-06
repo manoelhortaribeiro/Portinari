@@ -1,5 +1,5 @@
 /* Fonts */
-$title-font:  "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+$title-font: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
 $primary-font: "Raleway", sans-serif;
 $secondary-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $p-font-size: 10px;
@@ -177,6 +177,36 @@ body {
     }
   }
 
+  .current {
+    min-height: $form-height;
+    background-color: $bg-color;
+    border: $light-border;
+    margin: $three-px;
+
+    ul {
+      list-style: none;
+      text-align: center;
+    }
+
+    li {
+      background-color: $secondary-color;
+      font-size: $li-font-size;
+      font-family: $primary-font;
+      display: inline-block;
+      border: $light-border;
+      color: $header-color;
+      max-width: $li-width;
+      padding: $li-margin;
+      margin: $li-padding;
+      text-align: center;
+
+    }
+
+    li:hover {
+      background-color: $node-color;
+    }
+
+  }
 }
 
 /* - Query Menu */
@@ -263,104 +293,45 @@ body {
 
     }
 
-    .current {
-      min-height: $form-height;
-      background-color: $bg-color;
-      border: $light-border;
-      margin: $three-px;
-
-      ul {
-        list-style: none;
-        text-align: center;
-      }
-
-      li {
-        background-color: $secondary-color;
-        font-size: $li-font-size;
-        font-family: $primary-font;
-        display: inline-block;
-        border: $light-border;
-        color: $header-color;
-        max-width: $li-width;
-        padding: $li-margin;
-        margin: $li-padding;
-        text-align: center;
-
-      }
-
-      li:hover {
-        background-color: $node-color;
-      }
-
-    }
-
   }
 
 }
 
 /* -- Sankey -- */
 
-.node rect {
-  cursor: move;
-  fill-opacity: .9;
-  shape-rendering: crispEdges;
+#cohort-result {
+
+  .node rect {
+    fill-opacity: .9;
+    shape-rendering: crispEdges;
+  }
+
+  .node text {
+    pointer-events: none;
+    text-shadow: 0 1px 0 #fff;
+  }
+
+  .link {
+    fill: none;
+    stroke: #000;
+    stroke-opacity: .2;
+  }
+
+  .link:hover {
+    stroke-opacity: .5;
+  }
 }
 
-.node text {
-  pointer-events: none;
-  text-shadow: 0 1px 0 #fff;
-}
+#cohort-edit {
+  height: 100%;
+  padding: 10px;
+  background-color: $secondary-color;
 
-.link {
-  fill: none;
-  stroke: #000;
-  stroke-opacity: .2;
-}
-
-.link:hover {
-  stroke-opacity: .5;
-}
-
-#cohort-menu {
-    height: 100%;
-    background-color: $secondary-color;
-
-    p {
-      line-height: $form-height;
-      text-align: center;
-      opacity: 0.5;
-
-    }
-
-    .current {
-      min-height: $form-height;
-      background-color: $bg-color;
-      border: $light-border;
-      margin: $three-px;
-
-      ul {
-        list-style: none;
-        text-align: center;
-      }
-
-      li {
-        background-color: $secondary-color;
-        font-size: $li-font-size;
-        font-family: $primary-font;
-        display: inline-block;
-        border: $light-border;
-        color: $header-color;
-        max-width: $li-width;
-        padding: $li-margin;
-        margin: $li-padding;
-        text-align: center;
-
-      }
-
-      li:hover {
-        background-color: $node-color;
-      }
-
-    }
+  p {
+    line-height: $form-height;
+    text-align: center;
+    opacity: 0.5;
 
   }
+
+}

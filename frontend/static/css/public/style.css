@@ -104,6 +104,27 @@ body {
       color: #6c5c70;
       text-align: center;
       border: solid lightgrey 1px; }
+  body .current {
+    min-height: 40px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: solid lightgrey 1px;
+    margin: 3px 3px 3px 3px; }
+    body .current ul {
+      list-style: none;
+      text-align: center; }
+    body .current li {
+      background-color: #e8f0ff;
+      font-size: 10px;
+      font-family: "Raleway", sans-serif;
+      display: inline-block;
+      border: solid lightgrey 1px;
+      color: #202020;
+      max-width: 250px;
+      padding: 7px;
+      margin: 10px;
+      text-align: center; }
+    body .current li:hover {
+      background-color: #2aabd2; }
 
 /* - Query Menu */
 #query-system {
@@ -153,73 +174,28 @@ body {
       line-height: 40px;
       text-align: center;
       opacity: 0.5; }
-    #query-system #forms-menu .current {
-      min-height: 40px;
-      background-color: rgba(255, 255, 255, 0.9);
-      border: solid lightgrey 1px;
-      margin: 3px 3px 3px 3px; }
-      #query-system #forms-menu .current ul {
-        list-style: none;
-        text-align: center; }
-      #query-system #forms-menu .current li {
-        background-color: #e8f0ff;
-        font-size: 10px;
-        font-family: "Raleway", sans-serif;
-        display: inline-block;
-        border: solid lightgrey 1px;
-        color: #202020;
-        max-width: 250px;
-        padding: 7px;
-        margin: 10px;
-        text-align: center; }
-      #query-system #forms-menu .current li:hover {
-        background-color: #2aabd2; }
 
 /* -- Sankey -- */
-.node rect {
-  cursor: move;
+#cohort-result .node rect {
   fill-opacity: .9;
   shape-rendering: crispEdges; }
-
-.node text {
+#cohort-result .node text {
   pointer-events: none;
   text-shadow: 0 1px 0 #fff; }
-
-.link {
+#cohort-result .link {
   fill: none;
   stroke: #000;
   stroke-opacity: .2; }
-
-.link:hover {
+#cohort-result .link:hover {
   stroke-opacity: .5; }
 
-#cohort-menu {
+#cohort-edit {
   height: 100%;
+  padding: 10px;
   background-color: #e8f0ff; }
-  #cohort-menu p {
+  #cohort-edit p {
     line-height: 40px;
     text-align: center;
     opacity: 0.5; }
-  #cohort-menu .current {
-    min-height: 40px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border: solid lightgrey 1px;
-    margin: 3px 3px 3px 3px; }
-    #cohort-menu .current ul {
-      list-style: none;
-      text-align: center; }
-    #cohort-menu .current li {
-      background-color: #e8f0ff;
-      font-size: 10px;
-      font-family: "Raleway", sans-serif;
-      display: inline-block;
-      border: solid lightgrey 1px;
-      color: #202020;
-      max-width: 250px;
-      padding: 7px;
-      margin: 10px;
-      text-align: center; }
-    #cohort-menu .current li:hover {
-      background-color: #2aabd2; }
 
 /*# sourceMappingURL=style.css.map */
