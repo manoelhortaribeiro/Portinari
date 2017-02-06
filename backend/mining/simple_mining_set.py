@@ -24,11 +24,9 @@ class SimpleMiningSet:
          {"Attr0":
             {"Detailed Attr0":
                     {"possibleValue0":"Detailed possibleValue0", 
-                     "possibleValue1":"Detailed possibleValue1"
-                    }
+                     "possibleValue1":"Detailed possibleValue1"}
             }
         }
-
 
         :param src: src can be either a pandas dataframe or a the path to a csv file.
         :param description: dictionary providing information for each attribute, such as {Attr1: {"Detailed name":}}
@@ -36,12 +34,68 @@ class SimpleMiningSet:
 
         self.description = description
 
-        if type(src) is str:
-            self.data = pandas.read_csv(src, n)
-        elif type(src) is pandas.DataFrame:
+        if type(src) is pandas.DataFrame:
             self.data = src
         else:
-            raise ValueError('src should be of type str or pandas.DataFrame')
+            raise ValueError('src should be of type pandas.DataFrame')
+
+    def calculate_measures(self, pattern):
+        """
+        Calculates support as "sup".
+        Get the values of a certain column.
+        :param pattern: pattern to be used.
+        :return: nothing.
+        """
+        pattern.add("sup", self._get_sup(pattern))
+
+
+    def get_values_column(self, name):
+        """
+        Get the values of a certain column.
+        :param name: name of the column.
+        :return: values.
+        """
+        return self.data[name]
+
+    def _get_sup(self, pattern, comparator="=="):
+        """
+        Gets the support of the instances which are == or != to the pattern
+
+        :param pattern: pattern to be matched.
+        :param comparator: "==" or "!=".
+        :return: (support of positive instances, support of negative instances)
+        """
+
+        query_in = ""
+        if comparator == "==":
+            linker = "&"
+        elif comparator == "!=":
+            linker = "|"
+        else:
+            raise ValueError("comparator should be either '!=' or '=='")
+
+        for a, v in zip(pattern.attributes, pattern.values):
+            query_in += str(a) + comparator + str(v) + linker
+        query_in = query_in[:-1]
+
+        sup = len(self.data.query(query_in))
+
+        return sup
+
+    def columns(self):
+        """
+        This method returns the columns of the dataframe.
+        :return: This method returns the columns of the dataframe.
+        """
+        return self.data.columns.values.tolist()
+
+    def attributes(self):
+        """
+        This method returns the array of the attributes as a numpy array.
+        :return: Array of predictors as numpy array.
+        """
+        return self.data[self.columns()].values
+
 
     # def _get_sup(self, pattern, comparator="=="):
     #     """

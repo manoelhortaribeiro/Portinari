@@ -38,6 +38,7 @@ function make_simple_form(thisForm, form, options, submit_f, id_v, submit) {
     dataInput.attr("id", id_v);
 
     var select_attr = dataInput.append("select")
+        .classed("styled_form", true)
         .attr("id", "attr_name_" + id_v)
         .attr("name", "attribute");
 
