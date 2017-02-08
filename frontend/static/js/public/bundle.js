@@ -725,8 +725,8 @@ var query_form = new QueryForm(
 
 /* ---Internal Query System Events--- */
 reactor.registerEvent('query_successful');
-reactor.registerEvent('cohort_sankey_selected');
-reactor.registerEvent('cohort_sankey_unselected');
+reactor.registerEvent('cohort_node_selected');
+reactor.registerEvent('cohort_node_unselected');
 /* ---------------------------------- */
 
 // Creates needed selections
@@ -1792,6 +1792,7 @@ PredictionGraph.prototype.updateResult = function (graph) {
     var units = "individuals";
 
     var formatNumber = d3.format(",.0f"),    // zero decimal places
+        formatRR = d3.format(",.2f"),
         format = function (d) {
             return formatNumber(d) + " " + units;
         };
@@ -1864,8 +1865,23 @@ PredictionGraph.prototype.updateResult = function (graph) {
         })
         .attr("width", my_sankey.nodeWidth())
         .on("mousedown", function (d) {
-            console.log(d);
-            console.log(this);
+            if (d.hasOwnProperty("selected") && d.selected == true) {
+
+                d3.select(this).style("fill", function (d) {
+                    thisResult.reactor.dispatchEvent("cohort_node_unselected", d);
+                    return d.color;
+
+                });
+                d.selected = false;
+
+            }
+            else {
+                d3.select(this).style("fill", function (d) {
+                    thisResult.reactor.dispatchEvent("cohort_node_selected", d);
+                    return d3.rgb(d.color).darker(1);
+                });
+                d.selected = true;
+            }
         })
         .style("fill", function (d) {
             return d.color = color(d.name.replace(/ .*/, ""));
@@ -1875,9 +1891,8 @@ PredictionGraph.prototype.updateResult = function (graph) {
         })
         .append("title")
         .text(function (d) {
-            return d.name + "\n" + format(d.value) + "\n" + format(d.rr);
+            return d.name + "\n" + format(d.value) + "\n" + "Relative Risk: " + formatRR(d.rr);
         });
-
 
     // add in the title for the nodes
     node.append("text")

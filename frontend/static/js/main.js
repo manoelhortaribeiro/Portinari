@@ -70,8 +70,8 @@ var query_form = new QueryForm(
 
 /* ---Internal Query System Events--- */
 reactor.registerEvent('query_successful');
-reactor.registerEvent('cohort_sankey_selected');
-reactor.registerEvent('cohort_sankey_unselected');
+reactor.registerEvent('cohort_node_selected');
+reactor.registerEvent('cohort_node_unselected');
 /* ---------------------------------- */
 
 // Creates needed selections
