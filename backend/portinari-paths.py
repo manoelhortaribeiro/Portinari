@@ -6,7 +6,7 @@
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 
-from backend.utils.io_handling import Dataset, reads_params, get_config, read_config
+from backend.utils.io_handling import Dataset, reads_params, get_config, read_config, read_cohort_nodes
 from backend.query_maker.get_individuals import get_individuals, get_rr
 from backend.visualization_maker.make_sankey import new_sankey
 from backend.query_interpreter.graph_maker import Graph
@@ -69,6 +69,14 @@ def config():
     if DEBUG_CONFIG:
         print(param)
     return cf
+
+
+@app.route('/minecohort/', methods=['POST'])
+@cross_origin()
+def mine():
+    node = read_cohort_nodes(request)
+    print(node)
+    return "asdasd"
 
 if __name__ == "__main__":
     app.run()

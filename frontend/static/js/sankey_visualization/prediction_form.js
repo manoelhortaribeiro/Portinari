@@ -12,8 +12,11 @@ function PredictionForm(form_get_cohort,
     // ** Config
     var thisForm = this;
     thisForm.graph = graph;
+    thisForm.nodes = {};
     thisForm.reactor = reactor;
     thisForm.config = json_config.QUERY_FORM;
+
+    thisForm.node_info_cohort_selection = nodes_info_cohort_selection;
 
     make_simple_form(thisForm,
         form_get_cohort,
@@ -28,7 +31,52 @@ function PredictionForm(form_get_cohort,
         get_patterns,
         "get-patterns-cohort",
         "Get patterns");
+
+    thisForm.reactor.addEventListener('cohort_node_selected', thisForm.addNodes.bind(this));
+    thisForm.reactor.addEventListener('cohort_node_unselected', thisForm.removeNodes.bind(this));
 }
+
+PredictionForm.prototype.addNodes = function (d) {
+    var thisForm = this;
+    thisForm.nodes[d.identifier] = d;
+    console.log(thisForm.nodes);
+    thisForm.updateNodesInfo();
+};
+
+
+PredictionForm.prototype.removeNodes = function (d) {
+    var thisForm = this;
+    delete thisForm.nodes[d.identifier];
+    console.log(thisForm.nodes);
+    thisForm.updateNodesInfo();
+};
+
+PredictionForm.prototype.updateNodesInfo = function () {
+    var thisForm = this;
+    var formatRR = d3.format(",.2f");
+    var format = d3.format(",.0f");
+
+
+    var values = $.map(thisForm.nodes, function (value, key) {
+        return value
+    });
+
+    console.log(values);
+
+    var list = thisForm.node_info_cohort_selection.select("ul");
+
+    list.selectAll("li").remove();
+
+    list.selectAll("li")
+        .data(values)
+        .enter()
+        .append("li")
+        .text(function (d) {
+            console.log(d);
+            console.log(this);
+            return d.name + " - Entities: " + format(d.value) + " - Relative Risk: " + formatRR(d.rr);
+        });
+};
 
 
 function make_simple_form(thisForm, form, options, submit_f, id_v, submit) {
@@ -94,8 +142,26 @@ function get_outcome_cohort(thisForm) {
 
 function get_patterns(thisForm) {
 
-    // TO FILL
-}
+    var keys = $.map(thisForm.nodes, function (value, key) {
+        return key
+    });
 
+
+    var posted_data = {
+        'nodes': JSON.stringify(keys)
+    };
+
+
+    $.ajax({
+        type: 'POST',
+        url: "http://localhost:5000/minecohort/",
+        data: posted_data,
+        success: function (data) {
+            console.log("data");
+        },
+        async: true
+    });
+
+}
 
 module.exports = PredictionForm;

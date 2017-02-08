@@ -83,6 +83,11 @@ def read_config(request):
     return request.form['name']
 
 
+def read_cohort_nodes(request):
+
+    return json.loads(request.form["nodes"])
+
+
 def get_config(param):
     """ This function loads the config and returns it, so it is loaded by the front-end
     :param param: config name.

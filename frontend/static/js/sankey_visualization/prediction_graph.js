@@ -22,9 +22,15 @@ function PredictionGraph(svg, reactor) {
     thisResult.start = 0;
     thisResult.queryNumber = 1;
 
+    thisResult.nodes = {};
+
     thisResult.reactor = reactor;
     thisResult.reactor.addEventListener('query_successful', thisResult.updateResult.bind(this));
+
 }
+
+
+
 
 PredictionGraph.prototype.updateResult = function (graph) {
 
@@ -50,7 +56,7 @@ PredictionGraph.prototype.updateResult = function (graph) {
 
     // Makes Sankey Diagram
     var my_sankey = d3.sankey()
-        .nodeWidth(35)
+        .nodeWidth(25)
         .nodePadding(10)
         .size([width, height]);
 
@@ -123,6 +129,7 @@ PredictionGraph.prototype.updateResult = function (graph) {
                 });
                 d.selected = true;
             }
+
         })
         .style("fill", function (d) {
             return d.color = color(d.name.replace(/ .*/, ""));
