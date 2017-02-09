@@ -120,20 +120,6 @@ def genmax(dataset, min_support, verbose=False):
         # Prune n-Pattern set
         n_pattern_set = prune(tmp, n_pattern_set, min_support)
 
-        # Calculates risk pattern set
-        for pattern in n_pattern_set:
-            if pattern.get("relative_risk") >= min_relative_risk:
-                flag = True
-                for risk_pattern in risk_pattern_set:
-                    #print(pattern, risk_pattern, risk_pattern.is_sub_pattern(pattern),
-                     #     risk_pattern.other['relative_risk'] >= pattern.other['relative_risk'])
-
-                    if risk_pattern.is_sub_pattern(pattern) and \
-                       risk_pattern.other['relative_risk'] >= pattern.other['relative_risk']:
-                        flag = False
-
-                if flag:
-                    risk_pattern_set.append(pattern)
 
         if verbose:
             print("n-Pattern set:      ", n_pattern_set)

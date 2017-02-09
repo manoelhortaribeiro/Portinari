@@ -241,7 +241,6 @@ _df = _df.fillna(_config_importer["nan"])
 
 init_config_backend(_name, _path_config)
 
-exit()
 # global import var
 get_global_import_var(_config_importer, _df)
 

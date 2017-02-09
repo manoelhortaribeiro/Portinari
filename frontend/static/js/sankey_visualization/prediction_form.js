@@ -13,10 +13,12 @@ function PredictionForm(form_get_cohort,
     var thisForm = this;
     thisForm.graph = graph;
     thisForm.nodes = {};
+    thisForm.patterns = [];
     thisForm.reactor = reactor;
     thisForm.config = json_config.QUERY_FORM;
 
     thisForm.node_info_cohort_selection = nodes_info_cohort_selection;
+    thisForm.show_patterns_cohort = show_patterns_cohort;
 
     make_simple_form(thisForm,
         form_get_cohort,
@@ -74,8 +76,26 @@ PredictionForm.prototype.updateNodesInfo = function () {
         .text(function (d) {
             console.log(d);
             console.log(this);
-            return d.name + " - Entities: " + format(d.value) + " - Relative Risk: " + formatRR(d.rr);
+            return d.name + " - E: " + format(d.value) + " - RR: " + formatRR(d.rr);
         });
+};
+
+PredictionForm.prototype.updatePatternsDesc = function () {
+    var thisForm = this;
+
+    var list = thisForm.show_patterns_cohort.select("ul");
+
+    list.selectAll("li").remove();
+
+        list.selectAll("li")
+            .data(thisForm.patterns)
+            .enter()
+            .append("li")
+            .text(function (d) {
+                console.log(d);
+                console.log(this);
+                return d;
+            });
 };
 
 
@@ -134,6 +154,8 @@ function get_outcome_cohort(thisForm) {
         success: function (data) {
             var graph = JSON.parse(data);
             thisForm.reactor.dispatchEvent("query_successful", graph);
+            thisForm.nodes = {};
+            thisForm.updateNodesInfo();
         },
         async: true
     });
@@ -157,7 +179,10 @@ function get_patterns(thisForm) {
         url: "http://localhost:5000/minecohort/",
         data: posted_data,
         success: function (data) {
-            console.log("data");
+            thisForm.patterns = JSON.parse(data);
+            console.log(thisForm.patterns);
+            thisForm.updatePatternsDesc();
+
         },
         async: true
     });

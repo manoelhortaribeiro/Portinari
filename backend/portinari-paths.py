@@ -13,7 +13,7 @@ from backend.query_interpreter.graph_maker import Graph
 from flask_cors import cross_origin
 from flask import Flask, request
 app = Flask(__name__)
-
+import json
 # STARTS A DATASET SINGLETON
 dataset = Dataset()
 
@@ -41,6 +41,7 @@ def index():
         print("Edges:", edges)
         print("dataset:", ds)
         print("type:", typ)
+        print("------------------------------------")
 
     # Gets dataset
     dataset.get_instance(ds)
@@ -51,6 +52,9 @@ def index():
 
     # Gets individual
     individuals = get_individuals(dataset, glob_att, matching, typ, graph, paths)
+
+    for key, item in individuals.items():
+        print(len(item))
 
     # Gets Relative Risk
     rr = get_rr(dataset.event_data, individuals, dataset.config, outcomes)
@@ -76,7 +80,7 @@ def config():
 def mine():
     node = read_cohort_nodes(request)
     print(node)
-    return "asdasd"
+    return json.dumps(["asd", "bcd", "efg"])
 
 if __name__ == "__main__":
     app.run()

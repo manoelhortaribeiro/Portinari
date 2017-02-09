@@ -60,8 +60,10 @@ def get_rr(events, individuals, config, outcomes):
         exposed_true =filter_attributes(exposed, outcomes, config, flag=False)
         not_exposed_true =filter_attributes(not_exposed, outcomes, config, flag=False)
 
-        rr[key] = (len(exposed_true)/len(exposed))/(len(not_exposed_true)/len(not_exposed))
-
+        try:
+            rr[key] = (len(exposed_true)/len(exposed))/(len(not_exposed_true)/len(not_exposed))
+        except ZeroDivisionError:
+            rr[key] = -1
     return rr
 
 # ---- Helpers ----
@@ -126,6 +128,9 @@ def check_time(t_time, t_hop, acc_hop, acc_tim):
     :param acc_hop: current number of hops.
     :param acc_tim: current number of time passed.
     :return: True of False. """
+    #print("--")
+    #print(t_time, acc_tim, t_time[0][0] < acc_tim < t_time[0][1])
+    #print(t_hop, acc_hop, t_hop[0][0] < acc_hop < t_time[0][1])
     return (t_time[0][0] < acc_tim < t_time[0][1]) and (t_hop[0][0] < acc_hop < t_hop[0][1])
 
 
@@ -261,6 +266,7 @@ def filter_local_attributes_ordered(data, graph, paths, config, matching):
         if DEBUG_QUERY_MATCHING:
             print(t_time, t_hop)
 
+        print(t_time, t_hop)
         # gets all matching values
         f = functools.partial(rec_match, pt_nd=path_nodes, t_tim=t_time, t_hop=t_hop, config=config, flg=matching)
 
@@ -273,11 +279,12 @@ def filter_local_attributes_ordered(data, graph, paths, config, matching):
         path_r.reverse()
         acc = None
 
-        print(path, path_r)
+        print("PATHS: ", path, path_r)
 
         for idx, n in enumerate(path_r):
             to_app = result[result["Position"] == len(path) - idx]["IDX"]
-
+            print("----")
+            print(idx, len(to_app))
             if acc is None:
                 acc = to_app
             else:
@@ -290,11 +297,13 @@ def filter_local_attributes_ordered(data, graph, paths, config, matching):
             else:
                 entity_matching[n] = acc
 
+        print("-----------")
+
     return entity_matching
 
 
 def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=True,
-              flg="first_event", acc_hop=0, acc_tim=0):
+              flg="first_event", acc_hop=1, acc_tim=0):
 
     if DEBUG_QUERY_MATCHING:
         if first:
@@ -305,6 +314,7 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=Tr
         print(pt_nd)
         print(t_tim)
         print(t_hop)
+        print("-- p: ", p)
 
     if first:
         pid = x.head(1)[config["id_attribute"]["name"]].values[0]
@@ -355,8 +365,6 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=Tr
         else:
             tmp = np.array([tmp[0]])
 
-    # it matches!
-    p += 1
 
     if DEBUG_QUERY_MATCHING:
         print("case 4: false")
@@ -397,12 +405,16 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=Tr
             df = rec_match(x.ix[n_idx],
                            pt_nd[1:],
                            t_tim[int(not first):], t_hop[int(not first):],
-                           config, p=p, first=False, flg=flg,
+                           config, p=p+1, first=False, flg=flg,
                            acc_hop=acc_hop + mod_hop,
                            acc_tim=acc_tim + mod_tim,
                            idval=idval, pid=pid)
-            if df.iloc[0]["Position"] == p + len(pt_nd[1:]):
+            if DEBUG_QUERY_MATCHING:
+                print("RETURN, TESTING:", df.iloc[0]["Position"], p + len(pt_nd[1:]) + 1)
+            if df.iloc[0]["Position"] == p + len(pt_nd[1:]) + 1:
                 return df
+    if DEBUG_QUERY_MATCHING:
+        print("case 5: false, matching is completed", p)
 
     return to_df(p, idval, pid=pid)
 
@@ -427,6 +439,5 @@ def get_individuals(dataset, global_attr, matching, typ, graph, paths):
     # Filter non-indexed ordered attributes
     entity_matching = filter_local_attributes_ordered(dataframe_ev, graph, paths, dataset.config, matching)
 
-    print(entity_matching)
 
     return entity_matching
