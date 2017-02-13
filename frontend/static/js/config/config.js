@@ -1,15 +1,18 @@
-var $ = require("../external/jquery.min.js"),
+var pace = require("../external/pace.js"),
+    $ = require("../external/jquery.min.js"),
     d3 = require("../external/d3.min.v4.js");
-require("../external/date.js");
+    require("../external/date.js");
+
+
+pace.start({elements: {
+    selectors: ['.active']
+  }});
+
 
 function DBI() {
     var thisDatabaseInfo = this;
     thisDatabaseInfo.filename = "base";
     thisDatabaseInfo.conf_file = null;
-    thisDatabaseInfo.getDataSet();
-    thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
-    thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
-    thisDatabaseInfo.getDataSet();
 }
 
 DBI.prototype.getFilename = function () {
@@ -19,11 +22,10 @@ DBI.prototype.getFilename = function () {
 DBI.prototype.changeDataSet = function (new_name) {
     var thisDatabaseInfo = this;
     console.log(thisDatabaseInfo.conf_file);
-    thisDatabaseInfo.filename = new_name;
     thisDatabaseInfo.getDataSet();
 };
 
-DBI.prototype.getDataSet = function () {
+DBI.prototype.getDataSet = function (callback, flg) {
     var thisDatabaseInfo = this;
     var request = {'name': thisDatabaseInfo.filename};
     $.ajax({
@@ -31,9 +33,26 @@ DBI.prototype.getDataSet = function () {
         url: "http://localhost:5000/config/",
         data: request,
         success: function (data) {
-            thisDatabaseInfo.conf_file = JSON.parse(data);
+            if (flg == undefined) {
+                thisDatabaseInfo.conf_file = JSON.parse(data);
+                thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
+                thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
+                thisDatabaseInfo.getDataSet(callback, true);
+                pace.stop();
+
+            }
+            else {
+                thisDatabaseInfo.conf_file = JSON.parse(data);
+                pace.stop();
+                callback();
+
+            }
+
         },
-        async: false
+        error:  function() {
+            thisDatabaseInfo.getDataSet(callback, flg);
+        },
+        async: true
     });
 };
 
@@ -77,11 +96,9 @@ DBI.prototype.mining_algorithms = function () {
     return this.conf_file['mining_algorithms']
 };
 
-
 DBI.prototype.matchingDefault = function () {
     return this.matching_default;
 };
-
 
 DBI.prototype.typeValueHandling = function (type_name, name, sel) {
     var data = $("#new_" + name).serializeArray();
@@ -156,6 +173,8 @@ DBI.prototype.typeFormHandling = function (type_name, select_value, name, types)
 var databaseinfo = new DBI();
 
 module.exports = {
+
+    getDataSet: databaseinfo.getDataSet.bind(databaseinfo),
 
     QUERY_SYSTEM: {
         /*Stuff adjustable in the front end*/

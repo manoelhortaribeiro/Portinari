@@ -8,18 +8,30 @@
     <meta name="author" content="Manoel Horta Ribeiro">
     <script src="../static/js/external/jquery.min.js"></script>
     <script src="../static/js/external/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../static/css/external/pace-theme-corner-indicator.tmpl.css">
 
     <link rel="stylesheet" type="text/css" href="../static/css/external/normalize.css">
     <link rel="stylesheet" type="text/css" href="../static/css/external/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../static/css/external/bootstrap-theme.min.css">
     <link rel="stylesheet" type="text/css" href="../static/css/public/style.css">
+
+<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
+<link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
+
 </head>
 
 <body>
-<div class="container-fluid">
+
+<div id="loader_d">
+    <h1><img src="../static/imgs/portinari.png" alt="logo"/> portinari
+        <div id="loader"></div>
+    </h1>
+
+</div>
+
+<div class="container-fluid" id="content_d">
 
     <!-- Title -->
-    <h1><img src="../static/imgs/portinari.png" alt="logo"/> portinari</h1>
 
     <!--------------------->
     <!-- UPPER INTERFACE -->
@@ -150,6 +162,7 @@
     <!-- TODO: Footer -->
 
     <!-- Where magic happens! -->
+
     <script src="../static/js/public/bundle.js"></script>
 </div>
 </body>

@@ -33,6 +33,29 @@ $three-px: 3px 3px 3px 3px;
 
 /* -- General Website -- */
 
+/* Center the loader */
+
+#loader_d {
+  position: absolute;
+  display: block;
+  left: 30%;
+  top: 30%;
+}
+
+#content_d {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+html, body {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+
+
 body {
   font-family: $primary-font;
   margin: 0;
