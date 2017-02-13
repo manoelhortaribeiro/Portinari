@@ -48,7 +48,6 @@ class SimpleMiningSet:
         """
         pattern.add("sup", self._get_sup(pattern))
 
-
     def get_values_column(self, name):
         """
         Get the values of a certain column.

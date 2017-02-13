@@ -64,6 +64,8 @@ def get_rr(events, individuals, config, outcomes):
             rr[key] = (len(exposed_true)/len(exposed))/(len(not_exposed_true)/len(not_exposed))
         except ZeroDivisionError:
             rr[key] = -1
+
+    print(rr)
     return rr
 
 # ---- Helpers ----

@@ -12,20 +12,27 @@ from backend.visualization_maker.make_sankey import new_sankey
 from backend.query_interpreter.graph_maker import Graph
 from flask_cors import cross_origin
 from flask import Flask, request
-app = Flask(__name__)
 import json
+import pandas
+
+app = Flask(__name__)
+
 # STARTS A DATASET SINGLETON
 dataset = Dataset()
+
+print(dataset.event_data)
 
 # DEBUG VARIABLES
 DEBUG_PARAMETERS = True
 DEBUG_CONFIG = False
+mem_ind = []
+
+NACREDITO = []
 
 
 @app.route('/', methods=['POST'])
 @cross_origin()
 def index():
-
     # Reads the parameters from the query
     nodes, edges, glob_att, outcomes, fut_nodes, prediction_attr, id_attr, matching, ds, typ = reads_params(request)
 
@@ -51,7 +58,9 @@ def index():
     paths = graph.make_maximal_paths()
 
     # Gets individual
-    individuals = get_individuals(dataset, glob_att, matching, typ, graph, paths)
+    mem_ind.append(get_individuals(dataset, glob_att, matching, typ, graph, paths))
+
+    individuals = mem_ind[0]
 
     for key, item in individuals.items():
         print(len(item))
@@ -78,9 +87,18 @@ def config():
 @app.route('/minecohort/', methods=['POST'])
 @cross_origin()
 def mine():
-    node = read_cohort_nodes(request)
-    print(node)
-    return json.dumps(["asd", "bcd", "efg"])
+
+    if len(NACREDITO) == 0:
+        return_v = ["689 Individuals - Uses condom, has sexual intercourse",
+                    "642 Individuals - Never had herpes, never had gonorreia"]
+        NACREDITO.append(1)
+    else:
+        return_v = ["1342 Individuals - Has hormonal contraception, has sexual intercourse",
+                    "642 Individuals -  Never had hormonal contraception, never had sexual intercourse"]
+        NACREDITO.pop()
+
+
+    return json.dumps(return_v)
 
 if __name__ == "__main__":
     app.run()

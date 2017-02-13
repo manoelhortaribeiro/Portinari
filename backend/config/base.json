@@ -1,1 +1,42 @@
-{"default_matching": "first_occurence", "time_max": 10000000, "event_max": 50, "time_min": 0, "mining_algorithms": [{"name": "charm", "display": "CHARM"}], "nan": -999999999, "default_dataset": "mixed_sample", "no_indexed_event": 99, "event_min": 0, "visualization_options": [{"name": "linear", "display": "Linear Edges"}], "datasets": [{"name": "surveyboth", "display": "surveyboth"}, {"name": "mixed_sample", "display": "mixed_sample"}], "matching_options": [{"name": "first_occurence", "display": "First Occurence"}, {"name": "first_event", "display": "First Event"}]}
+{
+  "default_matching": "first_occurence",
+  "time_max": 10000000,
+  "event_max": 50,
+  "time_min": 0,
+  "mining_algorithms": [
+    {
+      "name": "charm",
+      "display": "genmax"
+    }
+  ],
+  "nan": -999999999,
+  "default_dataset": "surveyboth",
+  "no_indexed_event": 99,
+  "event_min": 0,
+  "visualization_options": [
+    {
+      "name": "linear",
+      "display": "Linear Edges"
+    }
+  ],
+  "datasets": [
+    {
+      "name": "surveyboth",
+      "display": "surveyboth"
+    },
+    {
+      "name": "surveyboth",
+      "display": "surveyboth"
+    }
+  ],
+  "matching_options": [
+    {
+      "name": "first_occurence",
+      "display": "First Occurence"
+    },
+    {
+      "name": "first_event",
+      "display": "First Event"
+    }
+  ]
+}

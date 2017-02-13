@@ -275,6 +275,8 @@ def make_tables(df, config):
                                   age=config["age"],
                                   sincelast=config["sincelast"]), axis=1)
 
+    df_entity = df_entity.drop_duplicates()
+
     return df_entity, df_events
 
 

@@ -45,9 +45,11 @@ class Dataset:
         param_config = json.loads(open("./config/" + param + ".json", "r").read())
         self.config = {key: value for (key, value) in (list(base.items()) + list(param_config.items()))}
 
+        print(self.config["event_table_name"])
         # READS EVENT DATA
         self.event_data = pickle.load(open(self.config["event_table_name"], "rb"))
 
+        print(self.config["individuals_table_name"])
         # READS ENTITY DATA
         self.entity_data = pickle.load(open(self.config["individuals_table_name"], "rb"))
 
