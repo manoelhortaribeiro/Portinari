@@ -104,8 +104,8 @@ function buildPortinari() {
         cohort_result,
         reactor);
 
-
-    setTimeout(Utils.makeVisible("#loader_d", "#content_d"), 3000);
+    Utils.makeVisible("#loader_d", "#content_d");
+    //Utils.makeVisible("#loader_d", "#content_d")
 
 }
 

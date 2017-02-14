@@ -2,12 +2,10 @@
 var pace = require("../external/pace.js"),
     $ = require("../external/jquery.min.js"),
     d3 = require("../external/d3.min.v4.js");
-    require("../external/date.js");
+require("../external/date.js");
 
 
-pace.start({elements: {
-    selectors: ['.active']
-  }});
+pace.start();
 
 
 function DBI() {
@@ -29,32 +27,32 @@ DBI.prototype.changeDataSet = function (new_name) {
 DBI.prototype.getDataSet = function (callback, flg) {
     var thisDatabaseInfo = this;
     var request = {'name': thisDatabaseInfo.filename};
-    $.ajax({
+    pace.track(function(){$.ajax({
         type: 'POST',
         url: "http://localhost:5000/config/",
         data: request,
         success: function (data) {
+
             if (flg == undefined) {
                 thisDatabaseInfo.conf_file = JSON.parse(data);
                 thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
                 thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
                 thisDatabaseInfo.getDataSet(callback, true);
-                pace.stop();
 
             }
             else {
+
                 thisDatabaseInfo.conf_file = JSON.parse(data);
-                pace.stop();
                 callback();
 
             }
 
         },
-        error:  function() {
+        error: function () {
             thisDatabaseInfo.getDataSet(callback, flg);
         },
         async: true
-    });
+    })});
 };
 
 DBI.prototype.outcome_attributes = function () {
@@ -781,8 +779,8 @@ function buildPortinari() {
         cohort_result,
         reactor);
 
-
-    setTimeout(Utils.makeVisible("#loader_d", "#content_d"), 3000);
+    Utils.makeVisible("#loader_d", "#content_d");
+    //Utils.makeVisible("#loader_d", "#content_d")
 
 }
 
