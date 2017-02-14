@@ -260,6 +260,7 @@ def make_numeric(df):
         df[col] = pandas.to_numeric(df[col])
     return df
 
+
 def make_tables(df, config):
     df_entity = df.drop(drop_cols(config["default"],
                                   "entity",
@@ -314,8 +315,13 @@ def make_all(config):
     # make tables
     df_entity, df_event = make_tables(df=df, config=config)
 
+    # increases index
+    df_entity.index += 1
+    df_event.index += 1
+
     # dumps pickle object
     filename, file_ext = os.path.splitext(raw_dir + name)
+
     pickle.dump(df_entity, open(filename + "_entity", "wb"))
     pickle.dump(df_event, open(filename + "_event", "wb"))
 

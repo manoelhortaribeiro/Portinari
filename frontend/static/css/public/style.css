@@ -20,8 +20,7 @@
 html, body {
   position: relative;
   height: 100%;
-  width: 100%;
-  overflow: hidden; }
+  width: 100%; }
 
 body {
   font-family: "Raleway", sans-serif;

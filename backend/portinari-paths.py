@@ -20,7 +20,6 @@ app = Flask(__name__)
 # STARTS A DATASET SINGLETON
 dataset = Dataset()
 
-print(dataset.event_data)
 
 # DEBUG VARIABLES
 DEBUG_PARAMETERS = True
@@ -50,6 +49,9 @@ def index():
         print("type:", typ)
         print("------------------------------------")
 
+    import time
+    time_v = time.time()
+
     # Gets dataset
     dataset.get_instance(ds)
 
@@ -70,6 +72,11 @@ def index():
 
     # Sankey
     response = new_sankey(individuals, graph, paths, dataset.config, rr)
+
+    from backend.query_maker.get_individuals import get_global,reset_global
+
+    print(get_global(), time.time() - time_v, get_global()/(time.time() - time_v))
+    reset_global()
 
     return response
 
@@ -96,7 +103,6 @@ def mine():
         return_v = ["1342 Individuals - Has hormonal contraception, has sexual intercourse",
                     "642 Individuals -  Never had hormonal contraception, never had sexual intercourse"]
         NACREDITO.pop()
-
 
     return json.dumps(return_v)
 

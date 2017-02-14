@@ -4,16 +4,16 @@
 #                                     # | AUTHOR: MANOEL HORTA RIBEIRO | #                                             #
 #                                     # \ ---------------------------- / #                                             #
 #                                                                                                                      #
-# This file the function ´get_individuals´, which interprets the query made by the interface and returns all of the    #
+# This file has the func. ´get_individuals´, which interprets the query made by the interface and returns all of the   #
 # individuals who match the query made.                                                                                #
 #                                                                                                                      #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 #                                                                                                                      #
 #                                           /=========================\                                                #
 #                                           ||||||get_individuals||||||                                                #
-#                                           \=========================/                                                #
-#                       /                                |                              \                              #
-#                      /                                 |                               \                             #
+#                        ___________________\=========================/___________________                             #
+#                       /                                |                                \                            #
+#                      /                                 |                                 \                           #
 #         /-----------------\         /---------------------------------\        /-------------------------------\     #
 #         |filter_attributes|         |filter_local_attributes_unordered|        |filter_local_attributes_ordered|     #
 #         \-----------------/         \---------------------------------/        \-------------------------------/     #
@@ -27,16 +27,21 @@
 #                                                                                                                      #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 #                                                                                                                      #
-# A. filter_attributes                                                                                                 #
 # 1. It is important that we have different behaviour for different attributes:                                        #
 #                                                                                                                      #
 #   - For those called range attributes, where the selection is made using operators such as < and >, we have:         #
 #       attr_constraint = attr_constraint1 && attr_constraint2 && ... && attr_constraintN                              #
 #                                                                                                                      #
 #   - For those called categorical attributes, where the selection is made using operators such as == and !=, we have: #
-#       attr_constraint = attr_constraint1 || attr_constraint2 && ... || attr_constraintN#                             #
+#       attr_constraint = attr_constraint1 || attr_constraint2 || ... || attr_constraintN                              #
 #                                                                                                                      #
-# 2. We also assume that, when we have a constraint over some attr, we eliminate all null values for that variable.    #
+# 2. We also assume that, when we have a constraint over some attr, we eliminate all null values for that variable. In #
+#  putting data should probably be done before importing your data to portinari.                                       #
+#                                                                                                                      #
+# 4. Categorical attributes are guaranteed no to have 0's, due to the importer. Thus, when a query is made with 402,   #
+#  what it really means is 4 & 2, so instead of doing attr == 2 || attr == 4, we require that two events on the same   #
+#  event date have attributes 2 and attributes 4, regardless of order. This is yet to be implemented.             - TODO
+#                                                                                                                      #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 # ---------------------------- ----------------------------  ---------------------------- ---------------------------- #
 
@@ -50,25 +55,25 @@ import time
 DEBUG_QUERY_MATCHING = False
 
 
-def get_rr(events, individuals, config, outcomes):
+# ---- Helpers ----
 
+
+def get_rr(events, individuals, config, outcomes):
     rr = {}
 
     for key, ind in individuals.items():
         exposed = events[events[config["id_attribute"]["name"]].isin(ind.index)]
         not_exposed = events[~events[config["id_attribute"]["name"]].isin(ind.index)]
-        exposed_true =filter_attributes(exposed, outcomes, config, flag=False)
-        not_exposed_true =filter_attributes(not_exposed, outcomes, config, flag=False)
+        exposed_true = filter_attributes(exposed, outcomes, config, flag=False)
+        not_exposed_true = filter_attributes(not_exposed, outcomes, config, flag=False)
 
         try:
-            rr[key] = (len(exposed_true)/len(exposed))/(len(not_exposed_true)/len(not_exposed))
+            rr[key] = (len(exposed_true) / len(exposed)) / (len(not_exposed_true) / len(not_exposed))
         except ZeroDivisionError:
             rr[key] = -1
 
     print(rr)
     return rr
-
-# ---- Helpers ----
 
 
 def filter_data_id(data, index, config):
@@ -98,7 +103,7 @@ def get_tuple(config, edge, min_v, max_v, attr):
             if o == "<" and eval(v) < tuple_v[1]:
                 tuple_v[1] = eval(v)
             if o == "==":
-                tuple_v = (eval(v),eval(v))
+                tuple_v = (eval(v), eval(v))
 
         edge.pop(config[attr]["name"])
 
@@ -130,9 +135,6 @@ def check_time(t_time, t_hop, acc_hop, acc_tim):
     :param acc_hop: current number of hops.
     :param acc_tim: current number of time passed.
     :return: True of False. """
-    #print("--")
-    #print(t_time, acc_tim, t_time[0][0] < acc_tim < t_time[0][1])
-    #print(t_hop, acc_hop, t_hop[0][0] < acc_hop < t_time[0][1])
     return (t_time[0][0] < acc_tim < t_time[0][1]) and (t_hop[0][0] < acc_hop < t_hop[0][1])
 
 
@@ -141,24 +143,17 @@ def apply_parallel(dfgrouped, func):
     :param dfgrouped: dataframe grouped.
     :param func: function to be used
     :return: applied dataframe. """
-    #ret_lst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(group) for name, group in dfgrouped)
-    ret_lst = [func(group) for name, group in dfgrouped]
-    return pandas.concat(ret_lst)
+    # ret_lst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(group) for name, group in dfgrouped)
+    ret_lst = [func(group) for name, group in dfgrouped]  # For testing this can be useful
 
+    ret_lst = list(zip(*ret_lst))
 
-def to_df(pos, idx, pid):
-    """ Creates a dataframe with index pid and two rows.
-    :param pos: position matched.
-    :param idx: index of position matched.
-    :param pid: patient id.
-    :return: dataframe with all this things.
-    """
-    return pandas.DataFrame(data={"Position": [pos], "IDX": [idx]}, index=[pid])
+    return pandas.DataFrame(data={"Position": ret_lst[0], "IDX": ret_lst[1]}, index=ret_lst[2])
 
 
 # ---- Unordered Filtering ----
 
-# TODO: COMPOSITE ATTRIBUTES (405)
+
 def filter_attributes(data, attr, config, flag=False):
     """ This function receives a dataframe, the list of attributes and filters people based on them (no order).
     :param data: dataframe object.
@@ -166,14 +161,14 @@ def filter_attributes(data, attr, config, flag=False):
     :param config: config file.
     :param flag: alters return value, if true, return the indexes, if false, the IDS.
     :return: ids of filtered entities if flag = False, otherwise, return the indexes. """
+    global g_time
 
     for name, op, value in attr:
         # Treat NaNs
-        data = data[eval("data[\"" + name + "\"]" + "!=" + str(config["nan"]))]
+        data = data.loc[~data[name].isin([config["nan"]])]
 
     # Gets constraints
     names = appending_help(attr)
-
     # Treat constraints
     for key, item in names.items():
         strings = []
@@ -187,9 +182,11 @@ def filter_attributes(data, attr, config, flag=False):
         data = data[eval(filter_v)]
 
     if flag:
-        return data[config["id_attribute"]["name"]].index
+        ret = data[config["id_attribute"]["name"]].index
     else:
-        return np.unique(data[config["id_attribute"]["name"]].values)
+        ret = np.unique(data[config["id_attribute"]["name"]].values)
+
+    return ret
 
 
 def filter_local_attributes_unordered(data, graph, paths, config, flag=True):
@@ -265,17 +262,12 @@ def filter_local_attributes_ordered(data, graph, paths, config, matching):
             t_time.append(get_tuple(config, edge, config["time_min"], config["time_max"], "edge_time_attribute"))
             t_hop.append(get_tuple(config, edge, config["event_min"], config["event_max"], "edge_hops_attribute"))
 
-        if DEBUG_QUERY_MATCHING:
-            print(t_time, t_hop)
-
-        print(t_time, t_hop)
         # gets all matching values
         f = functools.partial(rec_match, pt_nd=path_nodes, t_tim=t_time, t_hop=t_hop, config=config, flg=matching)
 
-        start = time.time()
         result = apply_parallel(data.groupby(config["id_attribute"]["name"]), f)
-        end = time.time()
-        print(end - start)
+
+        print(result)
 
         path_r = list.copy(path)
         path_r.reverse()
@@ -304,121 +296,98 @@ def filter_local_attributes_ordered(data, graph, paths, config, matching):
     return entity_matching
 
 
-def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=True,
-              flg="first_event", acc_hop=1, acc_tim=0):
+def reset_global():
+    global g_time
+    g_time = 0
+
+
+def get_global():
+    global g_time
+    return g_time
+
+
+g_time = 0
+
+
+def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=True, flg="first_event"):
+    global g_time
 
     if DEBUG_QUERY_MATCHING:
-        if first:
-            print("-" * 30)
-        print("---")
-        print(x["Diagnosis"].values)
-        print(x["SinceLast"].values)
-        print(pt_nd)
-        print(t_tim)
-        print(t_hop)
-        print("-- p: ", p)
+        print("\t\t" * p + "-" * 40)
+        print("\t\t" * p + "values", x["at1"].values)
+        print("\t\t" * p + "pt_nd", pt_nd)
+        print("\t\t" * p + "t_tim", t_tim)
+        print("\t\t" * p + "t_hop", t_hop)
+        print("\t\t" * p + "p ", p)
 
     if first:
-        pid = x.head(1)[config["id_attribute"]["name"]].values[0]
+        pid = x.iloc[0][config["id_attribute"]["name"]]  # gets patient id attribute
 
-    # case 1: pattern ended, returns true
-    if len(pt_nd) == 0:
+    if len(pt_nd) == 0 or len(x) == 0:  # case 1: pattern or data ended
         if DEBUG_QUERY_MATCHING:
-            print("case 1: true, matching is completed")
-        return to_df(p, idval, pid=pid)
+            print("\t\t" * p + "-> pattern or data ended, matching is completed")
+        return [p, idval, pid]
+
+    tmp = filter_attributes(x, pt_nd[0], config, flag=True).values  # Get indexes of filtered attributes
+
+
 
     if DEBUG_QUERY_MATCHING:
-        print("case 1: false")
+        print("\t\t" * p + "tmp ", tmp)
 
-    # case 2: data ended, returns false
-    if len(x) == 0:
-        if DEBUG_QUERY_MATCHING:
-            print("case 2: true, matching is uncompleted")
-        return to_df(p, idval, pid=pid)
-
-    if DEBUG_QUERY_MATCHING:
-        print("case 2: false")
-
-    # Get index of current attribute
-    idx = x.head(1).index[0]
-
-    # Get indexes of filtered attributes
-    tmp = filter_attributes(x, pt_nd[0], config, flag=True).values
-
-    if DEBUG_QUERY_MATCHING:
-        print("index matching:", tmp)
-
-    # case 3: no match, return false
+    # case 2: no match
     if len(tmp) == 0:
         if DEBUG_QUERY_MATCHING:
-            print("case 3: true, matching is uncompleted")
-        return to_df(p, idval, pid=pid)
+            print("\t\t" * p + "-> can't match next node")
+        return [p, idval, pid]
 
-    if DEBUG_QUERY_MATCHING:
-        print("case 3: false")
-
-    if DEBUG_QUERY_MATCHING:
-        print("index_first:", idx)
-
-    # case 4: no first match in first_event
+    # case 3: no first match in the first event for the "first_event" flag
     if flg == "first_event" and first:
+        idx = x.index[0]  # gets first index value
         if idx != tmp[0]:
-            return to_df(p, idval, pid=pid)
+            if DEBUG_QUERY_MATCHING:
+                print("\t\t" * p + "-> can't match first node")
+            return [p, idval, pid]
         else:
             tmp = np.array([tmp[0]])
 
+    best_match = [p, idval, pid]
 
-    if DEBUG_QUERY_MATCHING:
-        print("case 4: false")
-
-    # case 5: recursively calls itself
     for i in tmp:
 
-        if first:
-            idval = (i, i)
-        else:
-            idval = (idval[0], i)
-
-        if DEBUG_QUERY_MATCHING:
-            print("->", i, tmp)
-
-        mod_hop = i - idx
-        mod_tim = x[config["edge_time_attribute"]["name"]].ix[idx:i].values.sum()
-
-        if DEBUG_QUERY_MATCHING:
-            print(mod_hop, mod_tim)
-
         # case 4: if time_constraint or first
-        time_constraint = first or check_time(t_tim, t_hop, acc_hop + mod_hop, acc_tim + mod_tim)
+        time_constraint = first or check_time(t_tim, t_hop,
+                                              x[config["edge_time_attribute"]["name"]].ix[idval[1] + 1:i].values.sum(),
+                                              i - idval[1])
 
         if DEBUG_QUERY_MATCHING:
-            print("time_constraint:", time_constraint)
+            print("\t\t" * p + "| src:", idval[1], "next:", i, time_constraint)
+            if not first:
+                print("\t\t" * p + "| tim:", x[config["edge_time_attribute"]["name"]].ix[idval[1] + 1:i].values.sum())
+                print("\t\t" * p + "| hop:", i - idval[1] - 1)
+
+        idval = (i, i) if first else (idval[0], i)
 
         if time_constraint:
-            n_idx = x.index.values
-            n_idx = n_idx[n_idx > i]
-
-            if DEBUG_QUERY_MATCHING:
-                print("indexes", x.index.values, n_idx)
-                print("path_nodes", pt_nd, pt_nd[i:])
-                print("t_time", t_tim, t_tim[int(not first):])
-                print("t_hop", t_hop, t_hop[int(not first):])
-
-            df = rec_match(x.ix[n_idx],
+            df = rec_match(x.ix[x.index.values[x.index.values > i]],
                            pt_nd[1:],
                            t_tim[int(not first):], t_hop[int(not first):],
-                           config, p=p+1, first=False, flg=flg,
-                           acc_hop=acc_hop + mod_hop,
-                           acc_tim=acc_tim + mod_tim,
+                           config, p=p + 1, first=False, flg=flg,
                            idval=idval, pid=pid)
-            if DEBUG_QUERY_MATCHING:
-                print("RETURN, TESTING:", df.iloc[0]["Position"], p + len(pt_nd[1:]) + 1)
-            if df.iloc[0]["Position"] == p + len(pt_nd[1:]) + 1:
-                return df
-    if DEBUG_QUERY_MATCHING:
-        print("case 5: false, matching is completed", p)
 
-    return to_df(p, idval, pid=pid)
+            if df[0] == p + len(pt_nd[1:]) + 1:
+                if DEBUG_QUERY_MATCHING:
+                    print("\t\t" * p, "returning after successful match...")
+                return df
+
+            elif df[0] > best_match[0]:
+                best_match = df
+
+    if DEBUG_QUERY_MATCHING:
+        print("\t\t" * p + "returning after unsuccessful matches", p)
+        print("\t\t" * p + "-" * 40)
+
+    return best_match
 
 
 def get_individuals(dataset, global_attr, matching, typ, graph, paths):
@@ -427,19 +396,13 @@ def get_individuals(dataset, global_attr, matching, typ, graph, paths):
 
     # Filter global attributes
     index_en = filter_attributes(dataframe_en, global_attr, dataset.config)
-
     dataframe_ev = filter_data_id(dataframe_ev, index_en, dataset.config)
 
-    # Filter local attributes, in cohort, flag = true, otherwise, false
-    if typ == "cohort":
-        index_en_ev = filter_local_attributes_unordered(dataframe_ev, graph, paths, dataset.config, flag=True)
-    else:
-        index_en_ev = filter_local_attributes_unordered(dataframe_ev, graph, paths, dataset.config, flag=False)
-
+    # Filter local attributes
+    index_en_ev = filter_local_attributes_unordered(dataframe_ev, graph, paths, dataset.config, flag=True)
     dataframe_ev = filter_data_id(dataframe_ev, index_en_ev, dataset.config)
 
     # Filter non-indexed ordered attributes
     entity_matching = filter_local_attributes_ordered(dataframe_ev, graph, paths, dataset.config, matching)
-
 
     return entity_matching

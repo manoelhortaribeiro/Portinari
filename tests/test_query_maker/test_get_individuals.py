@@ -1,5 +1,7 @@
 import numpy as np
+import functools
 import unittest
+import timeit
 import pandas
 
 
@@ -9,8 +11,7 @@ def function(df):
 
 
 # TODO: test_filter_local_attributes_unordered & integration
-class TestFindAndCompare(unittest.TestCase):
-
+class TestGetIndividuals(unittest.TestCase):
     def test_filter_data_id(self):
         from backend.query_maker.get_individuals import filter_data_id
 
@@ -93,7 +94,7 @@ class TestFindAndCompare(unittest.TestCase):
         values3 = [['b', '!=', '70']]
         values4 = [['b', '>', '50'], ['b', '<', '75']]
 
-        config = {"nan_int": -99, "id_attribute": {"name": "ID"}}
+        config = {"nan": -99, "id_attribute": {"name": "ID"}}
 
         self.assertTrue(np.array_equal(f(a, values1, config, flag=False), np.array([], dtype=np.int64)))
         self.assertTrue(f(a, values1, config, flag=True).equals(pandas.Int64Index([], dtype='int64')))
@@ -142,7 +143,7 @@ class TestFindAndCompare(unittest.TestCase):
         graph = Graph(nodes, edges)
         paths = graph.make_maximal_paths()
 
-        config = {"nan_int": -99, "id_attribute": {"name": "ID"}}
+        config = {"nan": -99, "id_attribute": {"name": "ID"}}
 
         a = pandas.DataFrame(data={"ID": [1, 1, 2, 2, 2, 2, 3],
                                    "Diagnosis": [11, 12, 11, 11, 11, 13, -99],
@@ -166,3 +167,64 @@ class TestFindAndCompare(unittest.TestCase):
         self.assertTrue(np.array_equal(f(a, graph, paths, config, flag=False), np.array([1, 2])))
 
         print(">> backend.query_maker.test_filter_local_attributes_unordered - OK")
+
+    @staticmethod
+    def test_matching_case(x, y, pt_nd, t_tim, t_hop, config, name, test, flg="first_occurence"):
+        from backend.query_maker.get_individuals import rec_match, reset_global, get_global
+
+        f = functools.partial(rec_match, x, pt_nd,
+                              t_tim, t_hop,
+                              config,
+                              p=0, idval=(0, 0), pid=0,
+                              first=True, flg=flg)
+
+        r = f()
+
+        t = timeit.timeit(f, number=499)
+
+        gb = get_global()
+
+        reset_global()
+
+        print(r)
+
+        print(">", name, "-", t, "s/500it", gb/t)
+
+        test.assertTrue(r == y)
+
+    def test_rec_match(self):
+        config = {"nan": -99, "id_attribute": {"name": "idv"}, "edge_time_attribute": {"name": "tim"}}
+
+        # ---- trivial case ----
+        x = pandas.DataFrame(data={"idv": [1], "at1": [1], "tim": [0]}, index=[121])
+        y = [1, (121,121), 1]
+        pt_nd = [[["at1", "==", "1"]]]
+        t_tim, t_hop = [], []
+        TestGetIndividuals.test_matching_case(x, y, pt_nd, t_tim, t_hop, config, "trivial_case", self)
+
+        TestGetIndividuals.test_matching_case(x, y, pt_nd, t_tim, t_hop, config, "one hop case", self)
+
+        # ---- two hop case  ----
+        x = pandas.DataFrame(data={"idv": [1, 1, 1, 1],
+                                   "at1": [1, 1, 1, 2],
+                                   "tim": [0, 1, 1, 1]},
+                             index=[100, 101, 102, 104])
+        y = [2, (102, 104), 1]
+        pt_nd = [[["at1", "==", "1"]], [["at1", "==", "2"]]]
+        t_tim = [[0, 3]]
+        t_hop = [[0, 3]]
+
+        TestGetIndividuals.test_matching_case(x, y, pt_nd, t_tim, t_hop, config, "two hop case", self)
+
+        # ---- middle case ----
+        x = pandas.DataFrame(data={"idv": [1, 1],
+                                   "at1": [1, 2],
+                                   "tim": [0, 1]},
+                             index=[10, 11])
+        y =  [2, (10, 11), 1]
+        pt_nd = [[["at1", "==", "1"]], [["at1", "==", "2"]], [["at1", "==", "3"]]]
+        t_tim = [[0, 1000]]
+        t_hop = [[0, 1000]]
+        TestGetIndividuals.test_matching_case(x, y, pt_nd, t_tim, t_hop, config, "middle case", self)
+
+        # TODO: more test cases
