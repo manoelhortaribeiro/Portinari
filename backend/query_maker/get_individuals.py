@@ -61,6 +61,8 @@ DEBUG_QUERY_MATCHING = False
 def get_rr(events, individuals, config, outcomes):
     rr = {}
 
+    #print(individuals.items())
+
     for key, ind in individuals.items():
         exposed = events[events[config["id_attribute"]["name"]].isin(ind.index)]
         not_exposed = events[~events[config["id_attribute"]["name"]].isin(ind.index)]
@@ -72,7 +74,7 @@ def get_rr(events, individuals, config, outcomes):
         except ZeroDivisionError:
             rr[key] = -1
 
-    print(rr)
+    #print(rr)
     return rr
 
 
@@ -103,7 +105,7 @@ def get_tuple(config, edge, min_v, max_v, attr):
             if o == "<" and eval(v) < tuple_v[1]:
                 tuple_v[1] = eval(v)
             if o == "==":
-                tuple_v = (eval(v), eval(v))
+                tuple_v = (eval(v)-1, eval(v)+1)
 
         edge.pop(config[attr]["name"])
 
@@ -128,7 +130,7 @@ def appending_help(attr):
     return acc
 
 
-def check_time(t_time, t_hop, acc_hop, acc_tim):
+def check_time(t_time, t_hop, acc_tim, acc_hop):
     """ This checks the time constraints.
     :param t_time: tuples with time constraints.
     :param t_hop: tuples with hop constraints.
@@ -143,7 +145,7 @@ def apply_parallel(dfgrouped, func):
     :param dfgrouped: dataframe grouped.
     :param func: function to be used
     :return: applied dataframe. """
-    # ret_lst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(group) for name, group in dfgrouped)
+    #ret_lst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(group) for name, group in dfgrouped)
     ret_lst = [func(group) for name, group in dfgrouped]  # For testing this can be useful
 
     ret_lst = list(zip(*ret_lst))
@@ -273,7 +275,7 @@ def filter_local_attributes_ordered(data, graph, paths, config, matching):
         path_r.reverse()
         acc = None
 
-        print("PATHS: ", path, path_r)
+        #print("PATHS: ", path, path_r)
 
         for idx, n in enumerate(path_r):
             to_app = result[result["Position"] == len(path) - idx]["IDX"]
@@ -314,7 +316,8 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=Tr
 
     if DEBUG_QUERY_MATCHING:
         print("\t\t" * p + "-" * 40)
-        print("\t\t" * p + "values", x["at1"].values)
+        print("\t\t" * p + "values", x["Diagnosis"].values)
+        print("\t\t" * p + "time", x["SinceLast"].values)
         print("\t\t" * p + "pt_nd", pt_nd)
         print("\t\t" * p + "t_tim", t_tim)
         print("\t\t" * p + "t_hop", t_hop)
@@ -329,8 +332,6 @@ def rec_match(x, pt_nd, t_tim, t_hop, config, p=0, idval=(0, 0), pid=0, first=Tr
         return [p, idval, pid]
 
     tmp = filter_attributes(x, pt_nd[0], config, flag=True).values  # Get indexes of filtered attributes
-
-
 
     if DEBUG_QUERY_MATCHING:
         print("\t\t" * p + "tmp ", tmp)

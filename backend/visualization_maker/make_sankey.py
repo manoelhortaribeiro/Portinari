@@ -33,8 +33,7 @@ def new_sankey(individuals, graph, paths, config, rr):
 
     for path in paths:
         for n in path[:-1]:
-            if ind_number[n] == 0:
-                print("non.null:", n)
+
             if ind_number[n] > 0:
                 sankey["links"].append({"source": mapping[n], "target": 0, "value": ind_number[n]})
 

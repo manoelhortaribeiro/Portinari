@@ -56,6 +56,17 @@ class Dataset:
         # READS NAME
         self.name = param
 
+    @staticmethod
+    def get_categorical_columns(att_desc, types):
+
+        columns = []
+
+        for att in att_desc:
+            if type(types[att["type"]]["values"]) != str:
+                columns.append(att["name"])
+
+        return columns
+
 
 def reads_params(request):
     """ This function simply reads the fields of interest in the request made by the front-end.

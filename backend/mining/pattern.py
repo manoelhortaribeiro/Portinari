@@ -1,9 +1,12 @@
+import itertools
+
+
 class Pattern:
     """
     This class represents a pattern, that is a set of attributes with a specific value.
     """
 
-    def __init__(self, attributes, values):
+    def __init__(self, attributes, values, description=None):
         """
         Initializes a new pattern instance.
         :param attributes: list of attributes.
@@ -13,6 +16,7 @@ class Pattern:
         self.values = values
         self.other = {}
         self.size = len(attributes)
+        self.description = description
 
     def __repr__(self):
         """
@@ -21,10 +25,15 @@ class Pattern:
         """
         s = "("
         for x, y in list(zip(self.attributes, self.values)):
-            s += str(x) + str(y)
+            s += str(x) + ":" + str(y)
             s += " "
         s = s[:-1]
+        if "sup" in self.other:
+            s += " | sup:" + str(self.other["sup"])
+        if "excitingness" in self.other:
+            s += " | exc:" + str(self.other["excitingness"])[:4]
         s += ")"
+
         return s
 
     def __eq__(self, other):
@@ -42,6 +51,14 @@ class Pattern:
         :return: Whether the patterns are unequal.
         """
         return not self.__eq__(other)
+
+    def get_tuples(self):
+        """
+        Returns the attributes and values in form of a list of tuples:
+        [(attr,value1), ... , (attrN,valueN)]
+        :return: list of tuples with attr name and values.
+        """
+        return list(zip(*[self.attributes, self.values]))
 
     def unique_attributes(self):
         """
@@ -106,6 +123,10 @@ class Pattern:
             return False
 
     @staticmethod
+    def sort_on(patterns, measurement):
+        return sorted(patterns, key=lambda x: x.other[measurement])
+
+    @staticmethod
     def combine(pattern1, pattern2):
         """
         Combine two patterns: (A,1)(B,2)(C,3), (A,1)(B,2)(D,4) => (A,1)(B,2)(C,3)(D,4)
@@ -116,3 +137,31 @@ class Pattern:
         attr = pattern1.attributes[:-1] + [pattern1.attributes[-1]] + [pattern2.attributes[-1]]
         val = pattern1.values[:-1] + [pattern1.values[-1]] + [pattern2.values[-1]]
         return Pattern(attr, val)
+
+    @staticmethod
+    def generate_npn(n_pattern_set):
+        """
+        Generates n+1 pattern set.
+        :param n_pattern_set: previous set.
+        :return: new set.
+        """
+
+        np_pattern_set = []
+
+        for p, q in itertools.combinations(n_pattern_set, 2):
+
+            tmp = Pattern.combine(p, q)
+
+            # Ignores repeated attributes
+            if not tmp.unique_attributes():
+                continue
+
+            # Gets all sub-patterns
+            all_nm = tmp.get_all_nm_subpattern()
+
+            # Appends if all patterns of size n in the n+1 pattern are in the n-pattern set
+            if all(x in n_pattern_set for x in all_nm):
+                if tmp not in np_pattern_set:
+                    np_pattern_set.append(tmp)
+
+        return np_pattern_set

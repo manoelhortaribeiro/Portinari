@@ -14,6 +14,10 @@ from flask_cors import cross_origin
 from flask import Flask, request
 import json
 import pandas
+import numpy
+from backend.mining.pattern import Pattern
+
+from itertools import combinations
 
 app = Flask(__name__)
 
@@ -91,20 +95,109 @@ def config():
     return cf
 
 
+def apriori(df, up, min, cols):
+
+    pandas.get_dummies(df.unstack()[~(df.unstack() == -9999)]).groupby(level=1).sum()
+
+
+
+
+#     patterns = []
+#     for cnum in range(minlen, rowlen+1):
+#         for cols in combinations(ts, cnum):
+#             patsup = ts[list(cols)].all(axis=1).sum()
+#             patsup=float(patsup)/collen
+#             pattern.append([",".join(cols), patsup])
+#     sdf = pd.DataFrame(pattern, columns=["Pattern", "Support"])
+#     results=sdf[sdf.Support >= support]
+#
+#     return results
+
 @app.route('/minecohort/', methods=['POST'])
 @cross_origin()
 def mine():
 
-    if len(NACREDITO) == 0:
-        return_v = ["689 Individuals - Uses condom, has sexual intercourse",
-                    "642 Individuals - Never had herpes, never had gonorreia"]
-        NACREDITO.append(1)
-    else:
-        return_v = ["1342 Individuals - Has hormonal contraception, has sexual intercourse",
-                    "642 Individuals -  Never had hormonal contraception, never had sexual intercourse"]
-        NACREDITO.pop()
+    nodes = read_cohort_nodes(request)
+    indexes = None
 
-    return json.dumps(return_v)
+    for node in nodes:
+        if indexes is None:
+            indexes = mem_ind[0][int(node)].index.values
+        else:
+            indexes = numpy.union1d(indexes, mem_ind[0][int(node)].index.values)
+
+    indexes = numpy.unique(indexes)
+
+    # get dataset on binary format
+    ds = dataset.entity_data
+    new_data = ds.loc[ds[dataset.config["id_attribute"]["name"]].isin(indexes)]
+    new_data = new_data.drop(dataset.config["id_attribute"]["name"], 1)
+    cols = Dataset.get_categorical_columns(dataset.config["global_attributes"], dataset.config["types"])
+    new_data = new_data[cols]
+    for col in cols:
+        new_data[col] = pandas.Series(list(map(lambda x: (col,x), new_data[col].values)), index=new_data[col].index)
+    new_data = pandas.get_dummies(new_data.unstack()).groupby(level=1).sum() == 1
+    cols = new_data.columns
+    for col in cols:
+        if col[1] == dataset.config["nan"]:
+            del new_data[col]
+    new_data = new_data == 1
+
+    # sets variables for apriori
+    cols = new_data.columns
+    min_sup = 50
+
+    fp = []
+    pn = []
+    for col in cols:
+        sup = (new_data[col]).sum()
+        if sup >= min_sup:
+            pat = Pattern(attributes=[col[0]], values=[col[1]])
+            pat.add("sup", sup)
+            fp.append(pat)
+            pn.append(pat)
+
+    it = 0
+
+    while len(pn) != 0 and it < 1:
+        it += 1
+        print(len(pn), pn)
+        npn = Pattern.generate_npn(pn)
+        pn = []
+
+        for pat in npn:
+            tup = pat.get_tuples()
+
+            truth_table = new_data[tup[0]]
+
+            for t in tup[1:]:
+                truth_table = truth_table & new_data[t]
+
+            sup = truth_table.sum()
+            pat.add("sup", sup)
+
+            if pat.get("sup") >= min_sup:
+                fp.append(pat)
+                pn.append(pat)
+
+    print("finish mining!")
+    for pat in fp:
+
+        tup = pat.get_tuples()
+        truth_table = dataset.entity_data[tup[0][0]] == tup[0][1]
+        for t in tup[1:]:
+            truth_table = truth_table & (dataset.entity_data[t[0]] == t[1])
+        r_sup_o = truth_table.sum()/len(dataset.entity_data)
+        r_sup_n = pat.get("sup")/len(new_data)
+        pat.add("excitingness", r_sup_n/r_sup_o)
+
+    fp = Pattern.sort_on(fp, "excitingness")
+    new_fp = fp[-3:] + fp[:3]
+
+    new_fp_rpr = list(map(lambda a: a.__repr__(), new_fp))
+
+
+    return json.dumps(new_fp_rpr)
 
 if __name__ == "__main__":
     app.run()
