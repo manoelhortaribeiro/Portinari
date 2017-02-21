@@ -1,8 +1,10 @@
-var d3 = require("../external/d3.min.v4.js"),
-    $ = require("../external/jquery.min.js"),
-    json_config = require("../config/config.js");
+var json_config = require("../config/config.js"),
+    d3 = require("../external/d3.min.v4.js"),
+    $ = require("../external/jquery.min.js");
 
 function FormHandler(qif, qic, qgif, qgic, qcf, qcc, dsc, mtc, reactor) {
+    /*
+    * */
 
     var thisForm = this;
 

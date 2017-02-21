@@ -14,6 +14,8 @@
   margin: auto; }
 
 #content_d {
+  margin: 0;
+  padding: 0;
   opacity: 0;
   transition: opacity 1s; }
 
@@ -82,16 +84,8 @@ body {
   body ul {
     margin: 0;
     padding: 0; }
-  body #toggle-menu {
-    text-align: center;
-    margin: 0 0 5px 0; }
   body #nav-menu li.active a {
     background: #e8f0ff; }
-  body .tab-content {
-    background: #e8f0ff;
-    padding: 3px 3px 3px 3px; }
-  body .content {
-    display: none; }
   body .col-md-4 {
     margin: 0;
     padding: 0; }
@@ -142,56 +136,64 @@ body {
       margin: 10px;
       text-align: center; }
     body .current li:hover {
-      background-color: #2aabd2; }
+      background-color: #0c0c0e; }
 
 /* - Query Menu */
-#query-system {
-  margin: 3px 3px 3px 3px;
-  padding: 0;
-  border: solid lightgrey 1px;
-  background-color: #e8f0ff; }
-  #query-system #query-interface-graph svg {
+#query-interface-graph {
+  padding: 3px 0 0 0;
+  margin: 0; }
+  #query-interface-graph #query-menu {
+    text-align: center;
+    margin: 0;
+    padding: 0; }
+    #query-interface-graph #query-menu .btn {
+      min-height: 15px; }
+  #query-interface-graph svg {
     display: inline;
     border: solid lightgrey 1px;
     margin: 3px 3px 3px 3px;
     /* nodes */
     /* edges */
     /* text */ }
-    #query-system #query-interface-graph svg .Node {
-      fill: #2aabd2; }
-    #query-system #query-interface-graph svg .Node:hover {
+    #query-interface-graph svg .Tick {
+      fill: #0c0c0e; }
+    #query-interface-graph svg .Node {
+      fill: #0c0c0e; }
+    #query-interface-graph svg .Node:hover {
       fill: #235581;
       stroke: #202020;
       stroke-width: 2px; }
-    #query-system #query-interface-graph svg .Node.selected {
+    #query-interface-graph svg .Node.selected {
       fill: #235581;
       stroke: #202020;
       stroke-width: 2px; }
-    #query-system #query-interface-graph svg .link {
+    #query-interface-graph svg .link {
       stroke: #402D29;
       stroke-width: 4px; }
-    #query-system #query-interface-graph svg .selected path.link {
+    #query-interface-graph svg .selected path.link {
       stroke: #413F4A;
       fill: #413F4A;
       stroke-width: 6px; }
-    #query-system #query-interface-graph svg #end-arrow {
+    #query-interface-graph svg #end-arrow {
       stroke: #413F4A;
       fill: #413F4A; }
-    #query-system #query-interface-graph svg .InTextN text {
+    #query-interface-graph svg .InTextN text {
       fill: white; }
-    #query-system #query-interface-graph svg .OuTextN text {
+    #query-interface-graph svg .OuTextN text {
       fill: rgba(12, 12, 14, 0.9); }
-    #query-system #query-interface-graph svg .InTextE text {
+    #query-interface-graph svg .InTextE text {
       fill: rgba(12, 12, 14, 0.9); }
-    #query-system #query-interface-graph svg .OuTextE text {
+    #query-interface-graph svg .OuTextE text {
       fill: rgba(12, 12, 14, 0.9); }
-  #query-system #forms-menu {
-    height: 100%;
-    background-color: #e8f0ff; }
-    #query-system #forms-menu p {
-      line-height: 40px;
-      text-align: center;
-      opacity: 0.5; }
+
+#forms-menu {
+  height: 100%;
+  background-color: #e8f0ff;
+  display: none; }
+  #forms-menu p {
+    line-height: 40px;
+    text-align: center;
+    opacity: 0.5; }
 
 /* -- Sankey -- */
 #cohort-result .node rect {

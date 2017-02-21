@@ -11,7 +11,7 @@ $bg-color: rgba(255, 255, 255, 0.9);
 $secondary-color: #e8f0ff;
 
 /* Node Variables */
-$node-color: rgb(42, 171, 210);
+$node-color: rgb(12, 12, 14);
 $selected-node-color: rgb(35, 85, 129);
 $node-stroke: #202020;
 $node-stroke-width: 2px;
@@ -46,6 +46,8 @@ $three-px: 3px 3px 3px 3px;
 }
 
 #content_d {
+  margin: 0;
+  padding: 0;
   opacity: 0;
   transition: opacity 1s;
 }
@@ -135,25 +137,14 @@ body {
     padding: 0;
   }
 
-  #toggle-menu {
-    text-align: center;
-    margin: 0 0 5px 0;
-  }
-
   #nav-menu {
     li.active a {
       background: $secondary-color;
     }
   }
 
-  .tab-content {
-    background: $secondary-color;
-    padding: $three-px;
-  }
 
-  .content {
-    display: none;
-  }
+
 
   .col-md-4 {
     margin: 0;
@@ -236,91 +227,107 @@ body {
 
 /* - Query Menu */
 
-#query-system {
-  margin: $three-px;
-  padding: 0;
-  border: $light-border;
-  background-color: $secondary-color;
 
-  #query-interface-graph {
 
-    svg {
-      display: inline;
-      border: $light-border;
-      margin: $three-px;
+#query-interface-graph {
+  padding: 3px 0 0 0;
+  margin: 0;
 
-      /* nodes */
-
-      .Node {
-        fill: $node-color;
-      }
-
-      .Node:hover {
-        fill: $selected-node-color;
-        stroke: $node-stroke;
-        stroke-width: $node-stroke-width;
-      }
-
-      .Node.selected {
-        fill: $selected-node-color;
-        stroke: $node-stroke;
-        stroke-width: $node-stroke-width;
-      }
-
-      /* edges */
-
-      .link {
-        stroke: $stroke-link-color;
-        stroke-width: $stroke-link-width;
-      }
-
-      .selected path.link {
-        stroke: $stroke-link-color-selected;
-        fill: $stroke-link-color-selected;
-        stroke-width: $stroke-link-width-selected;
-      }
-
-      #end-arrow {
-        stroke: $stroke-link-color-selected;
-        fill: $stroke-link-color-selected;
-      }
-
-      /* text */
-
-      .InTextN text {
-        fill: rgba(255, 255, 255, 1);
-      }
-
-      .OuTextN text {
-        fill: rgba(12, 12, 14, 0.9);
-      }
-
-      .InTextE text {
-        fill: rgba(12, 12, 14, 0.9);
-      }
-
-      .OuTextE text {
-        fill: rgba(12, 12, 14, 0.9);
-      }
-
+  #query-menu{
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    .btn {
+      min-height: 15px;
     }
-
   }
 
-  #forms-menu {
-    height: 100%;
-    background-color: $secondary-color;
+  svg {
 
-    p {
-      line-height: $form-height;
-      text-align: center;
-      opacity: 0.5;
 
+    display: inline;
+    border: $light-border;
+    margin: $three-px;
+
+    /* nodes */
+
+
+
+    .Tick {
+      fill: $node-color;
+    }
+
+    .Node {
+      fill: $node-color;
+    }
+
+    .Node:hover {
+      fill: $selected-node-color;
+      stroke: $node-stroke;
+      stroke-width: $node-stroke-width;
+    }
+
+    .Node.selected {
+      fill: $selected-node-color;
+      stroke: $node-stroke;
+      stroke-width: $node-stroke-width;
+    }
+
+    /* edges */
+
+    .link {
+      stroke: $stroke-link-color;
+      stroke-width: $stroke-link-width;
+    }
+
+    .selected path.link {
+      stroke: $stroke-link-color-selected;
+      fill: $stroke-link-color-selected;
+      stroke-width: $stroke-link-width-selected;
+    }
+
+    #end-arrow {
+      stroke: $stroke-link-color-selected;
+      fill: $stroke-link-color-selected;
+    }
+
+    /* text */
+
+    .InTextN text {
+      fill: rgba(255, 255, 255, 1);
+    }
+
+    .OuTextN text {
+      fill: rgba(12, 12, 14, 0.9);
+    }
+
+    .InTextE text {
+      fill: rgba(12, 12, 14, 0.9);
+    }
+
+    .OuTextE text {
+      fill: rgba(12, 12, 14, 0.9);
     }
 
   }
 
 }
+
+#forms-menu {
+  height: 100%;
+  background-color: $secondary-color;
+  display: none;
+
+  p {
+    line-height: $form-height;
+    text-align: center;
+    opacity: 0.5;
+
+  }
+
+}
+
+
 
 /* -- Sankey -- */
 

@@ -186,9 +186,13 @@ module.exports = {
         nodesClass: "Nodes",
         edgeClass: "Edge",
         edgesClass: "Edges",
+        ticksClass: "Ticks",
+        tickClass: "Tick",
+        upperNavBarClass: "UpperNavBar",
         nodeRadius: 45,
         rectangleWidth: 40,
         delete: 68,
+        create: 67,
 
         /*Stuff adjustable in the back end*/
         datasets: databaseinfo.datasets.bind(databaseinfo),
