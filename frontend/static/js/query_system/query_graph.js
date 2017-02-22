@@ -14,282 +14,266 @@ var json_config = require("../config/config.js"),
 
 function GC(query_interface_selection, reactor) {
 
-    // loads the config file
-    this.config = json_config.QUERY_SYSTEM;
+    var QG = this;
 
-    // binds events to the reactor
-    this.reactor = reactor;
-    this.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
-    this.reactor.addEventListener('constraint_added', this.getElement.bind(this));
-    this.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
-    this.reactor.addEventListener('global_added', this.getGraph.bind(this));
-    this.reactor.addEventListener('matching_changed', this.changeMatching.bind(this));
+    // Loads the config file
+    QG.config = json_config.QUERY_SYSTEM;
 
-    // initial settings for the aspect and svg-related stuff
-    this.height = 500;
-    this.width = 1500;
-    this.aspect = [0, 0, this.width, this.height];
-    this.selectedSvgID = -1;
-    this.horizontal_fixed_points = 1;
-    this.vertical_fixed_points = 1;
-    this.levels = [];
+    // Binds events to the reactor
+    QG.reactor = reactor;
+    QG.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
+    QG.reactor.addEventListener('constraint_added', this.getElement.bind(this));
+    QG.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
+    QG.reactor.addEventListener('global_added', this.getGraph.bind(this));
+    QG.reactor.addEventListener('matching_changed', this.changeMatching.bind(this));
 
-    // initializes the query graph model
-    this.idct = 0;
-    this.graph = {};
-    this.graph.nodes = [];
-    this.graph.edges = [];
-    this.graph.future_nodes = 0;
-    this.graph.prediction_attr = "None";
-    this.graph.id_attr = "None";
-    this.graph.outcome_key_op_value = [];
-    this.graph.outcome_display_value = [];
-    this.graph.global_key_op_value = [];
-    this.graph.global_display_value = [];
-    this.graph.matching = this.config.matchingDefault();
+    // Initial settings for the aspect and svg-related stuff
+    QG.height = QG.config.svgHeight;
+    QG.width = QG.config.svgWidth;
+    QG.aspect = [0, 0, QG.width, QG.height];
 
-    // initializes svg compartments
-    this.initialize_svg(query_interface_selection);
+    // Variables to adjust the tiles
+    QG.horizontal_fixed_points = 1;
+    QG.vertical_fixed_points = 1;
+    QG.levels = [];
 
-    // initializes root node
-     this.addNode(undefined, [this.width / 2, this.height / 2]);
+    // Array containing selected nodes
+    QG.selectedSvgID = [];
 
-    // updates graph
-    this.updateGraph();
+    // Initializes the query graph model
+    QG.idct = 0;
+    QG.graph = {};
+    QG.graph.nodes = [];
+    QG.graph.edges = [];
+    QG.graph.future_nodes = 0;
+    QG.graph.prediction_attr = "None";
+    QG.graph.id_attr = "None";
+    QG.graph.outcome_key_op_value = [];
+    QG.graph.outcome_display_value = [];
+    QG.graph.global_key_op_value = [];
+    QG.graph.global_display_value = [];
+    QG.graph.matching = QG.config.matchingDefault();
+
+    // Initializes svg compartments
+    QG.initialize_svg(query_interface_selection);
+
+    // Initializes root node
+    QG.addNode();
+
+    // Initializes graph
+    QG.updateGraph();
 }
 
 GC.prototype.initialize_svg = function (query_interface_selection) {
+    /* This method initializes the svg auxiliary parts of the Query Graph
+      @params: query_interface_selection - */
 
-    // svg
-    this.svg = query_interface_selection.append("svg")
-        .attr("viewBox", this.aspect[0] + " " + this.aspect[1] + " " + this.aspect[2] + " " + this.aspect[3])
-        .attr("preserveAspectRatio", "xMinYMin meet");
+    var QG = this;
 
+    QG.svg = query_interface_selection.append("svg")
+        .attr("viewBox", QG.aspect[0] + " " + QG.aspect[1] + " " + QG.aspect[2] + " " + QG.aspect[3])
+        .attr("preserveAspectRatio", "xMinYMin meet"); // svg
 
-    // graph
-    this.svgG = this.svg.append("g").classed(this.config.graphClass, true);
+    QG.svgG = QG.svg.append("g").classed(QG.config.graphClass, true);     // graph
 
-    // nodes
-    this.svgG.append("g").classed(this.config.nodesClass, true);
+    QG.svgG.append("g").classed(QG.config.nodesClass, true);    // nodes
 
-    // edges
-    this.svgG.append("g").classed(this.config.edgesClass, true);
+    QG.svgG.append("g").classed(QG.config.edgesClass, true);     // edges
 
-    // node text
-    this.svgG.append("g").classed(this.config.innerTextNodeClass, true);
+    QG.svgG.append("g").classed(QG.config.innerTextNodeClass, true);    // node text
 
-    // edge text
-    this.svgG.append("g").classed(this.config.innerTextEdgeClass, true);
+    QG.svgG.append("g").classed(QG.config.innerTextEdgeClass, true);    // edge text
 
-    // node constraint text
-    this.svgG.append("g").classed(this.config.outerTextNodeClass, true);
+    QG.svgG.append("g").classed(QG.config.outerTextNodeClass, true);    // node constraint text
 
-    // edge constraint text
-    this.svgG.append("g").classed(this.config.outerTextEdgeClass, true);
+    QG.svgG.append("g").classed(QG.config.outerTextEdgeClass, true);    // edge constraint text
 
-    // marker
-    var defs = this.svg.append('svg:defs');
+    var defs = QG.svg.append('svg:defs');
     defs.append('svg:marker')
         .attr('id', 'end-arrow').attr('viewBox', '0 -5 10 10')
         .attr('refX', 8.5).attr('markerWidth', 3.5)
         .attr('markerHeight', 3.5).attr('orient', 'auto')
-        .append('svg:path').attr('d', 'M0,-5L10,0L0,5');
+        .append('svg:path').attr('d', 'M0,-5L10,0L0,5');    // marker
 
-    // -- Effects
-
-
-    // key down on window
     d3.select(window).on("keydown", function () {
         if (d3.event.shiftKey) {
-            this.svgKeyDown.call(this);
+            QG.svgKeyDown.call(QG);
         }
-    });
+    });    // key down on window
 
 };
 
-//- Node behaviour -
-
-
 GC.prototype.distributeNodes = function () {
+    /* This method distributes the nodes in the svg. It gets the horizontal_fixed_points and the vertical_fixed_points
+     using the levels variable, and then positions all the nodes on its respective tick.
+     @params: None
+     @return: Nothing */
 
-    var this
-    = this;
+    var QG = this;
 
-    this.horizontal_fixed_points = this.levels.length;
-    this.vertical_fixed_points = Math.max.apply(null, this.levels);
+    QG.horizontal_fixed_points = QG.levels.length;
+    QG.vertical_fixed_points = Math.max.apply(null, QG.levels);
 
-    var nodes_level = utils.getNodesByLevel(this.graph.nodes);
+    var nodes_level = utils.getNodesByLevel(QG.graph.nodes);
+    var ticks = utils.getTicks(QG.width, QG.height, QG.horizontal_fixed_points, QG.vertical_fixed_points);
 
-    var ticks = utils.getTicks(this.width, this.height,
-        this.horizontal_fixed_points,
-        this.vertical_fixed_points);
-
-    console.log("ticks", ticks);
-
-
-    for (var level = 0; level < this.horizontal_fixed_points; level++) {
+    for (var level = 0; level < QG.horizontal_fixed_points; level++) {
         var nodes_to_distribute = nodes_level[level];
+        var start_position = Math.floor((QG.vertical_fixed_points - nodes_to_distribute.length) / 2);
 
-        var start_position = (this.vertical_fixed_points - nodes_to_distribute.length) / 2;
-        console.log("start pos", start_position);
-
-        start_position = Math.floor(start_position)
-        console.log("start pos", start_position);
-
-        for (var pos = start_position; pos < this.vertical_fixed_points; pos++) {
+        for (var pos = start_position; pos < QG.vertical_fixed_points; pos++) {
             if (nodes_to_distribute.length == 0)
                 break;
             var tick = ticks[[level, pos]];
-            console.log("tick", tick);
             var node = nodes_to_distribute.pop();
-            console.log("node", node);
             node.x = tick.x;
             node.y = tick.y;
-
         }
     }
 };
 
-
 GC.prototype.addNode = function (parent, coordinates) {
+    /* This creates a node given a parent and a set of coordinates. It can be done without parents or coordinates. It
+     also handles the increase of the level.
+     @params: parent - parent node
+     coordinates - [x, y] array
+     @return: recently created node */
 
-    if (coordinates == undefined) {
-        coordinates = [0, 0];
-    }
+    var QG = this;
 
-    var node = new utils.Node(coordinates, this.idct, parent);
+    // Get coordinate values
+    coordinates = ((coordinates == undefined) ? [0, 0] : coordinates);
+
+    // Create nodes
+    var node = new utils.Node(coordinates, QG.idct, parent);
 
     // Add edges
-    if (parent != undefined)
-        this.addEdge(parent, node, "directed");
+    if (parent != undefined) QG.addEdge(parent, node, "directed");
 
     // Internal book keeping
-    this.graph.nodes.push(node);
-    this.idct += 1;
-    if (node.level == this.levels.length)
-        this.levels.push(1);
-    else
-        this.levels[node.level]++;
+    QG.graph.nodes.push(node);
+
+    // Increases index
+    QG.idct += 1;
+
+    // Pushes node to level
+    if (node.level == QG.levels.length) QG.levels.push(1);
+    else QG.levels[node.level]++;
 
     return node;
 };
 
 GC.prototype.nodeMouseDown = function (svg_element) {
+    var QG = this;
     d3.event.stopPropagation();
-    this.replaceSelected(svg_element);
+    var node = d3.select(svg_element)
+    if(node.classed("selected") == true) node.classed("selected", false);
+    else node.classed("selected", true);
 };
 
 // - Edge behaviour -
 GC.prototype.addEdge = function (src, dst, kind) {
-    var this
-    = this;
-    var edge = new utils.Edge(src, dst, this.idct, kind);
-    this.graph.edges.push(edge);
-    this.idct += 1;
-    this.updateGraph();
+    var QG = this;
+    var edge = new utils.Edge(src, dst, QG.idct, kind);
+    QG.graph.edges.push(edge);
+    QG.idct += 1;
+    QG.updateGraph();
 };
 
 GC.prototype.edgeMouseDown = function (svg_element) {
+    var QG = this;
     d3.event.stopPropagation();
-    this.replaceSelected(svg_element);
+    d3.select(svg_element).classed("selected", true)
 };
 
 
 GC.prototype.svgKeyDown = function () {
+
+    var QG = this;
 
     var selected = d3.select(".selected").data()[0];
     var sel_id = selected.id;
 
 
     switch (d3.event.keyCode) {
-        case this.config.delete:
+
+        case QG.config.delete:
 
             // Doesn't let you delete the root
             if (selected.level == 0)
                 break;
 
             // Gets node to be removed
-            var removed = utils.getNodeById(this.graph.nodes, sel_id);
+            var removed = utils.getNodeById(QG.graph.nodes, sel_id);
 
             // Gets descendants of the node to be removed
-            var descendants = utils.getDescendantsID(this.nodes, removed);
+            var descendants = utils.getDescendantsID(QG.nodes, removed);
 
             // Remove all descendants
-            this.graph.nodes = this.graph.nodes.filter(function (node) {
+            QG.graph.nodes = QG.graph.nodes.filter(function (node) {
                 return !node.id in descendants;
             });
 
             // Remove all edges involving descendants
-            this.graph.edges = this.graph.edges.filter(function (edge) {
+            QG.graph.edges = QG.graph.edges.filter(function (edge) {
                 return (!edge.src.id in descendants) && (!edge.dst.id in descendants);
             });
 
-            // Selection goes to the parent
-            this.selectedSvgID = selected.parent.id;
 
-            this.updateGraph();
+            QG.updateGraph();
             break;
-        //this.reactor.dispatchEvent("selected_node_changed", this.selectedSvgID);
+        //QG.reactor.dispatchEvent("selected_node_changed", QG.selectedSvgID);
 
-        case this.config.create:
+        case QG.config.create:
             console.log(selected);
-            var parent = utils.getNodeById(this.graph.nodes, sel_id);
-            var added = this.addNode(parent);
+            var parent = utils.getNodeById(QG.graph.nodes, sel_id);
+            var added = QG.addNode(parent);
 
-            this.selectedSvgID = added.id;
 
-            this.updateGraph();
+            QG.updateGraph();
             break;
-        //this.reactor.dispatchEvent("selected_node_changed", this.selectedSvgID);
+        //QG.reactor.dispatchEvent("selected_node_changed", QG.selectedSvgID);
 
     }
-};
-
-// - General Behaviour
-GC.prototype.replaceSelected = function (svg_element) {
-    var this
-    = this;
-    var svg_d = d3.select(svg_element).data()[0];
-    var svg_id = svg_d.id;
-    d3.select(".selected").classed("selected", false);
-    d3.select(svg_element).classed("selected", true);
-    this.selectedSvgID = svg_id;
-    this.reactor.dispatchEvent("selected_node_changed", svg_d);
 };
 
 
 GC.prototype.updateGraph = function () {
 
-    var this
-    = this;
+    var QG = this;
+
+    console.log(QG.selectedSvgID);
 
 
-    replaceSelected(this.selectedSvgID);
+    //this.replaceSelected(utils.getNodeById(this.selectedSvgID));
 
-    console.log(this.graph.nodes);
+    console.log(QG.graph.nodes);
 
-    this.distributeNodes();
+    QG.distributeNodes();
 
     // -- Nodes --
-    var nodes = this.svg
-        .select("g." + this.config.nodesClass)
-        .selectAll("g." + this.config.nodeClass);
-    var data = this.graph.nodes;
+    var nodes = QG.svg
+        .select("g." + QG.config.nodesClass)
+        .selectAll("g." + QG.config.nodeClass);
+
+    var nodes_data = nodes.data();
+
+
+    var data = QG.graph.nodes;
     // - enter
     var aux = nodes.data(data, function (d) {
         return d.name;
     }).enter()
         .append("g")
-        .classed(this.config.nodeClass, true)
+        .classed(QG.config.nodeClass, true)
         .attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
         })
         .on("mousedown", function (d) {
-            this.nodeMouseDown(this)
+            QG.nodeMouseDown(this)
         })
-        .call(this.drag);
     aux.append("circle")
-        .attr("r", String(utils.getNodeRadius(this.levels, this.width, this.height, this.config.nodeRadius)));
+        .attr("r", String(utils.getNodeRadius(QG.levels, QG.width, QG.height, QG.config.nodeRadius)));
 
     // - update
     nodes.data(data, function (d) {
@@ -298,7 +282,7 @@ GC.prototype.updateGraph = function () {
         .attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
         })
-        .attr("r", String(utils.getNodeRadius(this.levels, this.width, this.height, this.config.nodeRadius)));
+        .attr("r", String(utils.getNodeRadius(QG.levels, QG.width, QG.height, QG.config.nodeRadius)));
     ;
     // - exit
     nodes.data(data, function (d) {
@@ -308,10 +292,10 @@ GC.prototype.updateGraph = function () {
         .remove();
 
     // -- InText/Nodes--
-    var text = this.svg
-        .select("g." + this.config.innerTextNodeClass)
+    var text = QG.svg
+        .select("g." + QG.config.innerTextNodeClass)
         .selectAll("text");
-    var data = this.graph.nodes;
+    var data = QG.graph.nodes;
     // -- enter
     var aux = text.data(data, function (d) {
         return d.name;
@@ -335,7 +319,7 @@ GC.prototype.updateGraph = function () {
         var isStart = true;
         var isEnd = true;
 
-        this.graph.edges.forEach(function (edge) {
+        QG.graph.edges.forEach(function (edge) {
             if (d.name == edge.destination) {
                 isStart = false;
             }
@@ -357,10 +341,10 @@ GC.prototype.updateGraph = function () {
         .remove();
 
     // -- OutText/Nodes --
-    var text = this.svg
-        .select("g." + this.config.outerTextNodeClass)
+    var text = QG.svg
+        .select("g." + QG.config.outerTextNodeClass)
         .selectAll("text");
-    var data = this.graph.nodes;
+    var data = QG.graph.nodes;
     // -- enter
     var aux = text.data(data, function (d) {
         return d.name;
@@ -398,18 +382,18 @@ GC.prototype.updateGraph = function () {
         .remove();
 
     // -- Edges --
-    var edges = this.svg
-        .select("g." + this.config.edgesClass)
-        .selectAll("g." + this.config.edgeClass);
-    var data = this.graph.edges;
+    var edges = QG.svg
+        .select("g." + QG.config.edgesClass)
+        .selectAll("g." + QG.config.edgeClass);
+    var data = QG.graph.edges;
     // - enter
     var aux = edges.data(data, function (d) {
         return d.name;
     }).enter()
         .append("g")
-        .classed(this.config.edgeClass, true)
+        .classed(QG.config.edgeClass, true)
         .on("mousedown", function (d) {
-            this.edgeMouseDown(this)
+            QG.edgeMouseDown(this)
         });
     aux.append("path")
         .style('marker-end', function (d) {
@@ -419,7 +403,7 @@ GC.prototype.updateGraph = function () {
             else return 'none';
         })
         .attr("d", function (d) {
-            return utils.calcEdgePath(d, this.config.nodeRadius);
+            return utils.calcEdgePath(d, QG.config.nodeRadius);
         })
         .classed("link", true);
     // - update
@@ -428,7 +412,7 @@ GC.prototype.updateGraph = function () {
         })
         .selectAll("path")
         .attr("d", function (d) {
-            return utils.calcEdgePath(d, this.config.nodeRadius);
+            return utils.calcEdgePath(d, QG.config.nodeRadius);
         });
     // - exit
     edges.data(data, function (d) {
@@ -438,10 +422,10 @@ GC.prototype.updateGraph = function () {
         .remove();
 
     // -- OutText/Edges --
-    var text = this.svg
-        .select("g." + this.config.outerTextEdgeClass)
+    var text = QG.svg
+        .select("g." + QG.config.outerTextEdgeClass)
         .selectAll("text");
-    var data = this.graph.edges;
+    var data = QG.graph.edges;
     var modifier = 15;
     // -- enter
     var aux = text.data(data, function (d) {
@@ -449,10 +433,10 @@ GC.prototype.updateGraph = function () {
     }).enter()
         .append("text")
         .attr("x", function (d) {
-            return utils.calcTextEdgePath(d, this.config.nodeRadius, modifier)[0];
+            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0];
         })
         .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, this.config.nodeRadius, modifier)[1];
+            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[1];
         })
         .attr("text-anchor", "middle");
 
@@ -460,14 +444,14 @@ GC.prototype.updateGraph = function () {
     var aux = text.data(data, function (d) {
         return d.name;
     }).attr("x", function (d) {
-            return utils.calcTextEdgePath(d, this.config.nodeRadius, modifier)[0];
+            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0];
         })
         .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, this.config.nodeRadius, modifier)[1];
+            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[1];
         })
         .html(function (d) {
             var string = "";
-            var x = utils.calcTextEdgePath(d, this.config.nodeRadius, modifier)[0].toString();
+            var x = utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0].toString();
             d.key_op_value.forEach(function (d) {
                 string += "<tspan x=" + x + " dy=\"1.2em\">" + d[0] + d[1] + d[2] + "<\/tspan>";
             });
@@ -481,7 +465,8 @@ GC.prototype.updateGraph = function () {
 };
 
 GC.prototype.getGraph = function () {
-    return this.graph;
+    var QG = this;
+    return QG.graph;
 };
 
 GC.prototype.getElement = function () {
@@ -490,6 +475,7 @@ GC.prototype.getElement = function () {
 };
 
 GC.prototype.changeMatching = function (new_matching) {
+    var QG = this;
     this.graph.matching = new_matching;
 };
 

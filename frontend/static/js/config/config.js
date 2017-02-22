@@ -193,6 +193,8 @@ module.exports = {
         rectangleWidth: 40,
         delete: 68,
         create: 67,
+        svgHeight: 500,
+        svgWidth: 1500,
 
         /*Stuff adjustable in the back end*/
         datasets: databaseinfo.datasets.bind(databaseinfo),
