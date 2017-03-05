@@ -101,8 +101,10 @@ function getNodesByLevel(nodes) {
 function getNodeRadius (levels, width, height, radius){
     var number = Math.max(Math.max.apply(null, levels), levels.length);
     var size = Math.min(width, height);
-    return 45;//(size/number)*radius;
+    console.log(size, number, radius);
+    return (size/number)*radius/100;
 }
+
 
 
 function Edge(src, dst, id, kind) {

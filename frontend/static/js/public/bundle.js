@@ -1337,6 +1337,7 @@ GC.prototype.nodeMouseDown = function (svg_element) {
 
 GC.prototype.animateNodes = function () {
 
+    console.log("asdasd")
     var QG = this;
 
     var nodes = QG.svg
@@ -1357,16 +1358,48 @@ GC.prototype.animateNodes = function () {
         });
 
     /* Main Circle */
-    var main_circle = aux.append("circle")
+    aux.append("circle")
+        .attr("r", String(radius))
+        .attr("z-index", 1)
+        .classed(QG.config.mainCircleClass, true)
         .on("mousedown", function (d) {
             d3.event.stopPropagation();
             QG.nodeMouseDown(this)
         })
-        .attr("r", String(radius))
-        //function (d) {return d.id == QG.idct || QG.idct == 1 ? String(radius)  : 0 })
-        .attr("z-index", 1)
-        .classed(QG.config.mainCircleClass, true);
+        .transition()
+        .duration(300)
+        .attr("r", function (d) {
+            return String(radius);
+        });
 
+    /* Add Button */
+    aux.append("circle")
+        .attr("transform", function (d) {
+            return "translate(" + String(radius) + "," + 0 + ")";
+        })
+        .attr("r", 0)
+        .attr("z-index", 2)
+        .classed(QG.config.addButtonClass, true)
+        .on("mousedown", function (d) {
+            d3.event.stopPropagation();
+            QG.nodeMouseDown(this)
+        }).transition()
+        .duration(300)
+        .attr("r", function (d) {
+            return String(radius) / 3;
+        });
+    /* Remove Button */
+    aux.append("circle")
+        .attr("transform", function (d) {
+            return "translate(" + String(-radius) + "," + 0 + ")";
+        })
+        .attr("r", String(radius) / 3)
+        .attr("z-index", 2)
+        .classed(QG.config.removeButtonClass, true)
+        .on("mousedown", function (d) {
+            d3.event.stopPropagation();
+            QG.nodeMouseDown(this)
+        });
 
     // - update
     nodes.data(data, function (d) {
@@ -1375,15 +1408,42 @@ GC.prototype.animateNodes = function () {
         .transition()
         .delay(150)
         .attr("transform", function (node) {
-            return "translate(" + (  node.x ) + "," + ( node.y ) + ")";
+            return "translate(" + node.x + "," + node.y + ")";
         });
 
+
+    d3.selectAll("." + QG.config.mainCircleClass)
+        .transition()
+        .attr("r", function (d) {
+            console.log(d);
+            return String(radius);
+        });
+
+    if (QG.graph.previous_radius != undefined && QG.graph.previous_radius != radius) {
+        d3.selectAll("." + QG.config.addButtonClass)
+            .transition()
+            .delay(150)
+            .attr("r", String(radius) / 3)
+            .attr("transform", function (node) {
+                return "translate(" + radius + "," + 0 + ")";
+            });
+
+        d3.selectAll("." + QG.config.removeButtonClass)
+            .transition()
+            .delay(150)
+            .attr("r", String(radius) / 3)
+            .attr("transform", function (node) {
+                return "translate(" + (-radius) + "," + 0 + ")";
+            });
+    }
     // - exit
     nodes.data(data, function (d) {
         return d.id;
     })
         .exit()
         .remove();
+
+    QG.graph.previous_radius = radius;
 
 
 };
@@ -1787,8 +1847,10 @@ function getNodesByLevel(nodes) {
 function getNodeRadius (levels, width, height, radius){
     var number = Math.max(Math.max.apply(null, levels), levels.length);
     var size = Math.min(width, height);
-    return 45;//(size/number)*radius;
+    console.log(size, number, radius);
+    return (size/number)*radius/100;
 }
+
 
 
 function Edge(src, dst, id, kind) {
