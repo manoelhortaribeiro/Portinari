@@ -1,14 +1,23 @@
+@import url('https://fonts.googleapis.com/css?family=Lato|Raleway|Roboto');
+
 /* Fonts */
-$title-font: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
-$primary-font: "Raleway", sans-serif;
-$secondary-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$p-font-size: 10px;
-$li-font-size: 10px;
+$title-font: 'Raleway', sans-serif;
+$title-color: #212121;
+$title-size: 62px;
+
+$primary-font: 'Roboto', sans-serif;
+$primary-font-color: #616161;
+$primary-font-size: 10px;
+
+$secondary-font: 'Lato', sans-serif;
+$secondary-font-color: #9E9E9E;
+$secondary-font-size: 10px;
+
 $node-font-size: 16px;
 
 /* Colors */
 $bg-color: rgba(255, 255, 255, 0.9);
-$secondary-color: #e8f0ff;
+$secondary-color: #004D40;
 
 /* Node Variables */
 $node-color: rgb(12, 12, 14);
@@ -60,44 +69,33 @@ html, body {
 
 body {
   font-family: $primary-font;
+  background-color: $bg-color;
   margin: 0;
   padding: 0;
   border: 0;
-  background-color: $bg-color;
 
   p {
     font-family: $primary-font;
-    font-size: $p-font-size;
+    font-size: $primary-font-size;
     margin: 0;
     padding: 0;
-    text-rendering: optimizeLegibility;
-    color: $header-color;
-    letter-spacing: .1em;
+    border: 0;
   }
 
   h1 {
-    color: $header-color;
+    color: $title-color;
     font-family: $title-font;
-    font-size: 62px;
-    font-weight: 800;
-    line-height: 72px;
-    margin: 0 0 0 0;
+    font-size: $title-size;
     text-align: center;
-    text-rendering: optimizeLegibility;
-    letter-spacing: .05em;
   }
 
   h2 {
     font-family: $secondary-font;
-    font-size: 14px;
-    font-weight: bolder;
-    line-height: 30%;
-    text-transform: uppercase;
-    text-rendering: optimizeLegibility;
+    color: $secondary-font-color;
+    font-size: $secondary-font-size;
+    margin: 0;
     padding: 0;
-    margin: 10px 0 0 10px;
-    color: $header-color;
-    letter-spacing: .1em;
+    border: 0;
   }
 
   button {
@@ -201,7 +199,7 @@ body {
 
     li {
       background-color: $secondary-color;
-      font-size: $li-font-size;
+      font-size: $primary-font-size;
       font-family: $primary-font;
       display: inline-block;
       border: $light-border;
@@ -222,102 +220,107 @@ body {
 
 /* - Query Menu */
 
-#query-interface-graph {
-  padding: 3px 0 0 0;
-  margin: 0;
+#query-system {
 
-  #query-menu {
-    text-align: center;
+
+  #query-interface-graph {
+    padding: 3px 0 0 0;
     margin: 0;
-    padding: 0;
-    .btn {
-      min-height: 15px;
-    }
-  }
 
-  svg {
-
-    display: inline;
-    border: $light-border;
-    margin: $three-px;
-
-    /* nodes */
-
-    .Tick {
-      fill: $node-color;
+    #query-menu {
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      .btn {
+        min-height: 15px;
+      }
     }
 
-    .Node {
+    svg {
 
-      .MainCircle {
+      display: inline;
+      border: $light-border;
+      margin: $three-px;
+
+      /* nodes */
+
+      .Tick {
         fill: $node-color;
       }
 
-      .MainCircle:hover {
-        fill: $selected-node-color;
-        stroke: $node-stroke;
-        stroke-width: $node-stroke-width;
+      .Node {
+
+        .MainCircle {
+          fill: $node-color;
+        }
+
+        .MainCircle:hover {
+          fill: $selected-node-color;
+          stroke: $node-stroke;
+          stroke-width: $node-stroke-width;
+        }
+
+        .MainCircle.selected {
+          fill: $selected-node-color;
+          stroke: $node-stroke;
+          stroke-width: $node-stroke-width;
+        }
+
+        .AddButton {
+          fill: $selected-node-color;
+        }
       }
 
-      .MainCircle.selected {
-        fill: $selected-node-color;
-        stroke: $node-stroke;
-        stroke-width: $node-stroke-width;
+      /* edges */
+
+      .link {
+        stroke: $stroke-link-color;
+        stroke-width: $stroke-link-width;
       }
 
-      .AddButton {
-        fill: $selected-node-color;
+      .selected path.link {
+        stroke: $stroke-link-color-selected;
+        fill: $stroke-link-color-selected;
+        stroke-width: $stroke-link-width-selected;
       }
-    }
 
-    /* edges */
+      #end-arrow {
+        stroke: $stroke-link-color-selected;
+        fill: $stroke-link-color-selected;
+      }
 
-    .link {
-      stroke: $stroke-link-color;
-      stroke-width: $stroke-link-width;
-    }
+      /* text */
 
-    .selected path.link {
-      stroke: $stroke-link-color-selected;
-      fill: $stroke-link-color-selected;
-      stroke-width: $stroke-link-width-selected;
-    }
+      .InTextN text {
+        fill: rgba(255, 255, 255, 1);
+      }
 
-    #end-arrow {
-      stroke: $stroke-link-color-selected;
-      fill: $stroke-link-color-selected;
-    }
+      .OuTextN text {
+        fill: rgba(12, 12, 14, 0.9);
+      }
 
-    /* text */
+      .InTextE text {
+        fill: rgba(12, 12, 14, 0.9);
+      }
 
-    .InTextN text {
-      fill: rgba(255, 255, 255, 1);
-    }
+      .OuTextE text {
+        fill: rgba(12, 12, 14, 0.9);
+      }
 
-    .OuTextN text {
-      fill: rgba(12, 12, 14, 0.9);
-    }
-
-    .InTextE text {
-      fill: rgba(12, 12, 14, 0.9);
-    }
-
-    .OuTextE text {
-      fill: rgba(12, 12, 14, 0.9);
     }
 
   }
 
-}
+  #forms-menu {
+    height: 100%;
+    background-color: $secondary-color;
+    display: none;
+    p {
+      line-height: $form-height;
+      text-align: center;
+      opacity: 0.5;
 
-#forms-menu {
-  height: 100%;
-  background-color: $secondary-color;
-  display: none;
-  p {
-    line-height: $form-height;
-    text-align: center;
-    opacity: 0.5;
+    }
 
   }
 

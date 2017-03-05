@@ -43,7 +43,9 @@ function Node(coordinates, id, parent, name) {
     this.display_value = [];
     // Coordinates of the node
     this.x = coordinates[0];
+    this.oldx = coordinates[0];
     this.y = coordinates[1];
+    this.oldy = coordinates[1];
     // Parent node and level in the tree
     this.parent = parent;
     // Initializes empty children array
