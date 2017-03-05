@@ -1,21 +1,5 @@
 var conf = require("../config/config.js");
 
-function canDo(tmp_x, tmp_y, r, aspect, nodes, node) {
-    /* Checks if you can create a node in the specific location given the coordinates */
-    var can = true;
-
-    // if it is on the borders, then false
-    if (r + tmp_x > aspect[2] || tmp_x - r < aspect[0] || r + tmp_y > aspect[3] || tmp_y - r < aspect[1]) can = false;
-
-    // else if it is too close to another node, then also false!
-    nodes.forEach(function (n) {
-        var dist = Math.sqrt(Math.pow(tmp_x - n.x, 2) + Math.pow(tmp_y - n.y, 2));
-        if (dist <= 2 * r && (typeof node == "undefined" || node.id != n.id)) can = false;
-    });
-
-    // else, can is true!
-    return can;
-}
 
 function _internalCalc(d, consts) {
     /* Calculates the edge in the weird SVG way */
@@ -163,6 +147,5 @@ module.exports = {
     Edge: Edge,
     calcEdgePath: calcEdgePath,
     calcTextEdgePath: calcTextEdgePath,
-    canDo: canDo,
     getTicks: getTicks
 };

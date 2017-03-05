@@ -157,16 +157,18 @@ body {
     /* text */ }
     #query-interface-graph svg .Tick {
       fill: #0c0c0e; }
-    #query-interface-graph svg .Node {
+    #query-interface-graph svg .Node .MainCircle {
       fill: #0c0c0e; }
-    #query-interface-graph svg .Node:hover {
+    #query-interface-graph svg .Node .MainCircle:hover {
       fill: #235581;
       stroke: #202020;
       stroke-width: 2px; }
-    #query-interface-graph svg .Node.selected {
+    #query-interface-graph svg .Node .MainCircle.selected {
       fill: #235581;
       stroke: #202020;
       stroke-width: 2px; }
+    #query-interface-graph svg .Node .AddButton {
+      fill: #235581; }
     #query-interface-graph svg .link {
       stroke: #402D29;
       stroke-width: 4px; }

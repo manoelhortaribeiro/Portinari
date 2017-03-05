@@ -40,7 +40,7 @@ $three-px: 3px 3px 3px 3px;
   top: 50%;
   transform: translateY(-50%);
   display: block;
-  width: 700px ;
+  width: 700px;
   margin: auto;
 
 }
@@ -57,8 +57,6 @@ html, body {
   height: 100%;
   width: 100%;
 }
-
-
 
 body {
   font-family: $primary-font;
@@ -143,9 +141,6 @@ body {
     }
   }
 
-
-
-
   .col-md-4 {
     margin: 0;
     padding: 0;
@@ -227,13 +222,11 @@ body {
 
 /* - Query Menu */
 
-
-
 #query-interface-graph {
   padding: 3px 0 0 0;
   margin: 0;
 
-  #query-menu{
+  #query-menu {
     text-align: center;
     margin: 0;
     padding: 0;
@@ -244,33 +237,37 @@ body {
 
   svg {
 
-
     display: inline;
     border: $light-border;
     margin: $three-px;
 
     /* nodes */
 
-
-
     .Tick {
       fill: $node-color;
     }
 
     .Node {
-      fill: $node-color;
-    }
 
-    .Node:hover {
-      fill: $selected-node-color;
-      stroke: $node-stroke;
-      stroke-width: $node-stroke-width;
-    }
+      .MainCircle {
+        fill: $node-color;
+      }
 
-    .Node.selected {
-      fill: $selected-node-color;
-      stroke: $node-stroke;
-      stroke-width: $node-stroke-width;
+      .MainCircle:hover {
+        fill: $selected-node-color;
+        stroke: $node-stroke;
+        stroke-width: $node-stroke-width;
+      }
+
+      .MainCircle.selected {
+        fill: $selected-node-color;
+        stroke: $node-stroke;
+        stroke-width: $node-stroke-width;
+      }
+
+      .AddButton {
+        fill: $selected-node-color;
+      }
     }
 
     /* edges */
@@ -317,7 +314,6 @@ body {
   height: 100%;
   background-color: $secondary-color;
   display: none;
-
   p {
     line-height: $form-height;
     text-align: center;
@@ -326,8 +322,6 @@ body {
   }
 
 }
-
-
 
 /* -- Sankey -- */
 

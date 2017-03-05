@@ -184,12 +184,16 @@ module.exports = {
         outerTextClass: "OutText",
         graphClass: "Graph",
         nodeClass: "Node",
+        mainCircleClass: "MainCircle",
+        addButtonClass:"AddButton",
+        removeButtonClass:"RemoveButton",
+        editButtonClass:"EditButton",
         nodesClass: "Nodes",
         edgeClass: "Edge",
         edgesClass: "Edges",
         ticksClass: "Ticks",
         tickClass: "Tick",
-        upperNavBarClass: "UpperNavBar",
+        selectedClass: "selected",
         nodeRadius: 45,
         rectangleWidth: 40,
         delete: 68,
@@ -1169,23 +1173,40 @@ module.exports = FormHandler;
 /*                                      / ---------------------------- \                                              */
 /*                                      | AUTHOR: MANOEL HORTA RIBEIRO |                                              */
 /*                                      \ ---------------------------- /                                              */
-/*                                                                                                                    */
-/*                                                                                                                    */
+/* Events out:                                                                                                        */
+/* -> Inspect edge                                                                                                    */
+/* -> Inspect edge                                                                                                    */
+/* Events in:                                                                                                         */
+/* -> New node                                                                                                        */
+/* -> New update node                                                                                                 */
+/* -> New update edge                                                                                                 */
+/* -> Remove node                                                                                                     */
+/* -> Update Settings                                                                                                 */
 /*---------------------------- ----------------------------  ---------------------------- ----------------------------*/
 /*---------------------------- ----------------------------  ---------------------------- ----------------------------*/
+
+/*  TODO: ADD ANIMATION TO NODES BRANCHING OUT. */
+/*  TODO: MAKE IT FIT IN THE PAGE */
+
 
 var json_config = require("../config/config.js"),
     d3 = require("../external/d3.min.v4.js"),
     utils = require("./utils.js");
 
 function GC(query_interface_selection, reactor) {
+    /* Add event listeners, creates and configures the query graph editor as specified in the config file, initializes
+     * the query model and creates the root node.
+     * parameters:
+     * @query_interface_selection: selection of the div where the query graph will be initialized
+     * @reactor: reactor with events to be listened/subscribed
+     * @returns: Nothing*/
 
     var QG = this;
 
-    // Loads the config file
+    /* Loads the config file */
     QG.config = json_config.QUERY_SYSTEM;
 
-    // Binds events to the reactor
+    /* Binds events to the reactor */
     QG.reactor = reactor;
     QG.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
     QG.reactor.addEventListener('constraint_added', this.getElement.bind(this));
@@ -1193,20 +1214,20 @@ function GC(query_interface_selection, reactor) {
     QG.reactor.addEventListener('global_added', this.getGraph.bind(this));
     QG.reactor.addEventListener('matching_changed', this.changeMatching.bind(this));
 
-    // Initial settings for the aspect and svg-related stuff
+    /* Initial settings for the aspect and svg-related stuff */
     QG.height = QG.config.svgHeight;
     QG.width = QG.config.svgWidth;
     QG.aspect = [0, 0, QG.width, QG.height];
 
-    // Variables to adjust the tiles
+    /* Variables to adjust the tiles */
     QG.horizontal_fixed_points = 1;
     QG.vertical_fixed_points = 1;
     QG.levels = [];
 
-    // Array containing selected nodes
+    /* Array containing selected nodes */
     QG.selectedSvgID = [];
 
-    // Initializes the query graph model
+    /* Initializes the query graph model */
     QG.idct = 0;
     QG.graph = {};
     QG.graph.nodes = [];
@@ -1220,73 +1241,45 @@ function GC(query_interface_selection, reactor) {
     QG.graph.global_display_value = [];
     QG.graph.matching = QG.config.matchingDefault();
 
-    // Initializes svg compartments
-    QG.initialize_svg(query_interface_selection);
-
-    // Initializes root node
-    QG.addNode();
-
-    // Initializes graph
-    QG.updateGraph();
-}
-
-GC.prototype.initialize_svg = function (query_interface_selection) {
-    /* This method initializes the svg auxiliary parts of the Query Graph
-      @params: query_interface_selection - */
-
-    var QG = this;
-
+    /* Initializes the svg */
     QG.svg = query_interface_selection.append("svg")
         .attr("viewBox", QG.aspect[0] + " " + QG.aspect[1] + " " + QG.aspect[2] + " " + QG.aspect[3])
         .attr("preserveAspectRatio", "xMinYMin meet"); // svg
 
-    QG.svgG = QG.svg.append("g").classed(QG.config.graphClass, true);     // graph
-
-    QG.svgG.append("g").classed(QG.config.nodesClass, true);    // nodes
-
-    QG.svgG.append("g").classed(QG.config.edgesClass, true);     // edges
-
+    QG.svgG = QG.svg.append("g").classed(QG.config.graphClass, true);   // graph
+    QG.svgG.append("g").classed(QG.config.nodesClass, true);            // nodes
     QG.svgG.append("g").classed(QG.config.innerTextNodeClass, true);    // node text
-
-    QG.svgG.append("g").classed(QG.config.innerTextEdgeClass, true);    // edge text
-
     QG.svgG.append("g").classed(QG.config.outerTextNodeClass, true);    // node constraint text
-
+    QG.svgG.append("g").classed(QG.config.edgesClass, true);            // edges
+    QG.svgG.append("g").classed(QG.config.innerTextEdgeClass, true);    // edge text
     QG.svgG.append("g").classed(QG.config.outerTextEdgeClass, true);    // edge constraint text
 
-    var defs = QG.svg.append('svg:defs');
-    defs.append('svg:marker')
-        .attr('id', 'end-arrow').attr('viewBox', '0 -5 10 10')
-        .attr('refX', 8.5).attr('markerWidth', 3.5)
-        .attr('markerHeight', 3.5).attr('orient', 'auto')
-        .append('svg:path').attr('d', 'M0,-5L10,0L0,5');    // marker
-
+    // TODO: this is for testing only
     d3.select(window).on("keydown", function () {
         if (d3.event.shiftKey) {
             QG.svgKeyDown.call(QG);
         }
-    });    // key down on window
+    });
 
-};
+    QG.addNode();        // Initializes root node
+    QG.updateGraph();    // Initializes graph
+}
 
 GC.prototype.distributeNodes = function () {
     /* This method distributes the nodes in the svg. It gets the horizontal_fixed_points and the vertical_fixed_points
      using the levels variable, and then positions all the nodes on its respective tick.
-     @params: None
-     @return: Nothing */
+     parameters: none
+     @return: nothing */
 
     var QG = this;
-
     QG.horizontal_fixed_points = QG.levels.length;
     QG.vertical_fixed_points = Math.max.apply(null, QG.levels);
-
     var nodes_level = utils.getNodesByLevel(QG.graph.nodes);
     var ticks = utils.getTicks(QG.width, QG.height, QG.horizontal_fixed_points, QG.vertical_fixed_points);
 
     for (var level = 0; level < QG.horizontal_fixed_points; level++) {
         var nodes_to_distribute = nodes_level[level];
         var start_position = Math.floor((QG.vertical_fixed_points - nodes_to_distribute.length) / 2);
-
         for (var pos = start_position; pos < QG.vertical_fixed_points; pos++) {
             if (nodes_to_distribute.length == 0)
                 break;
@@ -1299,46 +1292,117 @@ GC.prototype.distributeNodes = function () {
 };
 
 GC.prototype.addNode = function (parent, coordinates) {
-    /* This creates a node given a parent and a set of coordinates. It can be done without parents or coordinates. It
-     also handles the increase of the level.
-     @params: parent - parent node
-     coordinates - [x, y] array
+    /* This method creates a node given a parent & a set of coordinates. It can be done without parents or coordinates.
+     It also handles the increase of the level.
+     parameters:
+     @parent:  parent node
+     @coordinates: [x, y] array
      @return: recently created node */
 
     var QG = this;
-
-    // Get coordinate values
-    coordinates = ((coordinates == undefined) ? [0, 0] : coordinates);
-
-    // Create nodes
-    var node = new utils.Node(coordinates, QG.idct, parent);
-
-    // Add edges
-    if (parent != undefined) QG.addEdge(parent, node, "directed");
-
-    // Internal book keeping
-    QG.graph.nodes.push(node);
-
-    // Increases index
-    QG.idct += 1;
-
-    // Pushes node to level
-    if (node.level == QG.levels.length) QG.levels.push(1);
-    else QG.levels[node.level]++;
-
+    coordinates = ((coordinates == undefined) ? [0, 0] : coordinates);                      // Get coordinate values
+    var node = new utils.Node(coordinates, QG.idct, parent);                                // Create node
+    if (parent != undefined) QG.addEdge(parent, node, "directed");                          // Add edges
+    QG.graph.nodes.push(node);                                                              // Internal book keeping
+    QG.idct += 1;                                                                           // Increases index
+    if (node.level == QG.levels.length) QG.levels.push(1); else QG.levels[node.level]++;    // Pushes node to level
     return node;
 };
 
+//GC.prototype.removeNode = function ()
+
 GC.prototype.nodeMouseDown = function (svg_element) {
+    /* This method marks every selected node as having the selected class if it is not selected, and as not having the
+     selected class if the node is selected
+     parameters:
+     @svg_element svg_element corresponding to the node
+     @return: nothing */
+
     var QG = this;
     d3.event.stopPropagation();
-    var node = d3.select(svg_element)
-    if(node.classed("selected") == true) node.classed("selected", false);
-    else node.classed("selected", true);
+    var node = d3.select(svg_element);
+    if (node.classed(QG.config.selectedClass) == true) node.classed(QG.config.selectedClass, false);
+    else node.classed(QG.config.selectedClass, true);
 };
 
-// - Edge behaviour -
+GC.prototype.animateNodes = function () {
+    var QG = this;
+
+    var nodes = QG.svg
+        .select("g." + QG.config.nodesClass)
+        .selectAll("g." + QG.config.nodeClass),
+        data = QG.graph.nodes,
+        radius = utils.getNodeRadius(QG.levels, QG.width, QG.height, QG.config.nodeRadius);
+
+    /* Enter */
+    var aux = nodes.data(data, function (d) {
+        return d.name;
+    }).enter();
+
+    // append node
+    aux = aux.append("g")
+        .classed(QG.config.nodeClass, true)
+        .attr("transform", function (d) {
+            return "translate(" + d.x + "," + d.y + ")";
+        });
+    // append main circle
+    aux.append("circle")
+        .attr("r", String(radius))
+        .attr("z-index", 1)
+        .classed(QG.config.mainCircleClass, true)
+        .on("mousedown", function (d) {
+            d3.event.stopPropagation();
+            QG.nodeMouseDown(this)
+        });
+    // append add button
+    aux.append("circle")
+        .attr("transform", function (d) {
+            return "translate(" +  String(radius) + "," + 0 + ")";
+        })
+        .attr("r", String(radius) / 3)
+        .attr("z-index", 2)
+        .classed(QG.config.addButtonClass, true)
+        .on("mousedown", function (d) {
+            d3.event.stopPropagation();
+            QG.nodeMouseDown(this)
+        });
+    // append remove button
+    aux.append("circle")
+        .attr("transform", function (d) {
+            return "translate(" +  String(radius) + "," + 0 + ")";
+        })
+        .attr("r", String(radius) / 3)
+        .attr("z-index", 2)
+        .classed(QG.config.addButtonClass, true)
+        .on("mousedown", function (d) {
+            d3.event.stopPropagation();
+            QG.nodeMouseDown(this)
+        });
+
+    // - update
+    nodes.data(data, function (d) {
+            return (d.name, d.x, d.y);
+        })
+        .attr("transform", function (d) {
+            return "translate(" + d.x + "," + d.y + ")";
+        })
+        .attr("r", String(radius));
+
+    // - exit
+    nodes.data(data, function (d) {
+            return d.name;
+        })
+        .exit()
+        .remove();
+};
+
 GC.prototype.addEdge = function (src, dst, kind) {
+    /* This method receives two nodes, src and dst, and the kind of edge and creates an edge between the two.
+     parameters:
+     @src: node of origin
+     @dst: node of destination
+     @kind: type of edge  */
+
     var QG = this;
     var edge = new utils.Edge(src, dst, QG.idct, kind);
     QG.graph.edges.push(edge);
@@ -1346,10 +1410,11 @@ GC.prototype.addEdge = function (src, dst, kind) {
     QG.updateGraph();
 };
 
+
+// TODO: simple in-edge time/hop editing
 GC.prototype.edgeMouseDown = function (svg_element) {
     var QG = this;
     d3.event.stopPropagation();
-    d3.select(svg_element).classed("selected", true)
 };
 
 
@@ -1364,31 +1429,29 @@ GC.prototype.svgKeyDown = function () {
     switch (d3.event.keyCode) {
 
         case QG.config.delete:
-
-            // Doesn't let you delete the root
-            if (selected.level == 0)
-                break;
-
-            // Gets node to be removed
-            var removed = utils.getNodeById(QG.graph.nodes, sel_id);
-
-            // Gets descendants of the node to be removed
-            var descendants = utils.getDescendantsID(QG.nodes, removed);
-
-            // Remove all descendants
-            QG.graph.nodes = QG.graph.nodes.filter(function (node) {
-                return !node.id in descendants;
-            });
-
-            // Remove all edges involving descendants
-            QG.graph.edges = QG.graph.edges.filter(function (edge) {
-                return (!edge.src.id in descendants) && (!edge.dst.id in descendants);
-            });
+            //
+            //// Doesn't let you delete the root
+            //if (selected.level == 0) break;
+            //
+            //// Gets node to be removed
+            //var removed = utils.getNodeById(QG.graph.nodes, sel_id);
+            //
+            //// Gets descendants of the node to be removed
+            //var descendants = utils.getDescendantsID(QG.nodes, removed);
+            //
+            //// Remove all descendants
+            //QG.graph.nodes = QG.graph.nodes.filter(function (node) {
+            //    return !node.id in descendants;
+            //});
+            //
+            //// Remove all edges involving descendants
+            //QG.graph.edges = QG.graph.edges.filter(function (edge) {
+            //    return (!edge.src.id in descendants) && (!edge.dst.id in descendants);
+            //});
 
 
             QG.updateGraph();
             break;
-        //QG.reactor.dispatchEvent("selected_node_changed", QG.selectedSvgID);
 
         case QG.config.create:
             console.log(selected);
@@ -1398,7 +1461,6 @@ GC.prototype.svgKeyDown = function () {
 
             QG.updateGraph();
             break;
-        //QG.reactor.dispatchEvent("selected_node_changed", QG.selectedSvgID);
 
     }
 };
@@ -1408,54 +1470,10 @@ GC.prototype.updateGraph = function () {
 
     var QG = this;
 
-    console.log(QG.selectedSvgID);
-
-
-    //this.replaceSelected(utils.getNodeById(this.selectedSvgID));
-
-    console.log(QG.graph.nodes);
-
     QG.distributeNodes();
 
-    // -- Nodes --
-    var nodes = QG.svg
-        .select("g." + QG.config.nodesClass)
-        .selectAll("g." + QG.config.nodeClass);
+    QG.animateNodes();
 
-    var nodes_data = nodes.data();
-
-
-    var data = QG.graph.nodes;
-    // - enter
-    var aux = nodes.data(data, function (d) {
-        return d.name;
-    }).enter()
-        .append("g")
-        .classed(QG.config.nodeClass, true)
-        .attr("transform", function (d) {
-            return "translate(" + d.x + "," + d.y + ")";
-        })
-        .on("mousedown", function (d) {
-            QG.nodeMouseDown(this)
-        })
-    aux.append("circle")
-        .attr("r", String(utils.getNodeRadius(QG.levels, QG.width, QG.height, QG.config.nodeRadius)));
-
-    // - update
-    nodes.data(data, function (d) {
-            return d.name;
-        })
-        .attr("transform", function (d) {
-            return "translate(" + d.x + "," + d.y + ")";
-        })
-        .attr("r", String(utils.getNodeRadius(QG.levels, QG.width, QG.height, QG.config.nodeRadius)));
-    ;
-    // - exit
-    nodes.data(data, function (d) {
-            return d.name;
-        })
-        .exit()
-        .remove();
 
     // -- InText/Nodes--
     var text = QG.svg
@@ -1473,7 +1491,10 @@ GC.prototype.updateGraph = function () {
         .attr("y", function (d) {
             return d.y
         })
-        .attr("text-anchor", "middle");
+        .attr("text-anchor", "middle")
+        .text(function (d) {
+            return '#' + String(d.id);
+        });
     // -- update
     text.data(data, function (d) {
         return d.name;
@@ -1482,23 +1503,7 @@ GC.prototype.updateGraph = function () {
     }).attr("y", function (d) {
         return d.y
     }).text(function (d) {
-        var isStart = true;
-        var isEnd = true;
-
-        QG.graph.edges.forEach(function (edge) {
-            if (d.name == edge.destination) {
-                isStart = false;
-            }
-            if (d.name == edge.source) {
-                isEnd = false;
-            }
-        });
-
-        if (isStart && isEnd) return ' ';
-        else if (isStart) return 'start';
-        else if (isEnd) return 'end';
-        else return ' ';
-
+        return '#' + String(d.id);
     });
     // -- exit
     text.data(data, function (d) {
@@ -1650,22 +1655,6 @@ module.exports = GC;
 },{"../config/config.js":1,"../external/d3.min.v4.js":2,"./utils.js":11}],11:[function(require,module,exports){
 var conf = require("../config/config.js");
 
-function canDo(tmp_x, tmp_y, r, aspect, nodes, node) {
-    /* Checks if you can create a node in the specific location given the coordinates */
-    var can = true;
-
-    // if it is on the borders, then false
-    if (r + tmp_x > aspect[2] || tmp_x - r < aspect[0] || r + tmp_y > aspect[3] || tmp_y - r < aspect[1]) can = false;
-
-    // else if it is too close to another node, then also false!
-    nodes.forEach(function (n) {
-        var dist = Math.sqrt(Math.pow(tmp_x - n.x, 2) + Math.pow(tmp_y - n.y, 2));
-        if (dist <= 2 * r && (typeof node == "undefined" || node.id != n.id)) can = false;
-    });
-
-    // else, can is true!
-    return can;
-}
 
 function _internalCalc(d, consts) {
     /* Calculates the edge in the weird SVG way */
@@ -1813,7 +1802,6 @@ module.exports = {
     Edge: Edge,
     calcEdgePath: calcEdgePath,
     calcTextEdgePath: calcTextEdgePath,
-    canDo: canDo,
     getTicks: getTicks
 };
 
