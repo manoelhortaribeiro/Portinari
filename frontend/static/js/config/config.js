@@ -193,7 +193,7 @@ module.exports = {
         ticksClass: "Ticks",
         tickClass: "Tick",
         selectedClass: "selected",
-        nodeRadius: 45,
+        nodeRadius: 33,
         rectangleWidth: 40,
         delete: 68,
         create: 67,

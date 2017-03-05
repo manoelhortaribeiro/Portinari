@@ -194,7 +194,7 @@ module.exports = {
         ticksClass: "Ticks",
         tickClass: "Tick",
         selectedClass: "selected",
-        nodeRadius: 45,
+        nodeRadius: 33,
         rectangleWidth: 40,
         delete: 68,
         create: 67,
@@ -1285,20 +1285,8 @@ GC.prototype.distributeNodes = function () {
                 break;
             var tick = ticks[[level, pos]];
             var node = nodes_to_distribute.pop();
-
-            console.log(">> distribute")
-
-            console.log("node.id", node.id, "QG.idct", QG.idct);
-            console.log("@before ", node.x, node.y, "next:", tick.x, tick.y);
-
-            node.oldx = node.id >= QG.idct - 1 ? tick.x : node.x;
-            node.oldy = node.id >= QG.idct - 1 ? tick.y : node.y;
             node.x = tick.x;
             node.y = tick.y;
-
-            console.log("@after", node.x, node.y, "old:", node.oldx, node.oldy);
-            console.log("@change", node.oldx - node.x, node.oldy - node.y);
-
         }
     }
 };
@@ -1335,9 +1323,39 @@ GC.prototype.nodeMouseDown = function (svg_element) {
     else node.classed(QG.config.selectedClass, true);
 };
 
+GC.prototype.addCircle = function (aux, radius, tx, ty, z_index, circle_class, function_mousedown) {
+    var QG = this;
+
+    aux.append("circle")
+        .attr("transform", function (d) {
+            return "translate(" + tx + "," + ty + ")";
+        })
+        .attr("r", 0)
+        .attr("z-index", z_index)
+        .classed(circle_class, true)
+        .on("mousedown", function (d) {
+            d3.event.stopPropagation();
+            function_mousedown(this)
+        })
+        .transition()
+        .duration(300)
+        .attr("r", function (d) {
+            return String(radius);
+        });
+
+        if (QG.graph.previous_radius != undefined && QG.graph.previous_radius != radius) {
+
+        d3.selectAll("." + circle_class)
+            .transition()
+            .attr("r", String(radius))
+            .attr("transform", function () {
+                return "translate(" + tx + "," + ty + ")";
+            });
+    }
+};
+
 GC.prototype.animateNodes = function () {
 
-    console.log("asdasd")
     var QG = this;
 
     var nodes = QG.svg
@@ -1346,6 +1364,7 @@ GC.prototype.animateNodes = function () {
         data = QG.graph.nodes,
         radius = utils.getNodeRadius(QG.levels, QG.width, QG.height, QG.config.nodeRadius);
 
+    /* >> Enter */
     var aux = nodes
         .data(data, function (d) {
             return d.id;
@@ -1357,51 +1376,12 @@ GC.prototype.animateNodes = function () {
             return "translate(" + d.x + "," + d.y + ")";
         });
 
-    /* Main Circle */
-    aux.append("circle")
-        .attr("r", String(radius))
-        .attr("z-index", 1)
-        .classed(QG.config.mainCircleClass, true)
-        .on("mousedown", function (d) {
-            d3.event.stopPropagation();
-            QG.nodeMouseDown(this)
-        })
-        .transition()
-        .duration(300)
-        .attr("r", function (d) {
-            return String(radius);
-        });
+    QG.addCircle(aux, radius, 0, 0, 2, QG.config.mainCircleClass, QG.nodeMouseDown.bind(this));    // Main Circle
+    QG.addCircle(aux, radius / 3, radius, 0, 3, QG.config.addButtonClass, QG.nodeMouseDown);       // Add Button
+    QG.addCircle(aux, radius / 3, -radius, 0, 3, QG.config.removeButtonClass, QG.nodeMouseDown);   // Remove Button
+    QG.addCircle(aux, radius / 3, 0, -radius, 3, QG.config.editButtonClass, QG.nodeMouseDown);     // Inspect Button
 
-    /* Add Button */
-    aux.append("circle")
-        .attr("transform", function (d) {
-            return "translate(" + String(radius) + "," + 0 + ")";
-        })
-        .attr("r", 0)
-        .attr("z-index", 2)
-        .classed(QG.config.addButtonClass, true)
-        .on("mousedown", function (d) {
-            d3.event.stopPropagation();
-            QG.nodeMouseDown(this)
-        }).transition()
-        .duration(300)
-        .attr("r", function (d) {
-            return String(radius) / 3;
-        });
-    /* Remove Button */
-    aux.append("circle")
-        .attr("transform", function (d) {
-            return "translate(" + String(-radius) + "," + 0 + ")";
-        })
-        .attr("r", String(radius) / 3)
-        .attr("z-index", 2)
-        .classed(QG.config.removeButtonClass, true)
-        .on("mousedown", function (d) {
-            d3.event.stopPropagation();
-            QG.nodeMouseDown(this)
-        });
-
-    // - update
+    /* >> Update */
     nodes.data(data, function (d) {
         return d.id;
     })
@@ -1411,31 +1391,6 @@ GC.prototype.animateNodes = function () {
             return "translate(" + node.x + "," + node.y + ")";
         });
 
-
-    d3.selectAll("." + QG.config.mainCircleClass)
-        .transition()
-        .attr("r", function (d) {
-            console.log(d);
-            return String(radius);
-        });
-
-    if (QG.graph.previous_radius != undefined && QG.graph.previous_radius != radius) {
-        d3.selectAll("." + QG.config.addButtonClass)
-            .transition()
-            .delay(150)
-            .attr("r", String(radius) / 3)
-            .attr("transform", function (node) {
-                return "translate(" + radius + "," + 0 + ")";
-            });
-
-        d3.selectAll("." + QG.config.removeButtonClass)
-            .transition()
-            .delay(150)
-            .attr("r", String(radius) / 3)
-            .attr("transform", function (node) {
-                return "translate(" + (-radius) + "," + 0 + ")";
-            });
-    }
     // - exit
     nodes.data(data, function (d) {
         return d.id;
@@ -1444,50 +1399,9 @@ GC.prototype.animateNodes = function () {
         .remove();
 
     QG.graph.previous_radius = radius;
-
-
 };
 
-//
-// /* Add Button */
-// var add_button = aux.append("circle")
-//     .attr("transform", function (d) {
-//         return "translate(" + String(radius) + "," + 0 + ")";
-//     })
-//     .attr("r", 0)
-//     .attr("z-index", 2)
-//     .classed(QG.config.addButtonClass, true)
-//     .on("mousedown", function (d) {
-//         d3.event.stopPropagation();
-//         QG.nodeMouseDown(this)
-//     });
 
-// add_button.transition()
-//     .duration(500)
-//     .attr("r", function (d) {
-//         console.log(d);
-//         return String(radius)/3;
-//     });
-
-//
-// /* Remove Button */
-// var remove_button = aux.append("circle")
-//     .attr("transform", function (d) {
-//         return "translate(" + String(-radius) + "," + 0 + ")";
-//     })
-//     .attr("r", 0)
-//     .attr("z-index", 2)
-//     .classed(QG.config.addButtonClass, true)
-//     .on("mousedown", function (d) {
-//         d3.event.stopPropagation();
-//         QG.nodeMouseDown(this)
-//     });
-// remove_button.transition()
-//     .duration(500)
-//     .attr("r", function (d) {
-//         console.log(d);
-//         return String(radius)/3;
-//     });
 
 GC.prototype.addEdge = function (src, dst, kind) {
     /* This method receives two nodes, src and dst, and the kind of edge and creates an edge between the two.
@@ -1789,9 +1703,7 @@ function Node(coordinates, id, parent, name) {
     this.display_value = [];
     // Coordinates of the node
     this.x = coordinates[0];
-    this.oldx = coordinates[0];
     this.y = coordinates[1];
-    this.oldy = coordinates[1];
     // Parent node and level in the tree
     this.parent = parent;
     // Initializes empty children array
