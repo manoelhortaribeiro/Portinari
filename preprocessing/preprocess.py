@@ -6,26 +6,26 @@
 #                                                                                                                      #
 # This script does the whole preprocessing of the two files. Basically it:                                             #
 #                                                                                                                      #
-#                   - Fill empty attributes as specified by the config file.                                           #
+#                  1- Fill empty attributes as specified by the config file.                                           #
 #                   * Uses the mandatory "nan" field on the config file.                                               #
 #                                                                                                                      #
-#                   - Does the conversion from date string to int as specified by config file.                         #
+#                  2- Does the conversion from date string to int as specified by config file.                         #
 #                   * Uses the optional "conversion" field on each attribute & the mandatory "timeformat" attribute.   #
 #                                                                                                                      #
-#                   - Drop columns and invalid rows as specified by the config file.                                   #
+#                  3- Drop columns and invalid rows as specified by the config file.                                   #
 #                   * Uses the optional field "drop_col" and "drop_val" on each attribute                              #
 #                                                                                                                      #
-#                   - Rename the categorical values of some attrs as specified by config file. Must be numbers wo 0.   #
+#                  4- Rename the categorical values of some attrs as specified by config file. Must be numbers wo 0.   #
 #                   * Uses the optional "rename":{"old":"new",...} field on each attribute.                            #
 #                                                                                                                      #
-#                   - Remove trailing zeroes in all attrbutes, just to prevent having 1.0 as float                     #
+#                  5- Remove trailing zeroes in all attributes, just to prevent having 1.0 as float                    #
 #                                                                                                                      #
-#                   - Creates two attributes "age" and "sincelast", derived from "eventdate" and "entitycreation".     #
+#                  6- Creates two attributes "age" and "sincelast", derived from "eventdate" and "entitycreation".     #
 #                   * Uses the mandatory "eventdate" & "entitycreation" fields on config file.                         #
 #                                                                                                                      #
-#                   -  Make all rows numeric (either float or int, no strings allowed).                                #
+#                  7-  Make all rows numeric (either float or int, no strings allowed).                                #
 #                                                                                                                      #
-#                   -  Make relational-like tables.                                                                    #
+#                  8-  Make relational-like tables.                                                                    #
 #                   * Uses the mandatory "default" field and the optional "entity" and "event" fields on each attr.    #
 #                                                                                                                      #
 #  The config file contains the following fields:                                                                      #
@@ -71,6 +71,7 @@ import json
 import time
 import os
 
+
 # ---- Helpers ----
 
 
@@ -102,10 +103,9 @@ def drop_cols(default, table_type, var, all_a, age="", sincelast=""):
     :param all_a: columns in the dataframe.
     :param age: age of the entity as specified in the config file.
     :param sincelast: time since last event as specified in the config file.
-    :return:
-    """
-    to_drop = []
-    names = []
+    :return: list with the values to be dropped. """
+    to_drop, names = [], []
+
     for col in var:
         if "drop_col" in var[col] and var[col]["drop_col"] == "true":
             continue
@@ -188,9 +188,13 @@ def to_unix(st, flag, config):
     :param flag: ("to_sec"|"to_min"|"to_hour"|"to_day"|"to_week"|"to_month"|"to_year").
     :param config: config_file.
     :return: new converted unix-like file. """
-    if st != config["nan"]:
-        st = np.floor(int(time.mktime(datetime.datetime.strptime(st, config["time_format"]).timetuple())))
 
+    # weird bug where 01.01.1970 has different values accross different machines
+    # http://stackoverflow.com/questions/42636080/inconsistent-strptime-accross-different-machines
+    offset = int(time.mktime(datetime.datetime.strptime("01.01.1970", "%d.%m.%Y").timetuple()))
+
+    if st != config["nan"]:
+        st = int(time.mktime(datetime.datetime.strptime(st, config["time_format"]).timetuple())) - offset
     return apply_time_flag(st, flag, config)
 
 
@@ -209,8 +213,7 @@ def drop_cols_vals(df, config):
     """ Drops columns and values as specified in the config file.
     :param df: dataframe.
     :param config: config file.
-    :return: filtered dataframe.
-    """
+    :return: filtered dataframe. """
     for key, var in config["variables"].items():
         # Drop Columns
         if "drop_col" in var and var["drop_col"] == "true":
@@ -220,26 +223,11 @@ def drop_cols_vals(df, config):
     return df
 
 
-def time_conversion(df, config):
-    """ This function does the time conversion on the file.
-    :param df: dataframe.
-    :param config: config file.
-    :return: unix-style timed dataset.
-    """
-    for key, var in config["variables"].items():
-        if "conversion" in var:
-            f = functools.partial(to_unix, flag=var["conversion"], config=config)
-            df[key] = df[key].apply(f)
-
-    return df
-
-
 def rename(df, config):
     """ Rename columns.
     :param df: dataframe.
     :param config: config file.
-    :return: dataframe with renamed columns.
-    """
+    :return: dataframe with renamed columns. """
     for i in config["variables"]:
         if "renaming" in config["variables"][i]:
             loc = list(df.columns.values).index(i)
@@ -255,18 +243,18 @@ def rename(df, config):
     return df
 
 
-def remove_trailing_zeroes(df):
-    """ Removes trailing zeroes, making type inference easier.
+def time_conversion(df, config):
+    """ This function does the time conversion on the file.
     :param df: dataframe.
-    :return: dataframe without trailing zeroes. """
-    table = df.values
-    for row in range(len(table)):
-        for col in range(len(table[row])):
-            val = table[row][col]
-            if type(val) == str and len(val) >= 3 and val[-2:] == ".0":
-                table[row][col] = val[:-2]
+    :param config: config file.
+    :return: unix-style timed dataset. """
+    for key, var in config["variables"].items():
+        if "conversion" in var:
+            f = functools.partial(to_unix, flag=var["conversion"], config=config)
+            new_name = config["variables"][key]["new_name"]
+            df[new_name] = df[new_name].apply(f)
 
-    return pandas.DataFrame(table, columns=df.columns)
+    return df
 
 
 def calculate_age(df, config):
@@ -327,6 +315,10 @@ def make_numeric(df):
 
 
 def make_tables(df, config):
+    """ This function creates the entity and the events tables by dropping stuff.
+    :param df: dataframe.
+    :param config: config.
+    :return: the two new tables """
     df_entity = df.drop(drop_cols(config["default"],
                                   "entity",
                                   config["variables"],
@@ -347,36 +339,38 @@ def make_tables(df, config):
 
 
 def make_all(config):
+    """ This function simply applies all the preprocessing steps to a dataset, receiving only its config file. It saves
+    the files as a pickle object, to be then loaded by portinari client.
+    :param config: config file.
+    :return: nothing. """
     raw_dir = config["directory"]
     name = config["name"]
 
-    df = pandas.read_csv(raw_dir + name, dtype=object, na_values=" ")    # paths
+    df = pandas.read_csv(raw_dir + name, dtype=object, na_values=" ")  # paths
 
-    df = fill_na(df=df, config=config)    # fill na
+    df = fill_na(df=df, config=config)  # fill na
 
-    df = drop_cols_vals(df=df, config=config)    # drop rows and cols
+    df = drop_cols_vals(df=df, config=config)  # drop rows and cols
 
-    df = time_conversion(df=df, config=config)    # time conversion
+    df = rename(df=df, config=config)  # rename values and columns
 
-    df = rename(df=df, config=config)    # rename values and columns
+    df = time_conversion(df=df, config=config)  # time conversion
 
-    df = remove_trailing_zeroes(df=df, config=config)     # remove trailing zeroes
+    df = calculate_age(df=df, config=config)  # calculate age
 
-    df = calculate_age(df=df, config=config)     # calculate age
+    df = calculate_sincelast(df=df, config=config)  # calculate sincelast
 
-    df = calculate_sincelast(df=df, config=config)     # calculate sincelast
+    df = make_numeric(df=df)  # make all rows numeric
 
-    df = make_numeric(df=df)    # make all rows numeric
+    df_entity, df_event = make_tables(df=df, config=config)  # make tables
 
-    df_entity, df_event = make_tables(df=df, config=config),     # make tables
+    df_entity.index, df_event_index = df_entity.index + 1, df_event.index + 1  # increases index (start at 1)
 
-    df_entity.index, df_event_index = df_entity.index + 1, df_event.index + 1     # increases index (start at 1)
+    filename, file_ext = os.path.splitext(raw_dir + name)  # gets path
 
-    filename, file_ext = os.path.splitext(raw_dir + name)     # gets path
+    pickle.dump(df_entity, open(filename + "_entity", "wb"))  # write entity table
 
-    pickle.dump(df_entity, open(filename + "_entity", "wb"))     # write entity table
-
-    pickle.dump(df_event, open(filename + "_event", "wb"))     # write event table
+    pickle.dump(df_event, open(filename + "_event", "wb"))  # write event table
 
 
 if __name__ == "__main__":
