@@ -173,7 +173,7 @@ GC.prototype.addCircle = function (aux, radius, tx, ty, z_index, circle_class, f
             return String(radius);
         });
 
-        if (QG.graph.previous_radius != undefined && QG.graph.previous_radius != radius) {
+    if (QG.graph.previous_radius != undefined && QG.graph.previous_radius != radius) {
 
         d3.selectAll("." + circle_class)
             .transition()
@@ -185,26 +185,37 @@ GC.prototype.addCircle = function (aux, radius, tx, ty, z_index, circle_class, f
 };
 
 GC.prototype.animateNodes = function () {
+    /* This method is responsible for entering, updating and exiting the svg relate to the nodes. It also makes nice
+     transition animations for the nodes insertion/removal.
+     parameters: none
+     @return : nothing */
 
-    var QG = this;
+    /* >> Set-up */
+    var QG = this,
 
-    var nodes = QG.svg
+        nodes = QG.svg
             .select("g." + QG.config.nodesClass)
             .selectAll("g." + QG.config.nodeClass),
+
         data = QG.graph.nodes,
-        radius = utils.getNodeRadius(QG.levels, QG.width, QG.height, QG.config.nodeRadius);
+
+        radius = utils.getNodeRadius(QG.levels, QG.width, QG.height, QG.config.nodeRadius),
+
+        func_return_id = function (d) {
+            return d.id;
+        },
+
+        func_translate = function (d) {
+            return "translate(" + d.x + "," + d.y + ")";
+        };
 
     /* >> Enter */
     var aux = nodes
-        .data(data, function (d) {
-            return d.id;
-        })
+        .data(data, func_return_id)
         .enter()
         .append("g")
         .classed(QG.config.nodeClass, true)
-        .attr("transform", function (d) {
-            return "translate(" + d.x + "," + d.y + ")";
-        });
+        .attr("transform", func_translate);
 
     QG.addCircle(aux, radius, 0, 0, 2, QG.config.mainCircleClass, QG.nodeMouseDown.bind(this));    // Main Circle
     QG.addCircle(aux, radius / 3, radius, 0, 3, QG.config.addButtonClass, QG.nodeMouseDown);       // Add Button
@@ -212,26 +223,68 @@ GC.prototype.animateNodes = function () {
     QG.addCircle(aux, radius / 3, 0, -radius, 3, QG.config.editButtonClass, QG.nodeMouseDown);     // Inspect Button
 
     /* >> Update */
-    nodes.data(data, function (d) {
-        return d.id;
-    })
+    nodes.data(data, func_return_id)
         .transition()
         .delay(150)
-        .attr("transform", function (node) {
-            return "translate(" + node.x + "," + node.y + ")";
-        });
+        .attr("transform", func_translate);
 
-    // - exit
-    nodes.data(data, function (d) {
-        return d.id;
-    })
+    /* >> Exit */
+    nodes.data(data, func_return_id)
         .exit()
         .remove();
 
-    QG.graph.previous_radius = radius;
+    QG.graph.previous_radius = radius;  // stores previous radius state
 };
 
+GC.prototype.animateEdges = function () {
+    /* This method is responsible for entering, updating and exiting the svg relate to the edges. It also makes nice
+     transition animations for the edges insertion/removal.
+     parameters: none
+     @return : nothing */
 
+    /* >> Set-up */
+    var QG = this,
+
+        edges = QG.svg
+            .select("g." + QG.config.edgesClass)
+            .selectAll("g." + QG.config.edgeClass),
+
+        data = QG.graph.edges,
+
+        radius = utils.getNodeRadius(QG.levels, QG.width, QG.height, QG.config.nodeRadius),
+
+        func_return_id = function (d) {
+            return d.id;
+        };
+
+    /* >> Enter */
+    var aux = edges.data(data, function (d) {
+        return d.id;
+    }).enter()
+        .append("g")
+        .classed(QG.config.edgeClass, true)
+        .on("mousedown", function () {
+            QG.edgeMouseDown(this)
+        });
+    aux.append("path")
+        .attr("d", function (d) {
+            return utils.calcEdgePath(d, radius);
+        })
+        .attr("z-index",0)
+        .classed(QG.config.linkClass, true);
+
+    /* >> Update */
+    edges.data(data, func_return_id)
+        .selectAll("path")
+        .attr("d", function (d) {
+            return utils.calcEdgePath(d, radius);
+        });
+
+    /* >> Exit */
+    edges.data(data, func_return_id)
+        .exit()
+        .remove();
+};
 
 GC.prototype.addEdge = function (src, dst, kind) {
     /* This method receives two nodes, src and dst, and the kind of edge and creates an edge between the two.
@@ -294,7 +347,6 @@ GC.prototype.svgKeyDown = function () {
             QG.addNode(parent);
             QG.updateGraph();
 
-
             break;
 
     }
@@ -309,165 +361,128 @@ GC.prototype.updateGraph = function () {
 
     QG.animateNodes();
 
+    QG.animateEdges();
 
-    // -- InText/Nodes--
-    var text = QG.svg
-        .select("g." + QG.config.innerTextNodeClass)
-        .selectAll("text");
-    var data = QG.graph.nodes;
-    // -- enter
-    var aux = text.data(data, function (d) {
-        return d.name;
-    }).enter()
-        .append("text")
-        .attr("x", function (d) {
-            return d.x
-        })
-        .attr("y", function (d) {
-            return d.y
-        })
-        .attr("text-anchor", "middle")
-        .text(function (d) {
-            return ' '//'#' + String(d.id);
-        });
-    // -- update
-    text.data(data, function (d) {
-        return d.name;
-    }).attr("x", function (d) {
-        return d.x
-    }).attr("y", function (d) {
-        return d.y
-    }).text(function (d) {
-        return ' '//'#' + String(d.id);
-    });
-    // -- exit
-    text.data(data, function (d) {
-        return d.name;
-    }).exit()
-        .remove();
+    // // -- InText/Nodes--
+    // var text = QG.svg
+    //     .select("g." + QG.config.innerTextNodeClass)
+    //     .selectAll("text");
+    // var data = QG.graph.nodes;
+    // // -- enter
+    // var aux = text.data(data, function (d) {
+    //     return d.name;
+    // }).enter()
+    //     .append("text")
+    //     .attr("x", function (d) {
+    //         return d.x
+    //     })
+    //     .attr("y", function (d) {
+    //         return d.y
+    //     })
+    //     .attr("text-anchor", "middle")
+    //     .text(function (d) {
+    //         return ' '//'#' + String(d.id);
+    //     });
+    // // -- update
+    // text.data(data, function (d) {
+    //     return d.name;
+    // }).attr("x", function (d) {
+    //     return d.x
+    // }).attr("y", function (d) {
+    //     return d.y
+    // }).text(function (d) {
+    //     return ' '//'#' + String(d.id);
+    // });
+    // // -- exit
+    // text.data(data, function (d) {
+    //     return d.name;
+    // }).exit()
+    //     .remove();
+    //
+    // // -- OutText/Nodes --
+    // var text = QG.svg
+    //     .select("g." + QG.config.outerTextNodeClass)
+    //     .selectAll("text");
+    // var data = QG.graph.nodes;
+    // // -- enter
+    // var aux = text.data(data, function (d) {
+    //     return d.name;
+    // }).enter()
+    //     .append("text")
+    //     .attr("x", function (d) {
+    //         return d.x
+    //     })
+    //     .attr("y", function (d) {
+    //         return d.y
+    //     })
+    //     .attr("text-anchor", "middle");
+    //
+    // // -- update
+    // var aux = text.data(data, function (d) {
+    //     return d.name;
+    // }).attr("x", function (d) {
+    //     return d.x
+    // })
+    //     .attr("y", function (d) {
+    //         return d.y + 50
+    //     })
+    //     .html(function (d) {
+    //         var string = "";
+    //         var x = d.x;
+    //         d.key_op_value.forEach(function (d) {
+    //             string += "<tspan x=" + x + " dy=\"1.2em\">" + d[0] + d[1] + d[2] + "<\/tspan>";
+    //         });
+    //         return string;
+    //     });
+    // // -- exit
+    // text.data(data, function (d) {
+    //     return d.name;
+    // }).exit()
+    //     .remove();
 
-    // -- OutText/Nodes --
-    var text = QG.svg
-        .select("g." + QG.config.outerTextNodeClass)
-        .selectAll("text");
-    var data = QG.graph.nodes;
-    // -- enter
-    var aux = text.data(data, function (d) {
-        return d.name;
-    }).enter()
-        .append("text")
-        .attr("x", function (d) {
-            return d.x
-        })
-        .attr("y", function (d) {
-            return d.y
-        })
-        .attr("text-anchor", "middle");
 
-    // -- update
-    var aux = text.data(data, function (d) {
-        return d.name;
-    }).attr("x", function (d) {
-        return d.x
-    })
-        .attr("y", function (d) {
-            return d.y + 50
-        })
-        .html(function (d) {
-            var string = "";
-            var x = d.x;
-            d.key_op_value.forEach(function (d) {
-                string += "<tspan x=" + x + " dy=\"1.2em\">" + d[0] + d[1] + d[2] + "<\/tspan>";
-            });
-            return string;
-        });
-    // -- exit
-    text.data(data, function (d) {
-        return d.name;
-    }).exit()
-        .remove();
-
-    // -- Edges --
-    var edges = QG.svg
-        .select("g." + QG.config.edgesClass)
-        .selectAll("g." + QG.config.edgeClass);
-    var data = QG.graph.edges;
-    // - enter
-    var aux = edges.data(data, function (d) {
-        return d.name;
-    }).enter()
-        .append("g")
-        .classed(QG.config.edgeClass, true)
-        .on("mousedown", function (d) {
-            QG.edgeMouseDown(this)
-        });
-    aux.append("path")
-        .style('marker-end', function (d) {
-            if (d.kind == "directed") {
-                return 'url(#end-arrow)'
-            }
-            else return 'none';
-        })
-        .attr("d", function (d) {
-            return utils.calcEdgePath(d, QG.config.nodeRadius);
-        })
-        .classed("link", true);
-    // - update
-    edges.data(data, function (d) {
-        return d.name;
-    })
-        .selectAll("path")
-        .attr("d", function (d) {
-            return utils.calcEdgePath(d, QG.config.nodeRadius);
-        });
-    // - exit
-    edges.data(data, function (d) {
-        return d.name;
-    })
-        .exit()
-        .remove();
-
-    // -- OutText/Edges --
-    var text = QG.svg
-        .select("g." + QG.config.outerTextEdgeClass)
-        .selectAll("text");
-    var data = QG.graph.edges;
-    var modifier = 15;
-    // -- enter
-    var aux = text.data(data, function (d) {
-        return d.name;
-    }).enter()
-        .append("text")
-        .attr("x", function (d) {
-            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0];
-        })
-        .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[1];
-        })
-        .attr("text-anchor", "middle");
-
-    // -- update
-    var aux = text.data(data, function (d) {
-        return d.name;
-    }).attr("x", function (d) {
-        return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0];
-    })
-        .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[1];
-        })
-        .html(function (d) {
-            var string = "";
-            var x = utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0].toString();
-            d.key_op_value.forEach(function (d) {
-                string += "<tspan x=" + x + " dy=\"1.2em\">" + d[0] + d[1] + d[2] + "<\/tspan>";
-            });
-            return string;
-        });
-    // -- exit
-    text.data(data, function (d) {
-        return d.name;
-    }).exit()
-        .remove();
+    //
+    // // -- OutText/Edges --
+    // var text = QG.svg
+    //     .select("g." + QG.config.outerTextEdgeClass)
+    //     .selectAll("text");
+    // var data = QG.graph.edges;
+    // var modifier = 15;
+    // // -- enter
+    // var aux = text.data(data, function (d) {
+    //     return d.name;
+    // }).enter()
+    //     .append("text")
+    //     .attr("x", function (d) {
+    //         return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0];
+    //     })
+    //     .attr("y", function (d) {
+    //         return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[1];
+    //     })
+    //     .attr("text-anchor", "middle");
+    //
+    // // -- update
+    // var aux = text.data(data, function (d) {
+    //     return d.name;
+    // }).attr("x", function (d) {
+    //     return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0];
+    // })
+    //     .attr("y", function (d) {
+    //         return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[1];
+    //     })
+    //     .html(function (d) {
+    //         var string = "";
+    //         var x = utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0].toString();
+    //         d.key_op_value.forEach(function (d) {
+    //             string += "<tspan x=" + x + " dy=\"1.2em\">" + d[0] + d[1] + d[2] + "<\/tspan>";
+    //         });
+    //         return string;
+    //     });
+    // // -- exit
+    // text.data(data, function (d) {
+    //     return d.name;
+    // }).exit()
+    //     .remove();
 };
 
 GC.prototype.getGraph = function () {

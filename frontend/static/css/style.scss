@@ -59,6 +59,9 @@ $three-px: 3px 3px 3px 3px;
   padding: 0;
   opacity: 0;
   transition: opacity 1s;
+  position: relative;
+  height: 100%;
+  width: 100%;
 }
 
 html, body {
@@ -101,7 +104,7 @@ body {
   button {
     margin: 0;
     padding: 0;
-    max-height: 40px;
+    min-height: 40px;
   }
 
   text {
@@ -222,7 +225,6 @@ body {
 
 #query-system {
 
-
   #query-interface-graph {
     padding: 3px 0 0 0;
     margin: 0;
@@ -250,6 +252,8 @@ body {
 
       .Node {
 
+        position: absolute;
+
         .MainCircle {
           fill: $node-color;
         }
@@ -273,20 +277,15 @@ body {
 
       /* edges */
 
-      .link {
-        stroke: $stroke-link-color;
-        stroke-width: $stroke-link-width;
-      }
+      .Edge {
 
-      .selected path.link {
-        stroke: $stroke-link-color-selected;
-        fill: $stroke-link-color-selected;
-        stroke-width: $stroke-link-width-selected;
-      }
+        .Link {
+          position: absolute;
 
-      #end-arrow {
-        stroke: $stroke-link-color-selected;
-        fill: $stroke-link-color-selected;
+          stroke: $stroke-link-color;
+          stroke-width: $stroke-link-width;
+        }
+
       }
 
       /* text */

@@ -18,7 +18,10 @@
   margin: 0;
   padding: 0;
   opacity: 0;
-  transition: opacity 1s; }
+  transition: opacity 1s;
+  position: relative;
+  height: 100%;
+  width: 100%; }
 
 html, body {
   position: relative;
@@ -52,7 +55,7 @@ body {
   body button {
     margin: 0;
     padding: 0;
-    max-height: 40px; }
+    min-height: 40px; }
   body text {
     font-family: "Lato", sans-serif;
     font-size: 16px;
@@ -147,28 +150,24 @@ body {
     /* text */ }
     #query-system #query-interface-graph svg .Tick {
       fill: #0c0c0e; }
-    #query-system #query-interface-graph svg .Node .MainCircle {
-      fill: #0c0c0e; }
-    #query-system #query-interface-graph svg .Node .MainCircle:hover {
-      fill: #235581;
-      stroke: #202020;
-      stroke-width: 2px; }
-    #query-system #query-interface-graph svg .Node .MainCircle.selected {
-      fill: #235581;
-      stroke: #202020;
-      stroke-width: 2px; }
-    #query-system #query-interface-graph svg .Node .AddButton {
-      fill: #235581; }
-    #query-system #query-interface-graph svg .link {
+    #query-system #query-interface-graph svg .Node {
+      position: absolute; }
+      #query-system #query-interface-graph svg .Node .MainCircle {
+        fill: #0c0c0e; }
+      #query-system #query-interface-graph svg .Node .MainCircle:hover {
+        fill: #235581;
+        stroke: #202020;
+        stroke-width: 2px; }
+      #query-system #query-interface-graph svg .Node .MainCircle.selected {
+        fill: #235581;
+        stroke: #202020;
+        stroke-width: 2px; }
+      #query-system #query-interface-graph svg .Node .AddButton {
+        fill: #235581; }
+    #query-system #query-interface-graph svg .Edge .Link {
+      position: absolute;
       stroke: #402D29;
       stroke-width: 4px; }
-    #query-system #query-interface-graph svg .selected path.link {
-      stroke: #413F4A;
-      fill: #413F4A;
-      stroke-width: 6px; }
-    #query-system #query-interface-graph svg #end-arrow {
-      stroke: #413F4A;
-      fill: #413F4A; }
     #query-system #query-interface-graph svg .InTextN text {
       fill: white; }
     #query-system #query-interface-graph svg .OuTextN text {

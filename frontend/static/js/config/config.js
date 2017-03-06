@@ -26,32 +26,34 @@ DBI.prototype.changeDataSet = function (new_name) {
 DBI.prototype.getDataSet = function (callback, flg) {
     var thisDatabaseInfo = this;
     var request = {'name': thisDatabaseInfo.filename};
-    pace.track(function(){$.ajax({
-        type: 'POST',
-        url: "http://localhost:5000/config/",
-        data: request,
-        success: function (data) {
+    pace.track(function () {
+        $.ajax({
+            type: 'POST',
+            url: "http://localhost:5000/config/",
+            data: request,
+            success: function (data) {
 
-            if (flg == undefined) {
-                thisDatabaseInfo.conf_file = JSON.parse(data);
-                thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
-                thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
-                thisDatabaseInfo.getDataSet(callback, true);
+                if (flg == undefined) {
+                    thisDatabaseInfo.conf_file = JSON.parse(data);
+                    thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
+                    thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
+                    thisDatabaseInfo.getDataSet(callback, true);
 
-            }
-            else {
+                }
+                else {
 
-                thisDatabaseInfo.conf_file = JSON.parse(data);
-                callback();
+                    thisDatabaseInfo.conf_file = JSON.parse(data);
+                    callback();
 
-            }
+                }
 
-        },
-        error: function () {
-            thisDatabaseInfo.getDataSet(callback, flg);
-        },
-        async: true
-    })});
+            },
+            error: function () {
+                thisDatabaseInfo.getDataSet(callback, flg);
+            },
+            async: true
+        })
+    });
 };
 
 DBI.prototype.outcome_attributes = function () {
@@ -184,12 +186,13 @@ module.exports = {
         graphClass: "Graph",
         nodeClass: "Node",
         mainCircleClass: "MainCircle",
-        addButtonClass:"AddButton",
-        removeButtonClass:"RemoveButton",
-        editButtonClass:"EditButton",
+        addButtonClass: "AddButton",
+        removeButtonClass: "RemoveButton",
+        editButtonClass: "EditButton",
         nodesClass: "Nodes",
         edgeClass: "Edge",
         edgesClass: "Edges",
+        linkClass: "Link",
         ticksClass: "Ticks",
         tickClass: "Tick",
         selectedClass: "selected",
