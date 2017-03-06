@@ -704,11 +704,6 @@ function buildPortinari() {
     /* ---  Interface Stuff --- */
     /* ------------------------ */
 
-    // Configures query button
-    Utils.toggleButton("#expand-query-button",
-        ".content_query",
-        "Query");
-
     /* --------------------- */
     /* ---  Query System --- */
     /* --------------------- */
@@ -780,10 +775,7 @@ function buildPortinari() {
         reactor);
 
     Utils.makeVisible("#loader_d", "#content_d");
-    //Utils.makeVisible("#loader_d", "#content_d")
-
 }
-
 
 },{"./config/config.js":1,"./external/d3.min.v4.js":2,"./external/pace.js":5,"./external/reactor.js":6,"./query_system/query_form.js":9,"./query_system/query_graph.js":10,"./sankey_visualization/prediction_form.js":12,"./sankey_visualization/prediction_graph.js":13,"./util/util.js":14}],9:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
@@ -1833,8 +1825,6 @@ function get_outcome_cohort(thisForm) {
         'type': JSON.stringify("cohort")
     };
 
-    Utils.toggleIfVisible("#expand-query-button", "#query-system");
-
     $.ajax({
         type: 'POST',
         url: "http://localhost:5000/",
@@ -2056,14 +2046,6 @@ module.exports = PredictionGraph;
 },{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/sankey.js":7}],14:[function(require,module,exports){
 var $ = require("../external/jquery.min.js");
 
-function toggle_button(b_id, b_class, b_desc) {
-    /* Makes the button toggle the section with id! */
-    $(b_id).click(function () {
-        $(b_class).slideToggle(200);
-        if ($(b_id).text() == b_desc + ' ▽') $(b_id).html(b_desc + ' &#9651');
-        else $(b_id).html(b_desc + ' &#9661');
-    });
-}
 
 function toggle_if_visible(b_id, div_id) {
     /* Toggles button if the section is visible! */
@@ -2081,7 +2063,6 @@ function make_visible(loader_d, content_d) {
 
 
 module.exports = {
-    toggleButton: toggle_button,
     toggleIfVisible: toggle_if_visible,
     makeVisible: make_visible
 };

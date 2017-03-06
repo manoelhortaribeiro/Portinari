@@ -145,8 +145,6 @@ function get_outcome_cohort(thisForm) {
         'type': JSON.stringify("cohort")
     };
 
-    Utils.toggleIfVisible("#expand-query-button", "#query-system");
-
     $.ajax({
         type: 'POST',
         url: "http://localhost:5000/",

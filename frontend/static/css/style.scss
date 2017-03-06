@@ -135,11 +135,6 @@ body {
     padding: 0;
   }
 
-  #toggle-menu {
-    text-align: center;
-    margin: 0 0 5px 0;
-  }
-
   #nav-menu {
     li.active a {
       background: $secondary-color;
@@ -151,9 +146,7 @@ body {
     padding: $three-px;
   }
 
-  .content {
-    display: none;
-  }
+
 
   .col-md-4 {
     margin: 0;

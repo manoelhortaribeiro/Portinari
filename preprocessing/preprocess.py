@@ -6,28 +6,26 @@
 #                                                                                                                      #
 # This script does the whole preprocessing of the two files. Basically it:                                             #
 #                                                                                                                      #
-#   def fill_na(df, config):                                                                                           #
-#                  1- Fill empty attributes as specified by the config file.                                           #
+#                   - Fill empty attributes as specified by the config file.                                           #
 #                   * Uses the mandatory "nan" field on the config file.                                               #
 #                                                                                                                      #
-#                                                                                                                      #
-#                  2- Does the conversion from date string to int as specified by config file.                         #
+#                   - Does the conversion from date string to int as specified by config file.                         #
 #                   * Uses the optional "conversion" field on each attribute & the mandatory "timeformat" attribute.   #
 #                                                                                                                      #
-#                  3- Drop columns and invalid rows as specified by the config file.                                   #
+#                   - Drop columns and invalid rows as specified by the config file.                                   #
 #                   * Uses the optional field "drop_col" and "drop_val" on each attribute                              #
 #                                                                                                                      #
-#                  4- Rename the categorical values of some attrs as specified by config file. Must be numbers wo 0.   #
+#                   - Rename the categorical values of some attrs as specified by config file. Must be numbers wo 0.   #
 #                   * Uses the optional "rename":{"old":"new",...} field on each attribute.                            #
 #                                                                                                                      #
-#                  5- Remove trailing zeroes in all attrbutes, just to prevent having 1.0 as float                     #
+#                   - Remove trailing zeroes in all attrbutes, just to prevent having 1.0 as float                     #
 #                                                                                                                      #
-#                  6- Creates two attributes "age" and "sincelast", derived from "eventdate" and "entitycreation".     #
+#                   - Creates two attributes "age" and "sincelast", derived from "eventdate" and "entitycreation".     #
 #                   * Uses the mandatory "eventdate" & "entitycreation" fields on config file.                         #
 #                                                                                                                      #
-#                  7-  Make all rows numeric (either float or int, no strings allowed).                                #
+#                   -  Make all rows numeric (either float or int, no strings allowed).                                #
 #                                                                                                                      #
-#                  8-  Make relational-like tables.                                                                    #
+#                   -  Make relational-like tables.                                                                    #
 #                   * Uses the mandatory "default" field and the optional "entity" and "event" fields on each attr.    #
 #                                                                                                                      #
 #  The config file contains the following fields:                                                                      #

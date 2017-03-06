@@ -82,16 +82,11 @@ body {
   body ul {
     margin: 0;
     padding: 0; }
-  body #toggle-menu {
-    text-align: center;
-    margin: 0 0 5px 0; }
   body #nav-menu li.active a {
     background: #e8f0ff; }
   body .tab-content {
     background: #e8f0ff;
     padding: 3px 3px 3px 3px; }
-  body .content {
-    display: none; }
   body .col-md-4 {
     margin: 0;
     padding: 0; }

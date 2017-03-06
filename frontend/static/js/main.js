@@ -29,11 +29,6 @@ function buildPortinari() {
     /* ---  Interface Stuff --- */
     /* ------------------------ */
 
-    // Configures query button
-    Utils.toggleButton("#expand-query-button",
-        ".content_query",
-        "Query");
-
     /* --------------------- */
     /* ---  Query System --- */
     /* --------------------- */
@@ -105,7 +100,4 @@ function buildPortinari() {
         reactor);
 
     Utils.makeVisible("#loader_d", "#content_d");
-    //Utils.makeVisible("#loader_d", "#content_d")
-
 }
-
