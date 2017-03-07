@@ -1,22 +1,23 @@
-var $ = require("../external/jquery.min.js");
+var d3 = require("../external/d3.min.v4.js");
 
-
-function toggle_if_visible(b_id, div_id) {
-    /* Toggles button if the section is visible! */
-    var display = $(div_id).css("display");
-    if (display == "block") {
-        $(b_id).click();
-    }
-}
 
 function make_visible(loader_d, content_d) {
-    $(loader_d).css("display", "none");
-    $(content_d).css("opacity", 1);
-    $(content_d).addClass("active");
+
+    d3.select(loader_d)
+        .transition()
+        .delay(1000)
+        .style("display", "none");
+
+    d3.select(content_d)
+        .classed("active", true)
+        .transition()
+        .duration(1000)
+        .style("opacity", 1);
 }
+
+
 
 
 module.exports = {
-    toggleIfVisible: toggle_if_visible,
     makeVisible: make_visible
 };

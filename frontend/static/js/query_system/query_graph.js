@@ -8,7 +8,7 @@ function GC(query_interface_selection, reactor) {
 
     // -- Config
     thisGraph.idct = 0;
-    thisGraph.aspect = [0, 0, 1600, 900];
+    thisGraph.aspect = [0, 0, 1200, 520];
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
     thisGraph.reactor.addEventListener('update_graph', this.updateGraph.bind(this));

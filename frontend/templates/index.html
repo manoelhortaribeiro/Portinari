@@ -15,45 +15,29 @@
     <link rel="stylesheet" type="text/css" href="../static/css/external/bootstrap-theme.min.css">
     <link rel="stylesheet" type="text/css" href="../static/css/public/style.css">
 
-<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
-<link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
+    <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32"/>
+    <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16"/>
 
 </head>
 
 <body>
 
 <div id="loader_d">
-    <h1><img src="../static/imgs/portinari.png" alt="logo"/> portinari
+    <h1><img src="../static/imgs/portinari.png" alt="logo" height=150px/> portinari
     </h1>
 
 </div>
 
 <div class="container-fluid" id="content_d">
 
-    <!-- Title -->
-    <h1><img src="../static/imgs/portinari.png" alt="logo"/> portinari </h1>
-
     <!--------------------->
     <!-- UPPER INTERFACE -->
     <!--------------------->
-
-
 
     <!-- Query System -->
     <div class="col-md-12 content_query" id="query-system">
         <div class="col-md-4" id="forms-menu">
 
-            <h2>choose dataset</h2>
-            <div id="dataset-choice" class="form">
-                <!-- here we choose the dataset we will use here -->
-                <ul></ul>
-            </div>
-
-            <h2>matching</h2>
-            <div id="matching-choice" class="form">
-                <!-- here we choose the matching algorithm to use -->
-                <ul></ul>
-            </div>
 
             <h2>view local constraints</h2>
             <div id="query-local-interface-current" class="current">
@@ -88,16 +72,22 @@
                 <!-- the form to add constraints goes here -->
             </div>
 
+
+            <h2>select dataset</h2>
+            <div id="dataset-choice" class="form">
+                <!-- here we choose the dataset we will use here -->
+            </div>
+
+            <h2>select matching</h2>
+            <div id="matching-choice" class="form">
+                <!-- here we choose the matching algorithm to use -->
+            </div>
         </div>
 
         <div class="col-md-8" id="query-interface-graph">
             <!-- query interface goes here goes here -->
         </div>
     </div>
-
-    <!-- TODO: Tutorial -->
-
-    <!-- TODO: About -->
 
     <br>
 
@@ -107,7 +97,7 @@
 
     <!-- Navigation Tabs -->
     <ul class="nav nav-tabs" id="nav-menu">
-        <li class="active"><a data-toggle="tab" href="#vis-prog">Visualize Cohort</a></li>
+        <li class="active"><h2><a data-toggle="tab" href="#vis-prog">Visualize Cohort</a></h2></li>
         <!-- TODO as I implement these functionalities on the backend -->
         <!-- <li><a data-toggle="tab" href="#vis-coh">Visualize Cohort</a></li> -->
         <!-- <li><a data-toggle="tab" href="#compare">Compare</a></li> -->

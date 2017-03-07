@@ -1,0 +1,83 @@
+@import "variables";
+
+html {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+div {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+svg {
+  border: $light-border;
+  background-color: $bg-color;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  color: $title-color;
+  font-family: $title-font;
+  font-size: $title-size;
+  text-align: center;
+}
+
+h2 {
+  font-family: $subtitle-font;
+  color: $subtitle-font-color;
+  font-size: $subtitle-font-size;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+p {
+  font-family: $primary-font;
+  font-size: $primary-font-size;
+  color: $primary-font-color;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+select, option, input {
+  background: $bg-color;
+  border: $light-border;
+  margin: $three-px;
+  max-height: 30px;
+  max-width: 200px;
+  min-height: 30px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.col-md-4 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.col-md-8 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}

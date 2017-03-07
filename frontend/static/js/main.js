@@ -99,5 +99,6 @@ function buildPortinari() {
         cohort_result,
         reactor);
 
+    console.log("asdasd");
     Utils.makeVisible("#loader_d", "#content_d");
 }

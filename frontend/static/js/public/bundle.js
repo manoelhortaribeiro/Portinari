@@ -774,6 +774,7 @@ function buildPortinari() {
         cohort_result,
         reactor);
 
+    console.log("asdasd");
     Utils.makeVisible("#loader_d", "#content_d");
 }
 
@@ -874,7 +875,6 @@ function make_form_matching(form, current, name, attributes, thisForm) {
 
     // ** FORM Pt1. attr_name **
     var select_attr = form.append("select")
-        .classed("styled_form", true)
         .attr("id", "attr_name_" + name)
         .attr("name", "attribute");
 
@@ -894,7 +894,6 @@ function make_form_matching(form, current, name, attributes, thisForm) {
     });
 
     form.append("input")
-        .classed("styled_form", true)
         .attr("id", "submit_query_form_" + name)
         .attr("type", "submit");
 
@@ -913,7 +912,6 @@ function make_form_dataset(form, current, name, attributes, thisForm) {
 
     // ** FORM Pt1. attr_name **
     var select_attr = form.append("select")
-        .classed("styled_form", true)
         .attr("id", "attr_name_" + name)
         .attr("name", "attribute");
 
@@ -933,9 +931,9 @@ function make_form_dataset(form, current, name, attributes, thisForm) {
     });
 
     form.append("input")
-        .classed("styled_form", true)
         .attr("id", "submit_query_form_" + name)
-        .attr("type", "submit");
+        .attr("type", "submit")
+        .attr("value", ">>");
 
     $(".query_" + name).bind("submit", function (event) {
         event.preventDefault();
@@ -952,15 +950,12 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
     // ** FORM Pt1. attr_name **
     var select_attr = form.append("select")
-        .classed("styled_form", true)
         .attr("id", "attr_name_" + name)
         .attr("name", "attribute");
 
     select_attr.append("option")
-        .classed("styled_form", true)
         .classed("disabled", true)
         .classed("hidden", true)
-        .attr("style", true)
         .text("Select Attribute");
 
     attributes.forEach(function (op) {
@@ -984,7 +979,6 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
         // ** FORM Pt2. oper_field **
         var select_oper = form.append("select")
-            .classed("styled_form", true)
             .attr("id", "oper_field_" + name)
             .attr("name", "operator");
 
@@ -998,7 +992,6 @@ function make_form(form, current, name, attributes, thisForm, callback) {
         thisForm.config.typeFormHandling(type_name, form, name, types);
 
         form.append("input")
-            .classed("styled_form", true)
             .attr("id", "submit_query_form_" + name)
             .attr("type", "submit");
 
@@ -1158,7 +1151,7 @@ function GC(query_interface_selection, reactor) {
 
     // -- Config
     thisGraph.idct = 0;
-    thisGraph.aspect = [0, 0, 1600, 900];
+    thisGraph.aspect = [0, 0, 1200, 520];
     thisGraph.selectedSvgID = -1;
     thisGraph.reactor = reactor;
     thisGraph.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
@@ -2044,27 +2037,28 @@ PredictionGraph.prototype.updateResult = function (graph) {
 
 module.exports = PredictionGraph;
 },{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/sankey.js":7}],14:[function(require,module,exports){
-var $ = require("../external/jquery.min.js");
+var d3 = require("../external/d3.min.v4.js");
 
-
-function toggle_if_visible(b_id, div_id) {
-    /* Toggles button if the section is visible! */
-    var display = $(div_id).css("display");
-    if (display == "block") {
-        $(b_id).click();
-    }
-}
 
 function make_visible(loader_d, content_d) {
-    $(loader_d).css("display", "none");
-    $(content_d).css("opacity", 1);
-    $(content_d).addClass("active");
+
+    d3.select(loader_d)
+        .transition()
+        .delay(1000)
+        .style("display", "none");
+
+    d3.select(content_d)
+        .classed("active", true)
+        .transition()
+        .duration(1000)
+        .style("opacity", 1);
 }
+
+
 
 
 module.exports = {
-    toggleIfVisible: toggle_if_visible,
     makeVisible: make_visible
 };
 
-},{"../external/jquery.min.js":4}]},{},[8]);
+},{"../external/d3.min.v4.js":2}]},{},[8]);

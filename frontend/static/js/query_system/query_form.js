@@ -94,7 +94,6 @@ function make_form_matching(form, current, name, attributes, thisForm) {
 
     // ** FORM Pt1. attr_name **
     var select_attr = form.append("select")
-        .classed("styled_form", true)
         .attr("id", "attr_name_" + name)
         .attr("name", "attribute");
 
@@ -114,7 +113,6 @@ function make_form_matching(form, current, name, attributes, thisForm) {
     });
 
     form.append("input")
-        .classed("styled_form", true)
         .attr("id", "submit_query_form_" + name)
         .attr("type", "submit");
 
@@ -133,7 +131,6 @@ function make_form_dataset(form, current, name, attributes, thisForm) {
 
     // ** FORM Pt1. attr_name **
     var select_attr = form.append("select")
-        .classed("styled_form", true)
         .attr("id", "attr_name_" + name)
         .attr("name", "attribute");
 
@@ -153,9 +150,9 @@ function make_form_dataset(form, current, name, attributes, thisForm) {
     });
 
     form.append("input")
-        .classed("styled_form", true)
         .attr("id", "submit_query_form_" + name)
-        .attr("type", "submit");
+        .attr("type", "submit")
+        .attr("value", ">>");
 
     $(".query_" + name).bind("submit", function (event) {
         event.preventDefault();
@@ -172,15 +169,12 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
     // ** FORM Pt1. attr_name **
     var select_attr = form.append("select")
-        .classed("styled_form", true)
         .attr("id", "attr_name_" + name)
         .attr("name", "attribute");
 
     select_attr.append("option")
-        .classed("styled_form", true)
         .classed("disabled", true)
         .classed("hidden", true)
-        .attr("style", true)
         .text("Select Attribute");
 
     attributes.forEach(function (op) {
@@ -204,7 +198,6 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
         // ** FORM Pt2. oper_field **
         var select_oper = form.append("select")
-            .classed("styled_form", true)
             .attr("id", "oper_field_" + name)
             .attr("name", "operator");
 
@@ -218,7 +211,6 @@ function make_form(form, current, name, attributes, thisForm, callback) {
         thisForm.config.typeFormHandling(type_name, form, name, types);
 
         form.append("input")
-            .classed("styled_form", true)
             .attr("id", "submit_query_form_" + name)
             .attr("type", "submit");
 
