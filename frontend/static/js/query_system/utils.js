@@ -26,7 +26,7 @@ function calcTextEdgePath(d, consts, mod) {
 function calcEdgePath(d, consts) {
     /* Gives the edge description for the SVG thingy */
     var result = _internalCalc(d, consts);
-    return "M" + result[1] + " " + result[3] + " L" + result[0] + " " + result[2];
+    return "M" + (result[1] + 8) + " " + result[3] + " L" + (result[0] - 8) + " " + result[2];
 }
 
 function Node(coordinates, id, parent, name) {

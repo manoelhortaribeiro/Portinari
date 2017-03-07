@@ -34,6 +34,10 @@ body {
   margin: 0;
   padding: 0;
   border: 0; }
+  body svg {
+    margin: 0;
+    padding: 0;
+    border: 0; }
   body p {
     font-family: "Roboto", sans-serif;
     font-size: 10px;
@@ -166,8 +170,7 @@ body {
         fill: #235581; }
     #query-system #query-interface-graph svg .Edge .Link {
       position: absolute;
-      stroke: #402D29;
-      stroke-width: 4px; }
+      stroke: #402D29; }
     #query-system #query-interface-graph svg .InTextN text {
       fill: white; }
     #query-system #query-interface-graph svg .OuTextN text {

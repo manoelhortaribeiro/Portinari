@@ -50,6 +50,7 @@ function buildPortinari() {
 
 // Creates needed selections
     var query_graph_selection = d3.select("#query-interface-graph"),
+        query_interface_buttons = d3.select("#query-interface-buttons"),
         query_local_form_selection = d3.select("#query-local-interface-form"),
         query_local_current_selection = d3.select("#query-local-interface-current"),
         query_global_form_selection = d3.select("#query-global-interface-form"),
@@ -61,7 +62,7 @@ function buildPortinari() {
 
 
 // Creates query graph interface
-    var query_graph = new QueryGraph(query_graph_selection, reactor);
+    var query_graph = new QueryGraph(query_graph_selection, query_interface_buttons, reactor);
 
 // Creates query form interface
     var query_form = new QueryForm(

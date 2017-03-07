@@ -23,7 +23,7 @@ var json_config = require("../config/config.js"),
     d3 = require("../external/d3.min.v4.js"),
     utils = require("./utils.js");
 
-function GC(query_interface_selection, reactor) {
+function GC(query_interface_selection, query_interface_buttons, reactor) {
     /* Add event listeners, creates and configures the query graph editor as specified in the config file, initializes
      * the query model and creates the root node.
      * parameters:
@@ -48,6 +48,7 @@ function GC(query_interface_selection, reactor) {
     QG.height = QG.config.svgHeight;
     QG.width = QG.config.svgWidth;
     QG.aspect = [0, 0, QG.width, QG.height];
+    QG.b_aspect = [0, 0, 1500, 50];
 
     /* Variables to adjust the tiles */
     QG.horizontal_fixed_points = 1;
@@ -90,6 +91,11 @@ function GC(query_interface_selection, reactor) {
             QG.svgKeyDown.call(QG);
         }
     });
+
+    /* Initializes the svg */
+    QG.svg_buttons = query_interface_buttons.append("svg")
+        .attr("viewBox", QG.b_aspect[0] + " " + QG.b_aspect[1] + " " + QG.b_aspect[2] + " " + QG.b_aspect[3])
+        .attr("preserveAspectRatio", "xMinYMin meet"); // svg
 
     QG.addNode();                                                       // Initializes root node
     QG.updateGraph();                                                   // Initializes graph
@@ -218,9 +224,9 @@ GC.prototype.animateNodes = function () {
         .attr("transform", func_translate);
 
     QG.addCircle(aux, radius, 0, 0, 2, QG.config.mainCircleClass, QG.nodeMouseDown.bind(this));    // Main Circle
-    QG.addCircle(aux, radius / 3, radius, 0, 3, QG.config.addButtonClass, QG.nodeMouseDown);       // Add Button
-    QG.addCircle(aux, radius / 3, -radius, 0, 3, QG.config.removeButtonClass, QG.nodeMouseDown);   // Remove Button
-    QG.addCircle(aux, radius / 3, 0, -radius, 3, QG.config.editButtonClass, QG.nodeMouseDown);     // Inspect Button
+    QG.addCircle(aux, radius / 3, radius * 0.7071, -radius * 0.7071, 3, QG.config.addButtonClass, QG.nodeMouseDown); // +
+    QG.addCircle(aux, radius / 3, -radius * 0.7071, -radius * 0.7071, 3, QG.config.removeButtonClass, QG.nodeMouseDown); // -
+    QG.addCircle(aux, radius / 3, 0, -radius, 3, QG.config.editButtonClass, QG.nodeMouseDown);     // Ins
 
     /* >> Update */
     nodes.data(data, func_return_id)
@@ -270,15 +276,22 @@ GC.prototype.animateEdges = function () {
         .attr("d", function (d) {
             return utils.calcEdgePath(d, radius);
         })
-        .attr("z-index",0)
-        .classed(QG.config.linkClass, true);
+        .classed(QG.config.linkClass, true)
+        .attr("stroke-width", 0)
+        .attr("z-index", 0)
+        .transition()
+        .duration(1500)
+        .attr("stroke-width", radius / 2);
 
     /* >> Update */
     edges.data(data, func_return_id)
         .selectAll("path")
+        .transition()
+        .duration(1500)
         .attr("d", function (d) {
             return utils.calcEdgePath(d, radius);
-        });
+        })
+        .attr("stroke-width", radius / 2);
 
     /* >> Exit */
     edges.data(data, func_return_id)
