@@ -10,14 +10,11 @@
   display: block;
   width: 700px;
   margin: auto;
-
 }
 
 #content_d {
-  margin: 0;
-  padding: 0;
+
   opacity: 0;
-  transition: opacity 1s;
   position: relative;
   height: 100%;
   width: 100%;
@@ -87,41 +84,16 @@
 
   }
 
-  .form {
-    min-height: 50px;
+  #forms-menu {
+    padding: 6px;
   }
 
-  .current {
-    min-height: 35px;
-
-    ul {
-      list-style: none;
-      text-align: center;
-    }
-
-    li {
-      font-size: $primary-font-size;
-      font-family: $primary-font;
-      display: inline-block;
-      border: $light-border;
-      max-width: $li-width;
-      padding: $li-margin;
-      margin: $li-padding;
-      text-align: center;
-    }
-
-    li:hover {
-      background-color: $neutral-color;
-    }
-
-  }
 
 }
 
 #forms-menu {
   height: 100%;
   text-align: center;
-
 }
 
 /* -- Sankey -- */
@@ -151,8 +123,8 @@
 
 #cohort-edit {
   height: 100%;
-  padding: 10px;
-  background-color: $secondary-color;
+  padding: 6px;
+  text-align: center;
 
   p {
     line-height: $form-height;

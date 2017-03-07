@@ -11,11 +11,10 @@ function make_visible(loader_d, content_d) {
     d3.select(content_d)
         .classed("active", true)
         .transition()
+        .delay(1000)
         .duration(1000)
         .style("opacity", 1);
 }
-
-
 
 
 module.exports = {

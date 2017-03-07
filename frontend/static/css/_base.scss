@@ -13,6 +13,9 @@ body {
   position: relative;
   height: 100%;
   width: 100%;
+  font-family: $primary-font;
+  font-size: $primary-font-size;
+  color: $primary-font-color;
 }
 
 div {
@@ -81,3 +84,33 @@ select, option, input {
   padding: 0;
   border: 0;
 }
+
+.form {
+  min-height: 50px;
+}
+
+.current {
+  min-height: 35px;
+
+  ul {
+    list-style: none;
+    text-align: center;
+  }
+
+  li {
+    font-size: $primary-font-size;
+    font-family: $primary-font;
+    display: inline-block;
+    border: $light-border;
+    max-width: $li-width;
+    padding: $li-margin;
+    margin: $li-padding;
+    text-align: center;
+  }
+
+  li:hover {
+    background-color: $neutral-color;
+  }
+
+}
+
