@@ -62,6 +62,8 @@ class TestPreprocessing(unittest.TestCase):
         self.assertEqual(bool_drop(default, table, "true", "nothing"), True)
         self.assertEqual(bool_drop(default, table, "nothing", "nothing"), False)
 
+        print("preprocessing.preprocess.bool_drop - OK")
+
     def test_time_flags(self):
         from preprocessing.preprocess import to_unix, unapply_time_flag, apply_time_flag
 
@@ -81,6 +83,8 @@ class TestPreprocessing(unittest.TestCase):
 
         thirty_years_in_months = to_unix("01.01.2000", "to_month", config)
         self.assertEqual(unapply_time_flag(thirty_years_in_months, "to_month", config), 946080000)
+
+        print("preprocessing.preprocess.time_flags - OK")
 
     def test_drop_cols(self):
         from preprocessing.preprocess import drop_cols
@@ -114,6 +118,8 @@ class TestPreprocessing(unittest.TestCase):
         a_4 = ['C', 'D', 'Age', 'SinceLast']
         self.assertTrue(set(c_4) == set(a_4))
 
+        print("preprocessing.preprocess.drop_cols - OK")
+
     def test_fill_na(self):
         from preprocessing.preprocess import fill_na
 
@@ -124,6 +130,8 @@ class TestPreprocessing(unittest.TestCase):
 
         for row1, row2 in zip(dfn.values, fill_na(dfo, config).values):
             self.assertListEqual(list(row1), list(row2))
+
+        print("preprocessing.preprocess.fill_na - OK")
 
     def test_drop_cols_vals(self):
         from preprocessing.preprocess import drop_cols_vals
@@ -140,6 +148,8 @@ class TestPreprocessing(unittest.TestCase):
         for row1, row2 in zip(dfn.values, drop_cols_vals(dfo, config).values):
             self.assertListEqual(list(row1), list(row2))
 
+        print("preprocessing.preprocess.drop_cols_vals - OK")
+
     def test_rename(self):
         from preprocessing.preprocess import rename
 
@@ -151,6 +161,8 @@ class TestPreprocessing(unittest.TestCase):
                                      "B": [1., 2., -1., 3., -1., 4.]})
 
         self.assertListEqual(list(dfn.columns.values), list(rename(dfo, config).columns.values))
+
+        print("preprocessing.preprocess.rename - OK")
 
     def test_time_conversion(self):
         from preprocessing.preprocess import time_conversion
@@ -165,6 +177,8 @@ class TestPreprocessing(unittest.TestCase):
         row2 = list(dfo["A"].values)
 
         self.assertListEqual(row1, row2)
+
+        print("preprocessing.preprocess.time_conversion - OK")
 
     def test_calculate_age(self):
         from preprocessing.preprocess import calculate_age
@@ -183,6 +197,8 @@ class TestPreprocessing(unittest.TestCase):
                                      "DiagnosisDate": [0, 12, 13, 25]})
 
         self.assertListEqual(list(calculate_age(dfn, config)["Age"].values), [0, 1, 1, 2])
+
+        print("preprocessing.preprocess.calculate_age - OK")
 
     def test_calculate_sincelast(self):
         from preprocessing.preprocess import calculate_sincelast
@@ -206,11 +222,15 @@ class TestPreprocessing(unittest.TestCase):
 
         self.assertListEqual(list(calculate_sincelast(dfn, config)["SinceLast"].values), [0, 12, 1, 12, 0, 22, 46, 31])
 
+        print("preprocessing.preprocess.calculate_sincelast - OK")
+
     def test_make_numeric(self):
         from preprocessing.preprocess import make_numeric
 
         df = pandas.DataFrame(data={"a": ["1.0", "2.0", "3.", "4.0", "5.0", "4.0"]})
         self.assertListEqual(list(make_numeric(df)["a"].values), [1, 2, 3, 4, 5, 4])
+
+        print("preprocessing.preprocess.make_numeric - OK")
 
     def test_make_all(self):
         from preprocessing.preprocess import make_all
@@ -228,7 +248,7 @@ class TestPreprocessing(unittest.TestCase):
             for el1, el2 in zip(row1, row2):
                 self.assertEqual(el1, el2)
 
-        for row1, row2 in zip(data_event_true.values, data_event_true.values):
+        for row1, row2 in zip(data_event.values, data_event_true.values):
             for el1, el2 in zip(row1, row2):
                 self.assertEqual(el1, el2)
 
