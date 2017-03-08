@@ -80,7 +80,6 @@ FormHandler.prototype.updateForm = function (element) {
 
     make_form(thisForm.form, thisForm.qic, "constraints", attributes, thisForm, constraints_form_callback);
 
-
     if (thisForm.qic.select("ul").select("li").empty()) {
         console.log("-- empty ul");
         thisForm.qic.append("p").text("Select a node or edge to see its constraints");
@@ -114,7 +113,8 @@ function make_form_matching(form, current, name, attributes, thisForm) {
 
     form.append("input")
         .attr("id", "submit_query_form_" + name)
-        .attr("type", "submit");
+        .attr("type", "submit")
+        .attr("value", ">>");
 
     $(".query_" + name).bind("submit", function (event) {
         event.preventDefault();
@@ -122,7 +122,6 @@ function make_form_matching(form, current, name, attributes, thisForm) {
         thisForm.reactor.dispatchEvent("matching_changed", data[0].value );
     });
 }
-
 
 function make_form_dataset(form, current, name, attributes, thisForm) {
     // form
@@ -212,8 +211,8 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
         form.append("input")
             .attr("id", "submit_query_form_" + name)
-            .attr("type", "submit");
-
+            .attr("type", "submit")
+            .attr("value", ">>");
     });
 
     $(".query_" + name).unbind();
@@ -231,10 +230,8 @@ function make_form(form, current, name, attributes, thisForm, callback) {
         var disp = attr_getter("#attr_name_" + name, "#oper_field_" + name, "#value_field_" + name);
 
         callback(attr, disp, current, thisForm)
-
     });
 }
-
 
 function global_form_callback(attr, disp, current, thisForm) {
 

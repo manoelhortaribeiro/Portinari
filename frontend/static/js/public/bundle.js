@@ -673,17 +673,16 @@ d3.sankey = function() {
 };
 
 },{"./d3.min.v4.js":2}],8:[function(require,module,exports){
-/* ----------------------------- */
-/* ---  Initialization Stuff --- */
-/* ----------------------------- */
-
 var config = require("./config/config.js"),
     pace = require("./external/pace.js");
-
 
 config.getDataSet(buildPortinari);
 
 function buildPortinari() {
+
+    /* ----------------------------- */
+    /* ---  Initialization Stuff --- */
+    /* ----------------------------- */
 
     var d3 = require("./external/d3.min.v4.js"),
         Reactor = require("./external/reactor.js");
@@ -696,13 +695,7 @@ function buildPortinari() {
     var PredictionForm = require("./sankey_visualization/prediction_form.js"),
         PredictionGraph = require("./sankey_visualization/prediction_graph.js");
 
-
-// Creates reactor
     var reactor = new Reactor();
-
-    /* ------------------------ */
-    /* ---  Interface Stuff --- */
-    /* ------------------------ */
 
     /* --------------------- */
     /* ---  Query System --- */
@@ -716,9 +709,7 @@ function buildPortinari() {
     reactor.registerEvent('update_graph');
     reactor.registerEvent('matching_changed');
 
-    /* ---------------------------------- */
-
-// Creates needed selections
+    /* ---Internal Query System Selections--- */
     var query_graph_selection = d3.select("#query-interface-graph"),
         query_local_form_selection = d3.select("#query-local-interface-form"),
         query_local_current_selection = d3.select("#query-local-interface-current"),
@@ -730,10 +721,10 @@ function buildPortinari() {
         matching_choice = d3.select("#matching-choice");
 
 
-// Creates query graph interface
+    // Creates query graph interface
     var query_graph = new QueryGraph(query_graph_selection, reactor);
 
-// Creates query form interface
+    // Creates query form interface
     var query_form = new QueryForm(
         query_local_form_selection,
         query_local_current_selection,
@@ -753,7 +744,7 @@ function buildPortinari() {
     reactor.registerEvent('cohort_node_unselected');
     /* ---------------------------------- */
 
-// Creates needed selections
+    // Creates needed selections
     var form_get_cohort = d3.select("#form-get-cohort"),
         nodes_info_cohort_selection = d3.select("#nodes-info-cohort"),
         get_patterns_cohort = d3.select("#get-patterns-cohort"),
@@ -761,7 +752,7 @@ function buildPortinari() {
         cohort_result = d3.select("#cohort-result");
 
 
-// Creates prediction form interface
+    // Creates prediction form interface
     var prediction_form = new PredictionForm(
         form_get_cohort,
         nodes_info_cohort_selection,
@@ -769,7 +760,7 @@ function buildPortinari() {
         show_patterns_cohort,
         query_graph.graph, reactor);
 
-// Append the svg canvas to the page
+    // Append the svg canvas to the page
     var prediction_graph = new PredictionGraph(
         cohort_result,
         reactor);
@@ -860,7 +851,6 @@ FormHandler.prototype.updateForm = function (element) {
 
     make_form(thisForm.form, thisForm.qic, "constraints", attributes, thisForm, constraints_form_callback);
 
-
     if (thisForm.qic.select("ul").select("li").empty()) {
         console.log("-- empty ul");
         thisForm.qic.append("p").text("Select a node or edge to see its constraints");
@@ -894,7 +884,8 @@ function make_form_matching(form, current, name, attributes, thisForm) {
 
     form.append("input")
         .attr("id", "submit_query_form_" + name)
-        .attr("type", "submit");
+        .attr("type", "submit")
+        .attr("value", ">>");
 
     $(".query_" + name).bind("submit", function (event) {
         event.preventDefault();
@@ -902,7 +893,6 @@ function make_form_matching(form, current, name, attributes, thisForm) {
         thisForm.reactor.dispatchEvent("matching_changed", data[0].value );
     });
 }
-
 
 function make_form_dataset(form, current, name, attributes, thisForm) {
     // form
@@ -992,8 +982,8 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
         form.append("input")
             .attr("id", "submit_query_form_" + name)
-            .attr("type", "submit");
-
+            .attr("type", "submit")
+            .attr("value", ">>");
     });
 
     $(".query_" + name).unbind();
@@ -1011,10 +1001,8 @@ function make_form(form, current, name, attributes, thisForm, callback) {
         var disp = attr_getter("#attr_name_" + name, "#oper_field_" + name, "#value_field_" + name);
 
         callback(attr, disp, current, thisForm)
-
     });
 }
-
 
 function global_form_callback(attr, disp, current, thisForm) {
 
@@ -1240,6 +1228,8 @@ function GC(query_interface_selection, reactor) {
             thisGraph.updateGraph();
         }
     });
+
+    thisGraph.addNode([thisGraph.aspect[2] / 2, thisGraph.aspect[3] / 2]);
 }
 
 //- Node behaviour -
@@ -1416,7 +1406,10 @@ GC.prototype.updateGraph = function () {
         .attr("y", function (d) {
             return d.y
         })
-        .attr("text-anchor", "middle");
+        .attr("text-anchor", "middle")
+        .text(function (d) {
+            return "#node" + d.id;
+        });
     // -- update
     text.data(data, function (d) {
         return d.name;
@@ -1425,23 +1418,7 @@ GC.prototype.updateGraph = function () {
     }).attr("y", function (d) {
         return d.y
     }).text(function (d) {
-        var isStart = true;
-        var isEnd = true;
-
-        thisGraph.graph.edges.forEach(function (edge) {
-            if (d.name == edge.destination) {
-                isStart = false;
-            }
-            if (d.name == edge.source) {
-                isEnd = false;
-            }
-        });
-
-        if (isStart && isEnd) return ' ';
-        else if (isStart) return 'start';
-        else if(isEnd) return 'end';
-        else return ' ';
-
+        return "#node" + d.id;
     });
     // -- exit
     text.data(data, function (d) {
@@ -1583,7 +1560,7 @@ GC.prototype.getElement = function () {
     return element;
 };
 
-GC.prototype.changeMatching = function (new_matching){
+GC.prototype.changeMatching = function (new_matching) {
     var thisGraph = this;
     thisGraph.graph.matching = new_matching;
 };
@@ -1697,14 +1674,14 @@ function PredictionForm(form_get_cohort,
         thisForm.config.visualizationOptions(),
         get_outcome_cohort,
         "query-cohort",
-        "Obtain new cohort");
+        ">>");
 
     make_simple_form(thisForm,
         get_patterns_cohort,
         thisForm.config.miningAlgorithms(),
         get_patterns,
         "get-patterns-cohort",
-        "Get patterns");
+        ">>");
 
     thisForm.reactor.addEventListener('cohort_node_selected', thisForm.addNodes.bind(this));
     thisForm.reactor.addEventListener('cohort_node_unselected', thisForm.removeNodes.bind(this));

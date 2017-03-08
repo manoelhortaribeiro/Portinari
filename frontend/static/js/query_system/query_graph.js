@@ -98,6 +98,8 @@ function GC(query_interface_selection, reactor) {
             thisGraph.updateGraph();
         }
     });
+
+    thisGraph.addNode([thisGraph.aspect[2] / 2, thisGraph.aspect[3] / 2]);
 }
 
 //- Node behaviour -
@@ -274,7 +276,10 @@ GC.prototype.updateGraph = function () {
         .attr("y", function (d) {
             return d.y
         })
-        .attr("text-anchor", "middle");
+        .attr("text-anchor", "middle")
+        .text(function (d) {
+            return "#node" + d.id;
+        });
     // -- update
     text.data(data, function (d) {
         return d.name;
@@ -283,23 +288,7 @@ GC.prototype.updateGraph = function () {
     }).attr("y", function (d) {
         return d.y
     }).text(function (d) {
-        var isStart = true;
-        var isEnd = true;
-
-        thisGraph.graph.edges.forEach(function (edge) {
-            if (d.name == edge.destination) {
-                isStart = false;
-            }
-            if (d.name == edge.source) {
-                isEnd = false;
-            }
-        });
-
-        if (isStart && isEnd) return ' ';
-        else if (isStart) return 'start';
-        else if(isEnd) return 'end';
-        else return ' ';
-
+        return "#node" + d.id;
     });
     // -- exit
     text.data(data, function (d) {
@@ -441,7 +430,7 @@ GC.prototype.getElement = function () {
     return element;
 };
 
-GC.prototype.changeMatching = function (new_matching){
+GC.prototype.changeMatching = function (new_matching) {
     var thisGraph = this;
     thisGraph.graph.matching = new_matching;
 };

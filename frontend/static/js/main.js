@@ -1,14 +1,13 @@
-/* ----------------------------- */
-/* ---  Initialization Stuff --- */
-/* ----------------------------- */
-
 var config = require("./config/config.js"),
     pace = require("./external/pace.js");
-
 
 config.getDataSet(buildPortinari);
 
 function buildPortinari() {
+
+    /* ----------------------------- */
+    /* ---  Initialization Stuff --- */
+    /* ----------------------------- */
 
     var d3 = require("./external/d3.min.v4.js"),
         Reactor = require("./external/reactor.js");
@@ -21,13 +20,7 @@ function buildPortinari() {
     var PredictionForm = require("./sankey_visualization/prediction_form.js"),
         PredictionGraph = require("./sankey_visualization/prediction_graph.js");
 
-
-// Creates reactor
     var reactor = new Reactor();
-
-    /* ------------------------ */
-    /* ---  Interface Stuff --- */
-    /* ------------------------ */
 
     /* --------------------- */
     /* ---  Query System --- */
@@ -41,9 +34,7 @@ function buildPortinari() {
     reactor.registerEvent('update_graph');
     reactor.registerEvent('matching_changed');
 
-    /* ---------------------------------- */
-
-// Creates needed selections
+    /* ---Internal Query System Selections--- */
     var query_graph_selection = d3.select("#query-interface-graph"),
         query_local_form_selection = d3.select("#query-local-interface-form"),
         query_local_current_selection = d3.select("#query-local-interface-current"),
@@ -55,10 +46,10 @@ function buildPortinari() {
         matching_choice = d3.select("#matching-choice");
 
 
-// Creates query graph interface
+    // Creates query graph interface
     var query_graph = new QueryGraph(query_graph_selection, reactor);
 
-// Creates query form interface
+    // Creates query form interface
     var query_form = new QueryForm(
         query_local_form_selection,
         query_local_current_selection,
@@ -78,7 +69,7 @@ function buildPortinari() {
     reactor.registerEvent('cohort_node_unselected');
     /* ---------------------------------- */
 
-// Creates needed selections
+    // Creates needed selections
     var form_get_cohort = d3.select("#form-get-cohort"),
         nodes_info_cohort_selection = d3.select("#nodes-info-cohort"),
         get_patterns_cohort = d3.select("#get-patterns-cohort"),
@@ -86,7 +77,7 @@ function buildPortinari() {
         cohort_result = d3.select("#cohort-result");
 
 
-// Creates prediction form interface
+    // Creates prediction form interface
     var prediction_form = new PredictionForm(
         form_get_cohort,
         nodes_info_cohort_selection,
@@ -94,7 +85,7 @@ function buildPortinari() {
         show_patterns_cohort,
         query_graph.graph, reactor);
 
-// Append the svg canvas to the page
+    // Append the svg canvas to the page
     var prediction_graph = new PredictionGraph(
         cohort_result,
         reactor);

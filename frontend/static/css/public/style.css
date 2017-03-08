@@ -34,7 +34,7 @@ div {
   border: 0; }
 
 svg {
-  border: solid #9E9E9E 1px;
+  border: solid #9E9E9E 2px;
   background-color: rgba(255, 255, 255, 0.9);
   margin: 0;
   padding: 0; }
@@ -43,7 +43,14 @@ h1 {
   color: #212121;
   font-family: "Raleway", sans-serif;
   font-size: 62px;
-  text-align: center; }
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Chrome/Safari */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE10+ */ }
 
 h2 {
   font-family: "Lato", sans-serif;
@@ -51,12 +58,28 @@ h2 {
   font-size: 18px;
   margin: 0;
   padding: 0;
-  border: 0; }
+  border: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Chrome/Safari */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE10+ */ }
 
 ul {
   margin: 0;
   padding: 0;
   border: 0; }
+
+a {
+  color: inherit;
+  text-decoration: none; }
+
+a:active, a:hover, a:visited, li.active, a:focus {
+  color: #212121;
+  text-decoration: none;
+  outline: none; }
 
 p {
   font-family: "Roboto", sans-serif;
@@ -64,17 +87,44 @@ p {
   color: #616161;
   margin: 0;
   padding: 0;
-  border: 0; }
+  border: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Chrome/Safari */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE10+ */ }
+
+li {
+  padding: 10px;
+  font-family: "Roboto", sans-serif;
+  font-size: 11px;
+  color: #616161; }
+
+text {
+  -webkit-user-select: none;
+  /* Chrome/Safari */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE10+ */ }
 
 select, option, input {
   background: rgba(255, 255, 255, 0.9);
-  border: solid #9E9E9E 1px;
+  border: solid #9E9E9E 2px;
   margin: 3px 3px 3px 3px;
   max-height: 30px;
   max-width: 200px;
   min-height: 30px;
   min-width: 50px;
-  text-align: center; }
+  text-align: center;
+  -webkit-user-select: none;
+  /* Chrome/Safari */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* IE10+ */ }
 
 .col-md-4 {
   margin: 0;
@@ -98,7 +148,7 @@ select, option, input {
     font-size: 11px;
     font-family: "Roboto", sans-serif;
     display: inline-block;
-    border: solid #9E9E9E 1px;
+    border: solid #9E9E9E 2px;
     max-width: 100px;
     padding: 5px;
     margin: 5px;
@@ -121,10 +171,11 @@ select, option, input {
   height: 100%;
   width: 100%; }
 
-/* - Query Menu */
+/* - Upper Interface */
 #query-system {
+  margin: 3px;
   padding: 6px;
-  border: solid #9E9E9E 1px; }
+  border: solid #9E9E9E 2px; }
   #query-system #query-interface-graph {
     /* nodes */
     /* edges */
@@ -157,12 +208,15 @@ select, option, input {
       fill: rgba(12, 12, 14, 0.9); }
     #query-system #query-interface-graph .OuTextE text {
       fill: rgba(12, 12, 14, 0.9); }
-  #query-system #forms-menu {
-    padding: 6px; }
 
 #forms-menu {
   height: 100%;
   text-align: center; }
+
+/* - Lower Interface */
+#vis-coh {
+  margin: 3px;
+  padding: 6px; }
 
 /* -- Sankey -- */
 #cohort-result .node rect {
@@ -181,7 +235,8 @@ select, option, input {
 #cohort-edit {
   height: 100%;
   padding: 6px;
-  text-align: center; }
+  text-align: center;
+  border: solid #9E9E9E 2px; }
   #cohort-edit p {
     line-height: 40px;
     text-align: center;

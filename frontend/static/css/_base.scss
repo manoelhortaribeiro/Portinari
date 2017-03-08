@@ -36,6 +36,10 @@ h1 {
   font-family: $title-font;
   font-size: $title-size;
   text-align: center;
+  user-select: none;
+  -webkit-user-select: none; /* Chrome/Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
 }
 
 h2 {
@@ -45,12 +49,27 @@ h2 {
   margin: 0;
   padding: 0;
   border: 0;
+  user-select: none;
+  -webkit-user-select: none; /* Chrome/Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
 }
 
 ul {
   margin: 0;
   padding: 0;
   border: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:active, a:hover, a:visited, li.active, a:focus {
+  color: $title-color;
+  text-decoration: none;
+  outline: none;
 }
 
 p {
@@ -60,6 +79,23 @@ p {
   margin: 0;
   padding: 0;
   border: 0;
+  user-select: none;
+  -webkit-user-select: none; /* Chrome/Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
+}
+
+li {
+  padding: 10px;
+  font-family: $primary-font;
+  font-size: $primary-font-size;
+  color: $primary-font-color;
+}
+
+text {
+  -webkit-user-select: none; /* Chrome/Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
 }
 
 select, option, input {
@@ -71,6 +107,9 @@ select, option, input {
   min-height: 30px;
   min-width: 50px;
   text-align: center;
+  -webkit-user-select: none; /* Chrome/Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
 }
 
 .col-md-4 {

@@ -20,9 +20,10 @@
   width: 100%;
 }
 
-/* - Query Menu */
+/* - Upper Interface */
 
 #query-system {
+  margin: 3px;
   padding: 6px;
   border: $light-border;
 
@@ -84,16 +85,18 @@
 
   }
 
-  #forms-menu {
-    padding: 6px;
-  }
-
-
 }
 
 #forms-menu {
   height: 100%;
   text-align: center;
+}
+
+/* - Lower Interface */
+
+#vis-coh {
+  margin: 3px;
+  padding: 6px;
 }
 
 /* -- Sankey -- */
@@ -125,6 +128,7 @@
   height: 100%;
   padding: 6px;
   text-align: center;
+  border: $light-border;
 
   p {
     line-height: $form-height;

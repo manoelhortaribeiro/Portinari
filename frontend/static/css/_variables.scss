@@ -13,7 +13,8 @@ $primary-font: 'Roboto', sans-serif;
 $primary-font-color: #616161;
 $primary-font-size: 11px;
 
-
+$node-font: 'Lato', sans-serif;
+$node-font-size: 12px;
 
 /* Colors */
 $bg-color: rgba(255, 255, 255, 0.9);
@@ -21,16 +22,13 @@ $secondary-color: rgba(3, 176, 255, 0.29);
 $neutral-color: #9E9E9E;
 
 /* Border */
-$light-border: solid $neutral-color 1px;
-
-
+$light-border: solid $neutral-color 2px;
 
 /* Node Variables */
 $node-color: rgb(63, 81, 181);
 $selected-node-color: rgb(35, 85, 129);
 $node-stroke: #00bcd4;
 $node-stroke-width: 5px;
-$node-font-size: 15px;
 
 /* Link Variables */
 $stroke-link-color: #402D29;
