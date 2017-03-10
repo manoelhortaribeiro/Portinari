@@ -1,7 +1,6 @@
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
-    json_config = require("../config/config.js"),
-    Utils = require("../util/util.js");
+    json_config = require("../config/config.js");
 
 function PredictionForm(form_get_cohort,
                         nodes_info_cohort_selection,
@@ -9,7 +8,6 @@ function PredictionForm(form_get_cohort,
                         show_patterns_cohort,
                         graph,
                         reactor) {
-    // ** Config
     var thisForm = this;
     thisForm.graph = graph;
     thisForm.nodes = {};
@@ -43,7 +41,6 @@ PredictionForm.prototype.addNodes = function (d) {
     thisForm.nodes[d.identifier] = d;
     thisForm.updateNodesInfo();
 };
-
 
 PredictionForm.prototype.removeNodes = function (d) {
     var thisForm = this;

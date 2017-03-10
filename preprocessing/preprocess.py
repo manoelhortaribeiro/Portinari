@@ -45,7 +45,7 @@
 #                                                                                                                      #
 #  "id": name of id attribute in dataset, MBD,                                                                         #
 #  "eventdate": name of eventdate attribute in current dataset, MBD,                                                   #
-#  "entitycreation": name of eventcreation attribute in curr dataset, MBD,                                             #
+#  "entitycreation": name of event creation attribute in curr dataset, MBD,                                            #
 #                                                                                                                      #
 #  "time_format": (%d.%m.%Y|...) format of the dates in the original dataset, MBD,                                     #
 #  "nan": value for non defined values in new dataset, MBD,                                                            #

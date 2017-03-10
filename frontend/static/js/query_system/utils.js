@@ -68,6 +68,8 @@ function Edge(src, dst, id, kind) {
     this.kind = kind;
 }
 
+
+
 module.exports = {
     Node: Node,
     Edge: Edge,

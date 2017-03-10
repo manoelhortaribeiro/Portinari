@@ -26,32 +26,34 @@ DBI.prototype.changeDataSet = function (new_name) {
 DBI.prototype.getDataSet = function (callback, flg) {
     var thisDatabaseInfo = this;
     var request = {'name': thisDatabaseInfo.filename};
-    pace.track(function(){$.ajax({
-        type: 'POST',
-        url: "http://localhost:5000/config/",
-        data: request,
-        success: function (data) {
+    pace.track(function () {
+        $.ajax({
+            type: 'POST',
+            url: "http://localhost:5000/config/",
+            data: request,
+            success: function (data) {
 
-            if (flg == undefined) {
-                thisDatabaseInfo.conf_file = JSON.parse(data);
-                thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
-                thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
-                thisDatabaseInfo.getDataSet(callback, true);
+                if (flg == undefined) {
+                    thisDatabaseInfo.conf_file = JSON.parse(data);
+                    thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
+                    thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
+                    thisDatabaseInfo.getDataSet(callback, true);
 
-            }
-            else {
+                }
+                else {
 
-                thisDatabaseInfo.conf_file = JSON.parse(data);
-                callback();
+                    thisDatabaseInfo.conf_file = JSON.parse(data);
+                    callback();
 
-            }
+                }
 
-        },
-        error: function () {
-            thisDatabaseInfo.getDataSet(callback, flg);
-        },
-        async: true
-    })});
+            },
+            error: function () {
+                thisDatabaseInfo.getDataSet(callback, flg);
+            },
+            async: true
+        })
+    });
 };
 
 DBI.prototype.outcome_attributes = function () {
@@ -186,21 +188,20 @@ module.exports = {
         nodesClass: "Nodes",
         edgeClass: "Edge",
         edgesClass: "Edges",
+        selectedClass: "selected",
         nodeRadius: 45,
         rectangleWidth: 40,
         delete: 68,
+        svgHeight: 500,
+        svgWidth: 1500,
 
         /*Stuff adjustable in the back end*/
-        datasets: databaseinfo.datasets.bind(databaseinfo),
-        matching: databaseinfo.matching.bind(databaseinfo),
         matchingDefault: databaseinfo.matchingDefault.bind(databaseinfo),
-        changeDataset: databaseinfo.changeDataSet.bind(databaseinfo),
         outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
         globalAttributes: databaseinfo.global_attributes.bind(databaseinfo),
         nodeAttributes: databaseinfo.node_attributes.bind(databaseinfo),
         edgeAttributes: databaseinfo.edge_attributes.bind(databaseinfo),
         types: databaseinfo.types.bind(databaseinfo),
-        filename: databaseinfo.getFilename.bind(databaseinfo),
 
         /*Helpers*/
         typeValueHandling: databaseinfo.typeValueHandling,
@@ -214,5 +215,12 @@ module.exports = {
         miningAlgorithms: databaseinfo.mining_algorithms.bind(databaseinfo),
         filename: databaseinfo.getFilename.bind(databaseinfo),
         id: databaseinfo.id.bind(databaseinfo)
+    },
+
+    SETTINGS: {
+        datasets: databaseinfo.datasets.bind(databaseinfo),
+        matching: databaseinfo.matching.bind(databaseinfo),
+        changeDataset: databaseinfo.changeDataSet.bind(databaseinfo),
+        filename: databaseinfo.getFilename.bind(databaseinfo)
     }
 };

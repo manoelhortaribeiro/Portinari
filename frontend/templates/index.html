@@ -71,16 +71,6 @@
             <div id="query-outcomes-form" class="form">
                 <!-- the form to add constraints goes here -->
             </div>
-
-            <h2>select dataset</h2>
-            <div id="dataset-choice" class="form">
-                <!-- here we choose the dataset we will use here -->
-            </div>
-
-            <h2>select matching</h2>
-            <div id="matching-choice" class="form">
-                <!-- here we choose the matching algorithm to use -->
-            </div>
         </div>
 
         <div class="col-md-8" id="query-interface-graph">
@@ -94,8 +84,9 @@
 
     <!-- Navigation Tabs -->
     <ul class="nav nav-tabs" id="nav-menu">
-        <li> <h2><a data-toggle="tab" href="#vis-coh">Visualize Cohort</a></h2></li>
+        <li><h2><a data-toggle="tab" href="#vis-coh">Visualize Cohort</a></h2></li>
         <li><h2><a data-toggle="tab" href="#vis-prog">Visualize Prognosis</a></h2></li>
+        <li><h2><a data-toggle="tab" href="#settings">Settings</a></h2></li>
         <!-- <li><a data-toggle="tab" href="#compare">Compare</a></li> -->
         <!-- <li><a data-toggle="tab" href="#mine">Mine</a></li> -->
     </ul>
@@ -133,12 +124,32 @@
             </div>
 
         </div>
-        <div id="vis-prog" class="tab-pane fade"> </div>
-        <!-- <div id="compare" class="tab-pane fade"> </div> -->
+        <div id="vis-prog" class="tab-pane fade col-md-12"></div>
+        <div id="settings" class="tab-pane fade col-md-12">
+            <div class="col-md-4">
+                <h2>select dataset</h2>
+                <div id="dataset-choice" class="form">
+                    <!-- here we choose the dataset we will use here -->
+                </div>
+            </div>
+
+            <div class="col-md-4">
+
+                <h2>select matching</h2>
+                <div id="matching-choice" class="form">
+                    <!-- here we choose the matching algorithm to use -->
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <h2>acknowledgments</h2>
+                <p>Portinari was developed as a joint project between the <i>Cancer Registry of Norway</i>, <i>Simula
+                    School</i> of Innovation and Research and <i>Universidade Federal de Minas Gerais</i>.</p>
+            </div>
+        </div>
+        <!--<div id="compare" class="tab-pane fade"> </div> -->
         <!-- <div id="mine" class="tab-pane fade"> </div> -->
     </div>
-
-    <!-- TODO: Footer -->
 
     <!-- Where magic happens! -->
     <script src="../static/js/public/bundle.js"></script>

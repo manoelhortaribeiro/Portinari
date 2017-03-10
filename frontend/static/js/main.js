@@ -14,17 +14,14 @@ function buildPortinari() {
 
     var Utils = require("./util/util.js");
 
-    var QueryForm = require("./query_system/query_form.js"),
-        QueryGraph = require("./query_system/query_graph.js");
-
-    var PredictionForm = require("./sankey_visualization/prediction_form.js"),
-        PredictionGraph = require("./sankey_visualization/prediction_graph.js");
-
     var reactor = new Reactor();
 
     /* --------------------- */
     /* ---  Query System --- */
     /* --------------------- */
+
+    var QueryForm = require("./query_system/query_form.js"),
+    QueryGraph = require("./query_system/query_graph.js");
 
     /* ---Internal Query System Events--- */
     reactor.registerEvent('selected_node_changed');
@@ -41,15 +38,12 @@ function buildPortinari() {
         query_global_form_selection = d3.select("#query-global-interface-form"),
         query_global_current_selection = d3.select("#query-global-interface-current"),
         outcomes_form_selection = d3.select("#query-outcomes-form"),
-        outcomes_current_selection = d3.select("#query-outcomes-current"),
-        dataset_choice = d3.select("#dataset-choice"),
-        matching_choice = d3.select("#matching-choice");
+        outcomes_current_selection = d3.select("#query-outcomes-current");
 
-
-    // Creates query graph interface
+    /* ---Creates query graph interface--- */
     var query_graph = new QueryGraph(query_graph_selection, reactor);
 
-    // Creates query form interface
+    /* ---Creates query form interface--- */
     var query_form = new QueryForm(
         query_local_form_selection,
         query_local_current_selection,
@@ -57,11 +51,14 @@ function buildPortinari() {
         query_global_current_selection,
         outcomes_form_selection,
         outcomes_current_selection,
-        dataset_choice, matching_choice, reactor);
+        reactor);
 
     /* ------------------------------------ */
     /* ---  Cohort Inspection System  --- */
     /* ----------------------------------- */
+
+    var PredictionForm = require("./sankey_visualization/prediction_form.js"),
+        PredictionGraph = require("./sankey_visualization/prediction_graph.js");
 
     /* ---Internal Query System Events--- */
     reactor.registerEvent('query_successful');
@@ -89,6 +86,19 @@ function buildPortinari() {
     var prediction_graph = new PredictionGraph(
         cohort_result,
         reactor);
+
+    /* ------------------------------------ */
+    /* ---           Settings           --- */
+    /* ----------------------------------- */
+
+    var SettingsForm = require("./settings/settings_form.js");
+
+    // Creates needed selections
+    var dataset_choice = d3.select("#dataset-choice"),
+        matching_choice = d3.select("#matching-choice");
+
+    var settings_form = new SettingsForm(matching_choice, dataset_choice, reactor);
+
 
     Utils.makeVisible("#loader_d", "#content_d");
 }

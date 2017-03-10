@@ -85,11 +85,10 @@
 
   }
 
-}
-
-#forms-menu {
-  height: 100%;
-  text-align: center;
+  #forms-menu {
+    height: 100%;
+    text-align: center;
+  }
 }
 
 /* - Lower Interface */
@@ -101,40 +100,45 @@
 
 /* -- Sankey -- */
 
-#cohort-result {
-
-  .node rect {
-    fill-opacity: .9;
-    shape-rendering: crispEdges;
-  }
-
-  .node text {
-    pointer-events: none;
-    text-shadow: 0 1px 0 #fff;
-  }
-
-  .link {
-    fill: none;
-    stroke: #000;
-    stroke-opacity: .2;
-  }
-
-  .link:hover {
-    stroke-opacity: .5;
-  }
-}
-
-#cohort-edit {
-  height: 100%;
+.tab-pane {
+  margin: 3px;
   padding: 6px;
-  text-align: center;
   border: $light-border;
 
-  p {
-    line-height: $form-height;
-    text-align: center;
-    opacity: 0.5;
+  #cohort-result {
 
+    .node rect {
+      fill-opacity: .9;
+      shape-rendering: crispEdges;
+    }
+
+    .node text {
+      pointer-events: none;
+      text-shadow: 0 1px 0 #fff;
+    }
+
+    .link {
+      fill: none;
+      stroke: #000;
+      stroke-opacity: .2;
+    }
+
+    .link:hover {
+      stroke-opacity: .5;
+    }
   }
 
+  #cohort-edit {
+    height: 100%;
+    padding: 6px;
+    text-align: center;
+
+    p {
+      line-height: $form-height;
+      text-align: center;
+      opacity: 0.5;
+
+    }
+
+  }
 }
