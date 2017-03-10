@@ -5,25 +5,20 @@
 /*                                      \ ---------------------------- /                                              */
 /* Events out:                                                                                                        */
 /* -> Inspect edge                                                                                                    */
-/* -> Inspect edge                                                                                                    */
+/* -> Inspect node                                                                                                    */
 /* Events in:                                                                                                         */
-/* -> New node                                                                                                        */
 /* -> New update node                                                                                                 */
 /* -> New update edge                                                                                                 */
-/* -> Remove node                                                                                                     */
 /* -> Update Settings                                                                                                 */
 /*---------------------------- ----------------------------  ---------------------------- ----------------------------*/
 /*---------------------------- ----------------------------  ---------------------------- ----------------------------*/
-
-/*  TODO: ADD ANIMATION TO NODES BRANCHING OUT. */
-/*  TODO: MAKE IT FIT IN THE PAGE */
 
 
 var json_config = require("../config/config.js"),
     d3 = require("../external/d3.min.v4.js"),
     utils = require("./utils.js");
 
-function GC(query_interface_selection, query_interface_buttons, reactor) {
+function GraphQuery(query_interface_selection, query_interface_buttons, reactor) {
     /* Add event listeners, creates and configures the query graph editor as specified in the config file, initializes
      * the query model and creates the root node.
      * parameters:
@@ -38,7 +33,6 @@ function GC(query_interface_selection, query_interface_buttons, reactor) {
 
     /* Binds events to the reactor */
     QG.reactor = reactor;
-    QG.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
     QG.reactor.addEventListener('constraint_added', this.getElement.bind(this));
     QG.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
     QG.reactor.addEventListener('global_added', this.getGraph.bind(this));
@@ -48,7 +42,7 @@ function GC(query_interface_selection, query_interface_buttons, reactor) {
     QG.height = QG.config.svgHeight;
     QG.width = QG.config.svgWidth;
     QG.aspect = [0, 0, QG.width, QG.height];
-    QG.b_aspect = [0, 0, 1500, 50];
+    QG.b_aspect = [0, 0, QG.config.buttonSvgWidth, QG.config.buttonSvgHeight];
 
     /* Variables to adjust the tiles */
     QG.horizontal_fixed_points = 1;
@@ -101,7 +95,7 @@ function GC(query_interface_selection, query_interface_buttons, reactor) {
     QG.updateGraph();                                                   // Initializes graph
 }
 
-GC.prototype.distributeNodes = function () {
+GraphQuery.prototype.distributeNodes = function () {
     /* This method distributes the nodes in the svg. It gets the horizontal_fixed_points and the vertical_fixed_points
      using the levels variable, and then positions all the nodes on its respective tick.
      parameters: none
@@ -127,7 +121,17 @@ GC.prototype.distributeNodes = function () {
     }
 };
 
-GC.prototype.addNode = function (parent, coordinates) {
+GraphQuery.prototype.addNodeSVG = function (svg_element) {
+    var QG = this;
+    d3.event.stopPropagation();
+    var node = d3.select(svg_element).data()[0];
+    console.log(node);
+    QG.addNode(node, [node.x, node.y]);
+    QG.updateGraph();   // Initializes graph
+
+};
+
+GraphQuery.prototype.addNode = function (parent, coordinates) {
     /* This method creates a node given a parent & a set of coordinates. It can be done without parents or coordinates.
      It also handles the increase of the level.
      parameters:
@@ -145,7 +149,7 @@ GC.prototype.addNode = function (parent, coordinates) {
     return node;
 };
 
-GC.prototype.nodeMouseDown = function (svg_element) {
+GraphQuery.prototype.nodeMouseDown = function (svg_element) {
     /* This method marks every selected node as having the selected class if it is not selected, and as not having the
      selected class if the node is selected
      parameters:
@@ -159,7 +163,7 @@ GC.prototype.nodeMouseDown = function (svg_element) {
     else node.classed(QG.config.selectedClass, true);
 };
 
-GC.prototype.addCircle = function (aux, radius, tx, ty, z_index, circle_class, function_mousedown) {
+GraphQuery.prototype.addCircle = function (aux, radius, tx, ty, z_index, circle_class, function_mousedown) {
     var QG = this;
 
     aux.append("circle")
@@ -171,10 +175,11 @@ GC.prototype.addCircle = function (aux, radius, tx, ty, z_index, circle_class, f
         .classed(circle_class, true)
         .on("mousedown", function (d) {
             d3.event.stopPropagation();
-            function_mousedown(this)
+            console.log(this);
+            function_mousedown(this);
         })
         .transition()
-        .duration(300)
+        .duration(500)
         .attr("r", function (d) {
             return String(radius);
         });
@@ -183,6 +188,7 @@ GC.prototype.addCircle = function (aux, radius, tx, ty, z_index, circle_class, f
 
         d3.selectAll("." + circle_class)
             .transition()
+            .duration(500)
             .attr("r", String(radius))
             .attr("transform", function () {
                 return "translate(" + tx + "," + ty + ")";
@@ -190,7 +196,7 @@ GC.prototype.addCircle = function (aux, radius, tx, ty, z_index, circle_class, f
     }
 };
 
-GC.prototype.animateNodes = function () {
+GraphQuery.prototype.animateNodes = function () {
     /* This method is responsible for entering, updating and exiting the svg relate to the nodes. It also makes nice
      transition animations for the nodes insertion/removal.
      parameters: none
@@ -223,15 +229,19 @@ GC.prototype.animateNodes = function () {
         .classed(QG.config.nodeClass, true)
         .attr("transform", func_translate);
 
-    QG.addCircle(aux, radius, 0, 0, 2, QG.config.mainCircleClass, QG.nodeMouseDown.bind(this));    // Main Circle
-    QG.addCircle(aux, radius / 3, radius * 0.7071, -radius * 0.7071, 3, QG.config.addButtonClass, QG.nodeMouseDown); // +
+    QG.addCircle(aux, radius, 0, 0, 2,
+        QG.config.mainCircleClass,
+        QG.nodeMouseDown.bind(this));    // Main Circle
+    QG.addCircle(aux, radius / 3, radius * 0.7071, -radius * 0.7071, 3,
+        QG.config.addButtonClass,
+        QG.addNodeSVG.bind(this)); // +
     QG.addCircle(aux, radius / 3, -radius * 0.7071, -radius * 0.7071, 3, QG.config.removeButtonClass, QG.nodeMouseDown); // -
     QG.addCircle(aux, radius / 3, 0, -radius, 3, QG.config.editButtonClass, QG.nodeMouseDown);     // Ins
 
     /* >> Update */
     nodes.data(data, func_return_id)
         .transition()
-        .delay(150)
+        .duration(500)
         .attr("transform", func_translate);
 
     /* >> Exit */
@@ -242,7 +252,7 @@ GC.prototype.animateNodes = function () {
     QG.graph.previous_radius = radius;  // stores previous radius state
 };
 
-GC.prototype.animateEdges = function () {
+GraphQuery.prototype.animateEdges = function () {
     /* This method is responsible for entering, updating and exiting the svg relate to the edges. It also makes nice
      transition animations for the edges insertion/removal.
      parameters: none
@@ -274,22 +284,22 @@ GC.prototype.animateEdges = function () {
         });
     aux.append("path")
         .attr("d", function (d) {
-            return utils.calcEdgePath(d, radius);
+            return utils.calcEdgePath(d, radius, radius / 3);
         })
         .classed(QG.config.linkClass, true)
         .attr("stroke-width", 0)
         .attr("z-index", 0)
         .transition()
-        .duration(1500)
+        .duration(500)
         .attr("stroke-width", radius / 2);
 
     /* >> Update */
     edges.data(data, func_return_id)
         .selectAll("path")
         .transition()
-        .duration(1500)
+        .duration(500)
         .attr("d", function (d) {
-            return utils.calcEdgePath(d, radius);
+            return utils.calcEdgePath(d, radius, radius / 3);
         })
         .attr("stroke-width", radius / 2);
 
@@ -299,7 +309,7 @@ GC.prototype.animateEdges = function () {
         .remove();
 };
 
-GC.prototype.addEdge = function (src, dst, kind) {
+GraphQuery.prototype.addEdge = function (src, dst, kind) {
     /* This method receives two nodes, src and dst, and the kind of edge and creates an edge between the two.
      parameters:
      @src: node of origin
@@ -314,13 +324,13 @@ GC.prototype.addEdge = function (src, dst, kind) {
 
 
 // TODO: simple in-edge time/hop editing
-GC.prototype.edgeMouseDown = function (svg_element) {
+GraphQuery.prototype.edgeMouseDown = function (svg_element) {
     var QG = this;
     d3.event.stopPropagation();
 };
 
 
-GC.prototype.svgKeyDown = function () {
+GraphQuery.prototype.svgKeyDown = function () {
 
     var QG = this;
 
@@ -366,7 +376,7 @@ GC.prototype.svgKeyDown = function () {
 };
 
 
-GC.prototype.updateGraph = function () {
+GraphQuery.prototype.updateGraph = function () {
 
     var QG = this;
 
@@ -498,19 +508,19 @@ GC.prototype.updateGraph = function () {
     //     .remove();
 };
 
-GC.prototype.getGraph = function () {
+GraphQuery.prototype.getGraph = function () {
     var QG = this;
     return QG.graph;
 };
 
-GC.prototype.getElement = function () {
+GraphQuery.prototype.getElement = function () {
     var element = d3.select(".selected").data()[0];
     return element;
 };
 
-GC.prototype.changeMatching = function (new_matching) {
+GraphQuery.prototype.changeMatching = function (new_matching) {
     var QG = this;
     this.graph.matching = new_matching;
 };
 
-module.exports = GC;
+module.exports = GraphQuery;

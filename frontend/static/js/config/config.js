@@ -202,6 +202,8 @@ module.exports = {
         create: 67,
         svgHeight: 500,
         svgWidth: 1500,
+        buttonSvgHeight: 50,
+        buttonSvgWidth: 1500,
 
         /*Stuff adjustable in the back end*/
         datasets: databaseinfo.datasets.bind(databaseinfo),
