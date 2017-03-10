@@ -18,6 +18,7 @@ html {
   width: 100%; }
 
 body {
+  background-color: #FFFFFF;
   margin: 0;
   padding: 0;
   border: 0;
@@ -34,8 +35,7 @@ div {
   border: 0; }
 
 svg {
-  border: solid #9E9E9E 2px;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: solid #9E9E9E 2px;
   margin: 0;
   padding: 0; }
 
@@ -111,8 +111,7 @@ text {
   /* IE10+ */ }
 
 select, option, input {
-  background: rgba(255, 255, 255, 0.9);
-  border: solid #9E9E9E 2px;
+  background: #FFFFFF;
   margin: 3px 3px 3px 3px;
   max-height: 30px;
   max-width: 200px;
@@ -126,12 +125,12 @@ select, option, input {
   -ms-user-select: none;
   /* IE10+ */ }
 
-.col-md-4 {
+.col-md-3 {
   margin: 0;
   padding: 0;
   border: 0; }
 
-.col-md-8 {
+.col-md-9 {
   margin: 0;
   padding: 0;
   border: 0; }
@@ -166,17 +165,27 @@ select, option, input {
   margin: auto; }
 
 #content_d {
-  opacity: 0;
+  border: solid #9E9E9E 2px;
+  padding: 0;
+  transform: translateY(-50%);
   position: relative;
-  height: 100%;
-  width: 100%; }
+  top: 50%;
+  display: block;
+  opacity: 0;
+  width: 95%;
+  height: 95%;
+  margin: 0 auto;
+  overflow: hidden; }
 
 /* - Upper Interface */
 #query-system {
-  margin: 3px;
-  padding: 6px;
-  border: solid #9E9E9E 2px; }
+  margin: 0;
+  padding: 0;
+  height: 50%; }
   #query-system #query-interface-graph {
+    margin: 0;
+    padding: 0;
+    height: 100%;
     /* nodes */
     /* edges */
     /* text */ }
@@ -209,14 +218,13 @@ select, option, input {
     #query-system #query-interface-graph .OuTextE text {
       fill: rgba(12, 12, 14, 0.9); }
   #query-system #forms-menu {
+    margin: 0;
+    padding: 0;
     height: 100%;
+    overflow: hidden;
     text-align: center; }
 
 /* - Lower Interface */
-#vis-coh {
-  margin: 3px;
-  padding: 6px; }
-
 /* -- Sankey -- */
 .tab-pane {
   margin: 3px;

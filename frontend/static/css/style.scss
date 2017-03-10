@@ -10,25 +10,36 @@
   display: block;
   width: 700px;
   margin: auto;
+
 }
 
 #content_d {
-
-  opacity: 0;
+  border: $light-border;
+  padding: 0;
+  transform: translateY(-50%);
   position: relative;
-  height: 100%;
-  width: 100%;
+  top: 50%;
+  display: block;
+  opacity: 0;
+  width: 95%;
+  height: 95%;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
 /* - Upper Interface */
 
+
+
 #query-system {
-  margin: 3px;
-  padding: 6px;
-  border: $light-border;
+  margin: 0;
+  padding: 0;
+  height: 50%;
 
   #query-interface-graph {
-
+    margin: 0;
+    padding: 0;
+    height: 100%;
     /* nodes */
 
     .Node {
@@ -86,7 +97,10 @@
   }
 
   #forms-menu {
+    margin: 0;
+    padding: 0;
     height: 100%;
+    overflow: hidden;
     text-align: center;
   }
 }
@@ -94,8 +108,6 @@
 /* - Lower Interface */
 
 #vis-coh {
-  margin: 3px;
-  padding: 6px;
 }
 
 /* -- Sankey -- */

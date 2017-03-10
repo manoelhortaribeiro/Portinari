@@ -27,6 +27,7 @@ DBI.prototype.changeDataSet = function (new_name) {
 DBI.prototype.getDataSet = function (callback, flg) {
     var thisDatabaseInfo = this;
     var request = {'name': thisDatabaseInfo.filename};
+    console.log("start");
     pace.track(function () {
         $.ajax({
             type: 'POST',
@@ -39,17 +40,18 @@ DBI.prototype.getDataSet = function (callback, flg) {
                     thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
                     thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
                     thisDatabaseInfo.getDataSet(callback, true);
-
+                    console.log("if");
                 }
                 else {
 
                     thisDatabaseInfo.conf_file = JSON.parse(data);
                     callback();
-
+                    console.log("else");
                 }
 
             },
             error: function () {
+                console.log("error");
                 thisDatabaseInfo.getDataSet(callback, flg);
             },
             async: true
@@ -96,6 +98,14 @@ DBI.prototype.visualization = function () {
 DBI.prototype.mining_algorithms = function () {
     return this.conf_file['mining_algorithms']
 };
+
+DBI.prototype.getWindowHeight = function () {
+    return window.innerHeight*(0.5*0.95);
+};
+
+DBI.prototype.getWindowWidth = function () {
+    return window.innerWidth*(2/3);
+}
 
 DBI.prototype.matchingDefault = function () {
     return this.matching_default;
@@ -193,8 +203,8 @@ module.exports = {
         nodeRadius: 45,
         rectangleWidth: 40,
         delete: 68,
-        svgHeight: 500,
-        svgWidth: 1500,
+        svgHeight: databaseinfo.getWindowHeight.bind(databaseinfo),
+        svgWidth: databaseinfo.getWindowWidth.bind(databaseinfo),
 
         /*Stuff adjustable in the back end*/
         matchingDefault: databaseinfo.matchingDefault.bind(databaseinfo),
@@ -1059,6 +1069,7 @@ module.exports = FormHandler;
 
 },{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4}],10:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
+    $ = require("../external/jquery.min.js"),
     utils = require("./utils.js"),
     json_config = require("../config/config.js");
 
@@ -1090,13 +1101,21 @@ function QueryGraph(query_interface_selection, reactor) {
     QG.graph.outcome_display_value = [];
     QG.graph.global_key_op_value = [];
     QG.graph.global_display_value = [];
-    QG.aspect = [0, 0, QG.config.svgWidth, QG.config.svgHeight];
+    QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
     QG.graph.matching = QG.config.matchingDefault();
 
     /* Initializes the svg */
     QG.svg = query_interface_selection.append("svg")
+        .attr("id", "query-graph-svg")
         .attr("viewBox", QG.aspect[0] + " " + QG.aspect[1] + " " + QG.aspect[2] + " " + QG.aspect[3])
         .attr("preserveAspectRatio", "xMinYMin meet"); // svg
+
+    $(window).resize(function () {
+        QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
+        d3.select("#query-graph-svg")
+            .attr("viewBox", QG.aspect[0] + " " + QG.aspect[1] + " " + QG.aspect[2] + " " + QG.aspect[3])
+            .attr("preserveAspectRatio", "xMinYMin meet"); // svg
+    });
 
     QG.svgG = QG.svg.append("g").classed(QG.config.graphClass, true);   // graph
     QG.svgG.append("g").classed(QG.config.nodesClass, true);            // nodes
@@ -1470,7 +1489,7 @@ QueryGraph.prototype.changeMatching = function (new_matching) {
 
 module.exports = QueryGraph;
 
-},{"../config/config.js":1,"../external/d3.min.v4.js":2,"./utils.js":11}],11:[function(require,module,exports){
+},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4,"./utils.js":11}],11:[function(require,module,exports){
 var conf = require("../config/config.js");
 
 function canDo(tmp_x, tmp_y, r, aspect, nodes, node) {

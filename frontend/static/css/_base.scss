@@ -7,6 +7,7 @@ html {
 }
 
 body {
+  background-color: $white;
   margin: 0;
   padding: 0;
   border: 0;
@@ -25,8 +26,7 @@ div {
 }
 
 svg {
-  border: $light-border;
-  background-color: $bg-color;
+  background-color: $light-border;
   margin: 0;
   padding: 0;
 }
@@ -99,8 +99,7 @@ text {
 }
 
 select, option, input {
-  background: $bg-color;
-  border: $light-border;
+  background: $white;
   margin: $three-px;
   max-height: 30px;
   max-width: 200px;
@@ -112,13 +111,13 @@ select, option, input {
   -ms-user-select: none; /* IE10+ */
 }
 
-.col-md-4 {
+.col-md-3 {
   margin: 0;
   padding: 0;
   border: 0;
 }
 
-.col-md-8 {
+.col-md-9 {
   margin: 0;
   padding: 0;
   border: 0;

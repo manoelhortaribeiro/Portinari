@@ -1,4 +1,5 @@
 var d3 = require("../external/d3.min.v4.js"),
+    $ = require("../external/jquery.min.js"),
     utils = require("./utils.js"),
     json_config = require("../config/config.js");
 
@@ -30,13 +31,21 @@ function QueryGraph(query_interface_selection, reactor) {
     QG.graph.outcome_display_value = [];
     QG.graph.global_key_op_value = [];
     QG.graph.global_display_value = [];
-    QG.aspect = [0, 0, QG.config.svgWidth, QG.config.svgHeight];
+    QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
     QG.graph.matching = QG.config.matchingDefault();
 
     /* Initializes the svg */
     QG.svg = query_interface_selection.append("svg")
+        .attr("id", "query-graph-svg")
         .attr("viewBox", QG.aspect[0] + " " + QG.aspect[1] + " " + QG.aspect[2] + " " + QG.aspect[3])
         .attr("preserveAspectRatio", "xMinYMin meet"); // svg
+
+    $(window).resize(function () {
+        QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
+        d3.select("#query-graph-svg")
+            .attr("viewBox", QG.aspect[0] + " " + QG.aspect[1] + " " + QG.aspect[2] + " " + QG.aspect[3])
+            .attr("preserveAspectRatio", "xMinYMin meet"); // svg
+    });
 
     QG.svgG = QG.svg.append("g").classed(QG.config.graphClass, true);   // graph
     QG.svgG.append("g").classed(QG.config.nodesClass, true);            // nodes

@@ -26,6 +26,7 @@ DBI.prototype.changeDataSet = function (new_name) {
 DBI.prototype.getDataSet = function (callback, flg) {
     var thisDatabaseInfo = this;
     var request = {'name': thisDatabaseInfo.filename};
+    console.log("start");
     pace.track(function () {
         $.ajax({
             type: 'POST',
@@ -38,17 +39,18 @@ DBI.prototype.getDataSet = function (callback, flg) {
                     thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
                     thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
                     thisDatabaseInfo.getDataSet(callback, true);
-
+                    console.log("if");
                 }
                 else {
 
                     thisDatabaseInfo.conf_file = JSON.parse(data);
                     callback();
-
+                    console.log("else");
                 }
 
             },
             error: function () {
+                console.log("error");
                 thisDatabaseInfo.getDataSet(callback, flg);
             },
             async: true
@@ -95,6 +97,14 @@ DBI.prototype.visualization = function () {
 DBI.prototype.mining_algorithms = function () {
     return this.conf_file['mining_algorithms']
 };
+
+DBI.prototype.getWindowHeight = function () {
+    return window.innerHeight*(0.5*0.95);
+};
+
+DBI.prototype.getWindowWidth = function () {
+    return window.innerWidth*(2/3);
+}
 
 DBI.prototype.matchingDefault = function () {
     return this.matching_default;
@@ -192,8 +202,8 @@ module.exports = {
         nodeRadius: 45,
         rectangleWidth: 40,
         delete: 68,
-        svgHeight: 500,
-        svgWidth: 1500,
+        svgHeight: databaseinfo.getWindowHeight.bind(databaseinfo),
+        svgWidth: databaseinfo.getWindowWidth.bind(databaseinfo),
 
         /*Stuff adjustable in the back end*/
         matchingDefault: databaseinfo.matchingDefault.bind(databaseinfo),
