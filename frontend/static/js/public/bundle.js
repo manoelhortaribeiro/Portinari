@@ -100,11 +100,13 @@ DBI.prototype.mining_algorithms = function () {
 };
 
 DBI.prototype.getWindowHeight = function () {
-    return window.innerHeight*(0.5*0.95);
-};
+    var s_query_graph = Number(d3.select("#query-graph").style("height").slice(0, -2));
+    console.log(s_query_graph);
+    return s_query_graph * 0.99;
+}
 
 DBI.prototype.getWindowWidth = function () {
-    return window.innerWidth*(3/4)*0.95;
+    return window.innerWidth*(3/4)*0.95*0.99;
 }
 
 DBI.prototype.matchingDefault = function () {
@@ -725,7 +727,7 @@ function buildPortinari() {
     reactor.registerEvent('matching_changed');
 
     /* ---Internal Query System Selections--- */
-    var query_graph_selection = d3.select("#query-interface-graph"),
+    var query_graph_selection = d3.select("#query-graph"),
         query_local_form_selection = d3.select("#query-local-interface-form"),
         query_local_current_selection = d3.select("#query-local-interface-current"),
         query_global_form_selection = d3.select("#query-global-interface-form"),

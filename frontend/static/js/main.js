@@ -32,7 +32,7 @@ function buildPortinari() {
     reactor.registerEvent('matching_changed');
 
     /* ---Internal Query System Selections--- */
-    var query_graph_selection = d3.select("#query-interface-graph"),
+    var query_graph_selection = d3.select("#query-graph"),
         query_local_form_selection = d3.select("#query-local-interface-form"),
         query_local_current_selection = d3.select("#query-local-interface-current"),
         query_global_form_selection = d3.select("#query-global-interface-form"),

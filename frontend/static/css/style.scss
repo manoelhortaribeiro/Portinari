@@ -1,114 +1,69 @@
 @import "variables";
-@import "base";
+@import "base_positioning";
+@import "base_text";
+@import "base_color";
 
 /* Loader */
 
-#loader_d {
-  transform: translateY(-50%);
-  position: relative;
-  top: 50%;
-  display: block;
-  width: 700px;
-  margin: auto;
 
-}
-
-#content_d {
-  border: $light-border;
-  padding: 0;
-  transform: translateY(-50%);
-  position: relative;
-  top: 50%;
-  display: block;
-  opacity: 0;
-  width: 95%;
-  height: 95%;
-  margin: 0 auto;
-  overflow: hidden;
-}
 
 /* - Upper Interface */
 
+#query-graph {
 
+  /* nodes */
 
-#query-system {
-  margin: 0;
-  padding: 0;
-  height: 50%;
-
-  #query-interface-graph {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
-    /* nodes */
-
-    .Node {
-      fill: $node-color;
-    }
-
-    .Node:hover {
-      fill: $selected-node-color;
-      stroke: $node-stroke;
-      stroke-width: $node-stroke-width;
-    }
-
-    .Node.selected {
-      fill: $selected-node-color;
-      stroke: $node-stroke;
-      stroke-width: $node-stroke-width;
-    }
-
-    /* edges */
-
-    .link {
-      stroke: $stroke-link-color;
-      stroke-width: $stroke-link-width;
-    }
-
-    .selected path.link {
-      stroke: $stroke-link-color-selected;
-      fill: $stroke-link-color-selected;
-      stroke-width: $stroke-link-width-selected;
-    }
-
-    #end-arrow {
-      stroke: $stroke-link-color-selected;
-      fill: $stroke-link-color-selected;
-    }
-
-    /* text */
-
-    .InTextN text {
-      fill: rgba(255, 255, 255, 1);
-    }
-
-    .OuTextN text {
-      fill: rgba(12, 12, 14, 0.9);
-    }
-
-    .InTextE text {
-      fill: rgba(12, 12, 14, 0.9);
-    }
-
-    .OuTextE text {
-      fill: rgba(12, 12, 14, 0.9);
-    }
-
+  .Node {
+    fill: $node-color;
   }
 
-  #forms-menu {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
-    text-align: center;
+  .Node:hover {
+    fill: $selected-node-color;
+    stroke: $node-stroke;
+    stroke-width: $node-stroke-width;
   }
-}
 
-/* - Lower Interface */
+  .Node.selected {
+    fill: $selected-node-color;
+    stroke: $node-stroke;
+    stroke-width: $node-stroke-width;
+  }
 
-#vis-coh {
+  /* edges */
+
+  .link {
+    stroke: $stroke-link-color;
+    stroke-width: $stroke-link-width;
+  }
+
+  .selected path.link {
+    stroke: $stroke-link-color-selected;
+    fill: $stroke-link-color-selected;
+    stroke-width: $stroke-link-width-selected;
+  }
+
+  #end-arrow {
+    stroke: $stroke-link-color-selected;
+    fill: $stroke-link-color-selected;
+  }
+
+  /* text */
+
+  .InTextN text {
+    fill: rgba(255, 255, 255, 1);
+  }
+
+  .OuTextN text {
+    fill: rgba(12, 12, 14, 0.9);
+  }
+
+  .InTextE text {
+    fill: rgba(12, 12, 14, 0.9);
+  }
+
+  .OuTextE text {
+    fill: rgba(12, 12, 14, 0.9);
+  }
 }
 
 /* -- Sankey -- */

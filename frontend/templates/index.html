@@ -23,136 +23,145 @@
 <body>
 
 <div id="loader_d">
-    <h1><img src="../static/imgs/portinari.png" alt="logo" height=150px/> portinari
+    <h1><img src="../static/imgs/portinari.png" alt="logo" height=100px/> portinari
     </h1>
+</div>
+
+<div id="content_d">
+
+    <!-- Query System -->
+    <div class="col-md-12" id="upper-interface">
+
+        <div class="col-md-3" id="query-form">
+            <div id="add-constraints">
+                <div id="query-local-interface-form" class="form">
+                    <!-- the form to add constraints goes here -->
+                </div>
+            </div>
+
+            <div id="visualize-cohort">
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-9" id="visual-query-maker">
+            <div id="query-graph">
+                <!-- query interface goes here goes here -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Knowledge Discovery System -->
+    <div class="col-md-12" id="lower-interface">
+
+        <div class="col-md-3" id="method-form">
+            <h2>get cohort</h2>
+            <div id="form-get-cohort" class="form">
+                <!-- gets the sankey diagram, possibly some visualization option -->
+            </div>
+
+            <h2>nodes info</h2>
+            <div id="nodes-info-cohort" class="current">
+                <ul></ul>
+                <!-- show information about the selected nodes -->
+            </div>
+
+            <h2>mine patterns</h2>
+            <div id="get-patterns-cohort" class="form">
+                <!-- presents option for mining patterns -->
+            </div>
+
+            <h2>show patterns</h2>
+            <div id="show-patterns-cohort" class="current">
+                <ul></ul>
+                <!-- present mined patterns -->
+            </div>
+        </div>
+
+        <div class="col-md-9" id="algorithm-output">
+
+            <div id="cohort-result"></div>
+
+        </div>
+
+    </div>
 
 </div>
 
-<div class="container-fluid" id="content_d">
+<!--&lt;!&ndash; Navigation Tabs &ndash;&gt;-->
+<!--<ul class="nav nav-tabs" id="nav-menu">-->
+<!--<li><h2><a data-toggle="tab" href="#vis-coh">Visualize Cohort</a></h2></li>-->
+<!--<li><h2><a data-toggle="tab" href="#vis-prog">Visualize Prognosis</a></h2></li>-->
+<!--<li><h2><a data-toggle="tab" href="#settings">Settings</a></h2></li>-->
+<!--&lt;!&ndash; <li><a data-toggle="tab" href="#compare">Compare</a></li> &ndash;&gt;-->
+<!--&lt;!&ndash; <li><a data-toggle="tab" href="#mine">Mine</a></li> &ndash;&gt;-->
+<!--</ul>-->
 
-    <!--------------------->
-    <!-- UPPER INTERFACE -->
-    <!--------------------->
+<!--&lt;!&ndash; Navigation Contents &ndash;&gt;-->
+<!--<div class="tab-content">-->
+<!--<div id="vis-coh" class="tab-pane fade col-md-12">-->
+<!--<div class="col-md-4" id="cohort-edit">-->
 
-    <!-- Query System -->
-    <div class="col-md-12" id="query-system">
-        <div class="col-md-3" id="forms-menu">
+<!--<h2>get cohort</h2>-->
+<!--<div id="form-get-cohort" class="form">-->
+<!--&lt;!&ndash; gets the sankey diagram, possibly some visualization option &ndash;&gt;-->
+<!--</div>-->
 
+<!--<h2>nodes info</h2>-->
+<!--<div id="nodes-info-cohort" class="current">-->
+<!--<ul></ul>-->
+<!--&lt;!&ndash; show information about the selected nodes &ndash;&gt;-->
+<!--</div>-->
 
-            <h2>view local constraints</h2>
-            <div id="query-local-interface-current" class="current">
-                <!-- information about the selected node goes here -->
-                <ul></ul>
-            </div>
+<!--<h2>mine patterns</h2>-->
+<!--<div id="get-patterns-cohort" class="form">-->
+<!--&lt;!&ndash; presents option for mining patterns &ndash;&gt;-->
+<!--</div>-->
 
-            <h2>add local constraints</h2>
-            <div id="query-local-interface-form" class="form">
-                <!-- the form to add constraints goes here -->
-            </div>
+<!--<h2>show patterns</h2>-->
+<!--<div id="show-patterns-cohort" class="current">-->
+<!--<ul></ul>-->
+<!--&lt;!&ndash; present mined patterns &ndash;&gt;-->
+<!--</div>-->
 
-            <h2>view global constraints</h2>
-            <div id="query-global-interface-current" class="current">
-                <!-- information about the selected node goes here -->
-                <ul></ul>
-            </div>
+<!--</div>-->
+<!--<div class="col-md-8">-->
+<!--<div id="cohort-result"></div>-->
+<!--</div>-->
 
-            <h2>add global constraints</h2>
-            <div id="query-global-interface-form" class="form">
-                <!-- the form to add constraints goes here -->
-            </div>
+<!--</div>-->
+<!--<div id="vis-prog" class="tab-pane fade col-md-12"></div>-->
+<!--<div id="settings" class="tab-pane fade col-md-12">-->
+<!--<div class="col-md-4">-->
+<!--<h2>select dataset</h2>-->
+<!--<div id="dataset-choice" class="form">-->
+<!--&lt;!&ndash; here we choose the dataset we will use here &ndash;&gt;-->
+<!--</div>-->
+<!--</div>-->
 
-            <h2>view outcomes</h2>
-            <div id="query-outcomes-current" class="current">
-                <!-- information about the selected node goes here -->
-                <ul></ul>
-            </div>
+<!--<div class="col-md-4">-->
 
-            <h2>select outcomes</h2>
-            <div id="query-outcomes-form" class="form">
-                <!-- the form to add constraints goes here -->
-            </div>
-        </div>
+<!--<h2>select matching</h2>-->
+<!--<div id="matching-choice" class="form">-->
+<!--&lt;!&ndash; here we choose the matching algorithm to use &ndash;&gt;-->
+<!--</div>-->
+<!--</div>-->
 
-        <div class="col-md-9" id="query-interface-graph">
-            <!-- query interface goes here goes here -->
-        </div>
-    </div>
+<!--<div class="col-md-4">-->
+<!--<h2>acknowledgments</h2>-->
+<!--<p>Portinari was developed as a joint project between the <i>Cancer Registry of Norway</i>, <i>Simula-->
+<!--School</i> of Innovation and Research and <i>Universidade Federal de Minas Gerais</i>.</p>-->
+<!--</div>-->
+<!--</div>-->
+<!--&lt;!&ndash;<div id="compare" class="tab-pane fade"> </div> &ndash;&gt;-->
+<!--&lt;!&ndash; <div id="mine" class="tab-pane fade"> </div> &ndash;&gt;-->
+<!--</div>-->
 
-    <!--------------------->
-    <!-- LOWER INTERFACE -->
-    <!--------------------->
-
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-tabs" id="nav-menu">
-        <li><h2><a data-toggle="tab" href="#vis-coh">Visualize Cohort</a></h2></li>
-        <li><h2><a data-toggle="tab" href="#vis-prog">Visualize Prognosis</a></h2></li>
-        <li><h2><a data-toggle="tab" href="#settings">Settings</a></h2></li>
-        <!-- <li><a data-toggle="tab" href="#compare">Compare</a></li> -->
-        <!-- <li><a data-toggle="tab" href="#mine">Mine</a></li> -->
-    </ul>
-
-    <!-- Navigation Contents -->
-    <div class="tab-content">
-        <div id="vis-coh" class="tab-pane fade col-md-12">
-            <div class="col-md-4" id="cohort-edit">
-
-                <h2>get cohort</h2>
-                <div id="form-get-cohort" class="form">
-                    <!-- gets the sankey diagram, possibly some visualization option -->
-                </div>
-
-                <h2>nodes info</h2>
-                <div id="nodes-info-cohort" class="current">
-                    <ul></ul>
-                    <!-- show information about the selected nodes -->
-                </div>
-
-                <h2>mine patterns</h2>
-                <div id="get-patterns-cohort" class="form">
-                    <!-- presents option for mining patterns -->
-                </div>
-
-                <h2>show patterns</h2>
-                <div id="show-patterns-cohort" class="current">
-                    <ul></ul>
-                    <!-- present mined patterns -->
-                </div>
-
-            </div>
-            <div class="col-md-8">
-                <div id="cohort-result"></div>
-            </div>
-
-        </div>
-        <div id="vis-prog" class="tab-pane fade col-md-12"></div>
-        <div id="settings" class="tab-pane fade col-md-12">
-            <div class="col-md-4">
-                <h2>select dataset</h2>
-                <div id="dataset-choice" class="form">
-                    <!-- here we choose the dataset we will use here -->
-                </div>
-            </div>
-
-            <div class="col-md-4">
-
-                <h2>select matching</h2>
-                <div id="matching-choice" class="form">
-                    <!-- here we choose the matching algorithm to use -->
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <h2>acknowledgments</h2>
-                <p>Portinari was developed as a joint project between the <i>Cancer Registry of Norway</i>, <i>Simula
-                    School</i> of Innovation and Research and <i>Universidade Federal de Minas Gerais</i>.</p>
-            </div>
-        </div>
-        <!--<div id="compare" class="tab-pane fade"> </div> -->
-        <!-- <div id="mine" class="tab-pane fade"> </div> -->
-    </div>
-
-    <!-- Where magic happens! -->
-    <script src="../static/js/public/bundle.js"></script>
+<!-- Where magic happens! -->
+<script src="../static/js/public/bundle.js"></script>
 </div>
 </body>
 </html>
