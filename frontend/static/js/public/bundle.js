@@ -104,7 +104,7 @@ DBI.prototype.getWindowHeight = function () {
 };
 
 DBI.prototype.getWindowWidth = function () {
-    return window.innerWidth*(2/3);
+    return window.innerWidth*(3/4)*0.95;
 }
 
 DBI.prototype.matchingDefault = function () {
