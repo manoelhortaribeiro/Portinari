@@ -100,14 +100,14 @@ DBI.prototype.mining_algorithms = function () {
 };
 
 DBI.prototype.getWindowHeight = function () {
-    var s_query_graph = Number(d3.select("#query-graph").style("height").slice(0, -2));
-    console.log(s_query_graph);
-    return s_query_graph * 0.99;
-}
+    console.log(window.innerHeight, window.innerHeight*0.5);
+    return window.innerHeight*0.5- 20;
+};
 
 DBI.prototype.getWindowWidth = function () {
-    return window.innerWidth*(3/4)*0.95*0.99;
-}
+    console.log(window.innerWidth, window.innerWidth*0.75);
+    return window.innerWidth*0.75 -16;
+};
 
 DBI.prototype.matchingDefault = function () {
     return this.matching_default;
@@ -1103,20 +1103,20 @@ function QueryGraph(query_interface_selection, reactor) {
     QG.graph.outcome_display_value = [];
     QG.graph.global_key_op_value = [];
     QG.graph.global_display_value = [];
-    QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
     QG.graph.matching = QG.config.matchingDefault();
 
     /* Initializes the svg */
+    QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
     QG.svg = query_interface_selection.append("svg")
         .attr("id", "query-graph-svg")
-        .attr("viewBox", QG.aspect[0] + " " + QG.aspect[1] + " " + QG.aspect[2] + " " + QG.aspect[3])
-        .attr("preserveAspectRatio", "xMinYMin meet"); // svg
+        .attr("width", QG.aspect[2])
+        .attr("height", QG.aspect[3]);
 
     $(window).resize(function () {
         QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
         d3.select("#query-graph-svg")
-            .attr("viewBox", QG.aspect[0] + " " + QG.aspect[1] + " " + QG.aspect[2] + " " + QG.aspect[3])
-            .attr("preserveAspectRatio", "xMinYMin meet"); // svg
+            .attr("width", QG.aspect[2])
+            .attr("height", QG.aspect[3])
     });
 
     QG.svgG = QG.svg.append("g").classed(QG.config.graphClass, true);   // graph

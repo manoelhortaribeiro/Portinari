@@ -13,21 +13,21 @@
 /* Link Variables */
 /* Forms */
 @import url("https://fonts.googleapis.com/css?family=Lato|Raleway|Roboto");
+@import url("https://fonts.googleapis.com/css?family=Lato|Raleway|Roboto");
 html, body {
   position: relative;
   height: 100%;
   width: 100%;
-  min-height: 1000px;
-  min-width: 1000px; }
+  overflow: hidden; }
 
 /* Resets box model */
-body, div, svg, ul, h1, h2, p, text, .col-md-3, .col-md-9, .col-md-12 {
+body, div, svg, ul, h1, h2, p, text, .col-md-3, .col-md-9, .col-md-12 .col-xs-3, .col-xs-9, .col-xs-12 {
   margin: 0;
   padding: 0;
   border: 0; }
 
 /* Height 100% and overflow hidden */
-#content_d, #visual-query-maker, #query-form, #method-form, #algorithm-output {
+#content_d, #visual-query-maker, #query-form, #method-form, #method-output {
   overflow: hidden;
   margin: 0 auto;
   height: 100%; }
@@ -46,31 +46,28 @@ body, div, svg, ul, h1, h2, p, text, .col-md-3, .col-md-9, .col-md-12 {
 
 #content_d {
   opacity: 0;
-  width: 95%;
-  height: 95%;
-  min-height: 1000px;
-  min-width: 1000px; }
+  width: 100%;
+  height: 100%; }
 
 /* Main interface placements */
 #upper-interface, #lower-interface {
-  height: 50%; }
+  height: 50%;
+  overflow: hidden; }
+  #upper-interface #add-constraints, #upper-interface #visualize-cohort, #upper-interface #method-choice, #upper-interface #method-options, #lower-interface #add-constraints, #lower-interface #visualize-cohort, #lower-interface #method-choice, #lower-interface #method-options {
+    margin: 8px; }
   #upper-interface #add-constraints, #lower-interface #add-constraints {
     text-align: center;
-    margin-bottom: 1%;
-    margin-left: 1%;
-    margin-right: 1%;
-    height: 34%; }
+    height: 33%; }
   #upper-interface #visualize-cohort, #lower-interface #visualize-cohort {
     text-align: center;
-    margin-bottom: 1%;
-    margin-left: 1%;
-    margin-right: 1%;
-    height: 64%; }
-  #upper-interface #query-graph, #lower-interface #query-graph {
-    margin-bottom: 1%;
-    margin-left: 1%;
-    margin-right: 1%;
-    height: 98%; }
+    height: 63%; }
+  #upper-interface #query-graph-svg, #lower-interface #query-graph-svg {
+    margin: 8px; }
+  #upper-interface #method-choice, #lower-interface #method-choice {
+    text-align: center;
+    height: 20%; }
+  #upper-interface #method-options, #lower-interface #method-options {
+    height: 76%; }
 
 select, option, input {
   background: #FFFFFF;
@@ -131,13 +128,16 @@ h2 {
   color: #00695C;
   font-size: 18px; }
 
+/* Fonts */
+/* Colors */
+/* Border */
+/* Node Variables */
+/* Link Variables */
+/* Forms */
 body {
   background-color: #FFFFFF; }
 
-#lower-interface {
-  border: solid rgba(33, 33, 33, 0.3) 1px; }
-
-#add-constraints, #visualize-cohort, #query-graph {
+#add-constraints, #visualize-cohort, #query-graph-svg, #method-choice, #method-options {
   border: solid rgba(33, 33, 33, 0.3) 1px;
   box-shadow: 0px 0px 2px 1px rgba(33, 33, 33, 0.2);
   -moz-box-shadow: 0px 0px 2px 1px rgba(33, 33, 33, 0.2);

@@ -31,20 +31,20 @@ function QueryGraph(query_interface_selection, reactor) {
     QG.graph.outcome_display_value = [];
     QG.graph.global_key_op_value = [];
     QG.graph.global_display_value = [];
-    QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
     QG.graph.matching = QG.config.matchingDefault();
 
     /* Initializes the svg */
+    QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
     QG.svg = query_interface_selection.append("svg")
         .attr("id", "query-graph-svg")
-        .attr("viewBox", QG.aspect[0] + " " + QG.aspect[1] + " " + QG.aspect[2] + " " + QG.aspect[3])
-        .attr("preserveAspectRatio", "xMinYMin meet"); // svg
+        .attr("width", QG.aspect[2])
+        .attr("height", QG.aspect[3]);
 
     $(window).resize(function () {
         QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
         d3.select("#query-graph-svg")
-            .attr("viewBox", QG.aspect[0] + " " + QG.aspect[1] + " " + QG.aspect[2] + " " + QG.aspect[3])
-            .attr("preserveAspectRatio", "xMinYMin meet"); // svg
+            .attr("width", QG.aspect[2])
+            .attr("height", QG.aspect[3])
     });
 
     QG.svgG = QG.svg.append("g").classed(QG.config.graphClass, true);   // graph

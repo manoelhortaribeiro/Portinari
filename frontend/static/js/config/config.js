@@ -99,14 +99,14 @@ DBI.prototype.mining_algorithms = function () {
 };
 
 DBI.prototype.getWindowHeight = function () {
-    var s_query_graph = Number(d3.select("#query-graph").style("height").slice(0, -2));
-    console.log(s_query_graph);
-    return s_query_graph * 0.99;
-}
+    console.log(window.innerHeight, window.innerHeight*0.5);
+    return window.innerHeight*0.5- 20;
+};
 
 DBI.prototype.getWindowWidth = function () {
-    return window.innerWidth*(3/4)*0.95*0.99;
-}
+    console.log(window.innerWidth, window.innerWidth*0.75);
+    return window.innerWidth*0.75 -16;
+};
 
 DBI.prototype.matchingDefault = function () {
     return this.matching_default;
