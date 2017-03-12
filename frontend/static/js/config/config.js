@@ -32,6 +32,7 @@ DBI.prototype.getDataSet = function (callback, flg) {
             type: 'POST',
             url: "http://localhost:5000/config/",
             data: request,
+            timeout: 1000,
             success: function (data) {
 
                 if (flg == undefined) {

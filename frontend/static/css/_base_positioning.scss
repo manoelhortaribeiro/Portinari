@@ -52,19 +52,19 @@ body, div, svg, ul, h1, h2, p, text, .col-md-3, .col-md-9, .col-md-12 .col-xs-3,
   height: 50%;
   overflow: hidden;
 
-  #add-constraints, #visualize-cohort, #method-choice, #method-options {
+  #add-constraints, #visualize-cohort, #settings, #method-choice, #method-options {
     margin: 8px;
   }
 
 
-  #add-constraints {
+  #add-constraints, #settings {
     text-align: center;
-    height: 33%
+    height: 15%
   }
 
   #visualize-cohort {
     text-align: center;
-    height: 63%
+    height: 60%
   }
 
    #query-graph-svg {

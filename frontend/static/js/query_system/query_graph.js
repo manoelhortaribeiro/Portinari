@@ -1,37 +1,24 @@
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
     utils = require("./utils.js"),
-    json_config = require("../config/config.js");
+    json_config = require("../config/config.js"),
+    graph = require("./graph.js");
 
 function QueryGraph(query_interface_selection, reactor) {
 
     var QG = this;
 
-    /* Loads the config file */
     QG.config = json_config.QUERY_SYSTEM;
+    /* Loads the config file */
 
-    /* Binds events to the reactor */
-    QG.reactor = reactor;
-    QG.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
-    QG.reactor.addEventListener('constraint_added', this.getElement.bind(this));
-    QG.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
-    QG.reactor.addEventListener('global_added', this.getGraph.bind(this));
-    QG.reactor.addEventListener('matching_changed', this.changeMatching.bind(this));
 
-    /* Initializes the query graph model */
     QG.idct = 0;
-    QG.graph = {};
-    QG.graph.nodes = [];
-    QG.graph.edges = [];
-    QG.selectedSvgID = -1;
-    QG.graph.future_nodes = 0;
-    QG.graph.prediction_attr = "None";
-    QG.graph.id_attr = "None";
-    QG.graph.outcome_key_op_value = [];
-    QG.graph.outcome_display_value = [];
-    QG.graph.global_key_op_value = [];
-    QG.graph.global_display_value = [];
-    QG.graph.matching = QG.config.matchingDefault();
+    /* Initializes the query graph model */
+
+
+    QG.graph = new graph();
+    console.log(QG.graph);
+    QG.graph.setMatching(QG.config.matchingDefault());
 
     /* Initializes the svg */
     QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
@@ -55,6 +42,8 @@ function QueryGraph(query_interface_selection, reactor) {
     QG.svgG.append("g").classed(QG.config.innerTextEdgeClass, true);    // edge text
     QG.svgG.append("g").classed(QG.config.outerTextEdgeClass, true);    // edge constraint text
 
+
+
     QG.svg.append('svg:defs').append('svg:marker').attr('id', 'end-arrow').attr('viewBox', '0 -5 10 10')
         .attr('refX', 8.5).attr('markerWidth', 3.5).attr('markerHeight', 3.5).attr('orient', 'auto')
         .append('svg:path').attr('d', 'M0,-5L10,0L0,5');
@@ -70,6 +59,8 @@ function QueryGraph(query_interface_selection, reactor) {
             QG.svgKeyDown.call(QG);
         }
     });
+
+    QG.nodeAdder();
 
     QG.drag = d3.drag().on("drag", function (d) {
 
@@ -90,7 +81,33 @@ function QueryGraph(query_interface_selection, reactor) {
     });
 
     QG.addNode([QG.aspect[2] / 2, QG.aspect[3] / 2]);
+
+    /* Binds events to the reactor */
+    QG.reactor = reactor;
+    QG.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
+    QG.reactor.addEventListener('matching_changed', this.graph.setMatching.bind(this.graph));
 }
+
+QueryGraph.prototype.nodeAdder = function (){
+
+    var QG = this;
+
+    QG.svg.append("circle")
+        .attr("id", "tst")
+        .attr("r", 15)
+        .attr("color", "#121212")
+        .attr("transform", "translate(20,20)")
+        .call(d3.drag()
+            .on("drag", function (d) {
+                QG.svg.select("#tst")
+                    .attr("transform", "translate(" + d3.event.x + "," + d3.event.y + ")");
+            })
+            .on("end", function (d) {
+                QG.svg.select("#tst").remove();
+                QG.nodeAdder()
+                QG.addNode([d3.event.x, d3.event.y]);
+            }));
+};
 
 QueryGraph.prototype.addNode = function (coordinates) {
     var QG = this;
@@ -402,19 +419,5 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 };
 
-QueryGraph.prototype.getGraph = function () {
-    var QG = this;
-    return QG.graph;
-};
-
-QueryGraph.prototype.getElement = function () {
-    var element = d3.select(".selected").data()[0];
-    return element;
-};
-
-QueryGraph.prototype.changeMatching = function (new_matching) {
-    var QG = this;
-    QG.graph.matching = new_matching;
-};
 
 module.exports = QueryGraph;

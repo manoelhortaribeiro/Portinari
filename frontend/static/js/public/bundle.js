@@ -33,6 +33,7 @@ DBI.prototype.getDataSet = function (callback, flg) {
             type: 'POST',
             url: "http://localhost:5000/config/",
             data: request,
+            timeout: 1000,
             success: function (data) {
 
                 if (flg == undefined) {
@@ -798,7 +799,33 @@ function buildPortinari() {
     Utils.makeVisible("#loader_d", "#content_d");
 }
 
-},{"./config/config.js":1,"./external/d3.min.v4.js":2,"./external/pace.js":5,"./external/reactor.js":6,"./query_system/query_form.js":9,"./query_system/query_graph.js":10,"./sankey_visualization/prediction_form.js":12,"./sankey_visualization/prediction_graph.js":13,"./settings/settings_form.js":14,"./util/util.js":15}],9:[function(require,module,exports){
+},{"./config/config.js":1,"./external/d3.min.v4.js":2,"./external/pace.js":5,"./external/reactor.js":6,"./query_system/query_form.js":10,"./query_system/query_graph.js":11,"./sankey_visualization/prediction_form.js":13,"./sankey_visualization/prediction_graph.js":14,"./settings/settings_form.js":15,"./util/util.js":16}],9:[function(require,module,exports){
+var utils = require("./utils.js");
+
+function Graph(){
+    var G = this;
+    
+    G.nodes = [];
+    G.edges = [];
+    G.selectedSvgID = -1;
+    G.outcome_key_op_value = [];
+    G.outcome_display_value = [];
+    G.global_key_op_value = [];
+    G.global_display_value = [];
+    G.matching = "None";
+
+    return G;
+}
+
+Graph.prototype.setMatching = function(matching){
+    var G = this;
+    G.matching = matching;
+};
+
+
+
+module.exports = Graph;
+},{"./utils.js":12}],10:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
     json_config = require("../config/config.js");
@@ -1069,41 +1096,28 @@ function attr_getter(id, oper, val) {
 
 module.exports = FormHandler;
 
-},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4}],10:[function(require,module,exports){
+},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4}],11:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
     utils = require("./utils.js"),
-    json_config = require("../config/config.js");
+    json_config = require("../config/config.js"),
+    graph = require("./graph.js");
 
 function QueryGraph(query_interface_selection, reactor) {
 
     var QG = this;
 
-    /* Loads the config file */
     QG.config = json_config.QUERY_SYSTEM;
+    /* Loads the config file */
 
-    /* Binds events to the reactor */
-    QG.reactor = reactor;
-    QG.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
-    QG.reactor.addEventListener('constraint_added', this.getElement.bind(this));
-    QG.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
-    QG.reactor.addEventListener('global_added', this.getGraph.bind(this));
-    QG.reactor.addEventListener('matching_changed', this.changeMatching.bind(this));
 
-    /* Initializes the query graph model */
     QG.idct = 0;
-    QG.graph = {};
-    QG.graph.nodes = [];
-    QG.graph.edges = [];
-    QG.selectedSvgID = -1;
-    QG.graph.future_nodes = 0;
-    QG.graph.prediction_attr = "None";
-    QG.graph.id_attr = "None";
-    QG.graph.outcome_key_op_value = [];
-    QG.graph.outcome_display_value = [];
-    QG.graph.global_key_op_value = [];
-    QG.graph.global_display_value = [];
-    QG.graph.matching = QG.config.matchingDefault();
+    /* Initializes the query graph model */
+
+
+    QG.graph = new graph();
+    console.log(QG.graph);
+    QG.graph.setMatching(QG.config.matchingDefault());
 
     /* Initializes the svg */
     QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
@@ -1127,6 +1141,8 @@ function QueryGraph(query_interface_selection, reactor) {
     QG.svgG.append("g").classed(QG.config.innerTextEdgeClass, true);    // edge text
     QG.svgG.append("g").classed(QG.config.outerTextEdgeClass, true);    // edge constraint text
 
+
+
     QG.svg.append('svg:defs').append('svg:marker').attr('id', 'end-arrow').attr('viewBox', '0 -5 10 10')
         .attr('refX', 8.5).attr('markerWidth', 3.5).attr('markerHeight', 3.5).attr('orient', 'auto')
         .append('svg:path').attr('d', 'M0,-5L10,0L0,5');
@@ -1142,6 +1158,8 @@ function QueryGraph(query_interface_selection, reactor) {
             QG.svgKeyDown.call(QG);
         }
     });
+
+    QG.nodeAdder();
 
     QG.drag = d3.drag().on("drag", function (d) {
 
@@ -1162,7 +1180,33 @@ function QueryGraph(query_interface_selection, reactor) {
     });
 
     QG.addNode([QG.aspect[2] / 2, QG.aspect[3] / 2]);
+
+    /* Binds events to the reactor */
+    QG.reactor = reactor;
+    QG.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
+    QG.reactor.addEventListener('matching_changed', this.graph.setMatching.bind(this.graph));
 }
+
+QueryGraph.prototype.nodeAdder = function (){
+
+    var QG = this;
+
+    QG.svg.append("circle")
+        .attr("id", "tst")
+        .attr("r", 15)
+        .attr("color", "#121212")
+        .attr("transform", "translate(20,20)")
+        .call(d3.drag()
+            .on("drag", function (d) {
+                QG.svg.select("#tst")
+                    .attr("transform", "translate(" + d3.event.x + "," + d3.event.y + ")");
+            })
+            .on("end", function (d) {
+                QG.svg.select("#tst").remove();
+                QG.nodeAdder()
+                QG.addNode([d3.event.x, d3.event.y]);
+            }));
+};
 
 QueryGraph.prototype.addNode = function (coordinates) {
     var QG = this;
@@ -1474,24 +1518,10 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 };
 
-QueryGraph.prototype.getGraph = function () {
-    var QG = this;
-    return QG.graph;
-};
-
-QueryGraph.prototype.getElement = function () {
-    var element = d3.select(".selected").data()[0];
-    return element;
-};
-
-QueryGraph.prototype.changeMatching = function (new_matching) {
-    var QG = this;
-    QG.graph.matching = new_matching;
-};
 
 module.exports = QueryGraph;
 
-},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4,"./utils.js":11}],11:[function(require,module,exports){
+},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4,"./graph.js":9,"./utils.js":12}],12:[function(require,module,exports){
 var conf = require("../config/config.js");
 
 function canDo(tmp_x, tmp_y, r, aspect, nodes, node) {
@@ -1572,7 +1602,7 @@ module.exports = {
     canDo: canDo
 };
 
-},{"../config/config.js":1}],12:[function(require,module,exports){
+},{"../config/config.js":1}],13:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
     json_config = require("../config/config.js");
@@ -1757,7 +1787,7 @@ function get_patterns(thisForm) {
 
 module.exports = PredictionForm;
 
-},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4}],13:[function(require,module,exports){
+},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4}],14:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     json_config = require("../config/config.js");
 
@@ -1931,7 +1961,7 @@ PredictionGraph.prototype.updateResult = function (graph) {
 };
 
 module.exports = PredictionGraph;
-},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/sankey.js":7}],14:[function(require,module,exports){
+},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/sankey.js":7}],15:[function(require,module,exports){
 
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
@@ -2033,7 +2063,7 @@ function make_form_dataset(form, current, name, attributes, thisForm) {
 }
 
 module.exports = SettingsForm;
-},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4}],15:[function(require,module,exports){
+},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4}],16:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js");
 
 

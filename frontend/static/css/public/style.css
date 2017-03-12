@@ -53,14 +53,14 @@ body, div, svg, ul, h1, h2, p, text, .col-md-3, .col-md-9, .col-md-12 .col-xs-3,
 #upper-interface, #lower-interface {
   height: 50%;
   overflow: hidden; }
-  #upper-interface #add-constraints, #upper-interface #visualize-cohort, #upper-interface #method-choice, #upper-interface #method-options, #lower-interface #add-constraints, #lower-interface #visualize-cohort, #lower-interface #method-choice, #lower-interface #method-options {
+  #upper-interface #add-constraints, #upper-interface #visualize-cohort, #upper-interface #settings, #upper-interface #method-choice, #upper-interface #method-options, #lower-interface #add-constraints, #lower-interface #visualize-cohort, #lower-interface #settings, #lower-interface #method-choice, #lower-interface #method-options {
     margin: 8px; }
-  #upper-interface #add-constraints, #lower-interface #add-constraints {
+  #upper-interface #add-constraints, #upper-interface #settings, #lower-interface #add-constraints, #lower-interface #settings {
     text-align: center;
-    height: 33%; }
+    height: 15%; }
   #upper-interface #visualize-cohort, #lower-interface #visualize-cohort {
     text-align: center;
-    height: 63%; }
+    height: 60%; }
   #upper-interface #query-graph-svg, #lower-interface #query-graph-svg {
     margin: 8px; }
   #upper-interface #method-choice, #lower-interface #method-choice {
@@ -137,7 +137,7 @@ h2 {
 body {
   background-color: #FFFFFF; }
 
-#add-constraints, #visualize-cohort, #query-graph-svg, #method-choice, #method-options {
+#add-constraints, #visualize-cohort, #settings, #query-graph-svg, #method-choice, #method-options {
   border: solid rgba(33, 33, 33, 0.3) 1px;
   box-shadow: 0px 0px 2px 1px rgba(33, 33, 33, 0.2);
   -moz-box-shadow: 0px 0px 2px 1px rgba(33, 33, 33, 0.2);
