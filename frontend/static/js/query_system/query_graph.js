@@ -1,68 +1,38 @@
 var d3 = require("../external/d3.min.v4.js"),
     utils = require("./utils.js"),
-    json_config = require("../config/config.js");
+    json_config = require("../config/config.js"),
+    graph = require("./graph.js");
 
 function GC(query_interface_selection, reactor) {
 
-    var thisGraph = this;
+    var GQ = this;
 
     // -- Config
-    thisGraph.idct = 0;
-    thisGraph.aspect = [0, 0, 1600, 900];
-    thisGraph.selectedSvgID = -1;
-    thisGraph.reactor = reactor;
-    thisGraph.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
-    thisGraph.reactor.addEventListener('constraint_added', this.getElement.bind(this));
-    thisGraph.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
-    thisGraph.reactor.addEventListener('global_added', this.getGraph.bind(this));
-    thisGraph.reactor.addEventListener('matching_changed', this.changeMatching.bind(this));
-    thisGraph.config = json_config.QUERY_SYSTEM;
+    GQ.config = json_config.QUERY_SYSTEM;
 
     // -- Model
-    thisGraph.graph = {};
-    thisGraph.graph.nodes = [];
-    thisGraph.graph.edges = [];
-    thisGraph.graph.future_nodes = 0;
-    thisGraph.graph.prediction_attr = "None";
-    thisGraph.graph.id_attr = "None";
-    thisGraph.graph.outcome_key_op_value = [];
-    thisGraph.graph.outcome_display_value = [];
-    thisGraph.graph.global_key_op_value = [];
-    thisGraph.graph.global_display_value = [];
-    thisGraph.graph.matching = thisGraph.config.matchingDefault();
+    GQ.graph = new graph.Graph();
+    GQ.graph.setMatching(GQ.config.matchingDefault());
 
     // -- View
+
+    GQ.aspect = [0, 0, screen.width * 0.7, screen.height * 0.6];
+
     // svg
-    thisGraph.svg = query_interface_selection.append("svg")
-        .attr("viewBox", thisGraph.aspect[0] + " " +
-            thisGraph.aspect[1] + " " +
-            thisGraph.aspect[2] + " " +
-            thisGraph.aspect[3])
+    GQ.svg = query_interface_selection.append("svg")
+        .attr("viewBox", GQ.aspect[0] + " " + GQ.aspect[1] + " " + GQ.aspect[2] + " " + GQ.aspect[3])
         .attr("preserveAspectRatio", "xMinYMin meet");
 
-    // graph
-    thisGraph.svgG = thisGraph.svg.append("g")
-        .classed(thisGraph.config.graphClass, true);
-    // nodes
-    thisGraph.vis_nodes = thisGraph.svgG.append("g")
-        .classed(thisGraph.config.nodesClass, true);
-    // edges
-    thisGraph.vis_edges = thisGraph.svgG.append("g")
-        .classed(thisGraph.config.edgesClass, true);
-    // node text
-    thisGraph.vis_node_text = thisGraph.svgG.append("g")
-        .classed(thisGraph.config.innerTextNodeClass, true);
-    // edge text
-    thisGraph.vis_edge_text = thisGraph.svgG.append("g")
-        .classed(thisGraph.config.innerTextEdgeClass, true);
-    // node constraint text
-    thisGraph.vis_node_c_text = thisGraph.svgG.append("g")
-        .classed(thisGraph.config.outerTextNodeClass, true);
-    // edge constraint text
-    thisGraph.vis_edge_c_text = thisGraph.svgG.append("g")
-        .classed(thisGraph.config.outerTextEdgeClass, true);
+    GQ.svgG = GQ.svg.append("g").classed(GQ.config.graphClass, true);
+    GQ.vis_nodes = GQ.svgG.append("g").classed(GQ.config.nodesClass, true);
+    GQ.vis_edges = GQ.svgG.append("g").classed(GQ.config.edgesClass, true);
+    GQ.vis_node_text = GQ.svgG.append("g").classed(GQ.config.innerTextNodeClass, true);
+    GQ.vis_edge_text = GQ.svgG.append("g").classed(GQ.config.innerTextEdgeClass, true);
+    GQ.vis_node_c_text = GQ.svgG.append("g").classed(GQ.config.outerTextNodeClass, true);
+    GQ.vis_edge_c_text = GQ.svgG.append("g").classed(GQ.config.outerTextEdgeClass, true);
+
     // marker
-    var defs = thisGraph.svg.append('svg:defs');
+    var defs = GQ.svg.append('svg:defs');
     defs.append('svg:marker')
         .attr('id', 'end-arrow').attr('viewBox', '0 -5 10 10')
         .attr('refX', 8.5).attr('markerWidth', 3.5)
@@ -71,23 +41,23 @@ function GC(query_interface_selection, reactor) {
 
     // ** Effects
     // mouse down on
-    thisGraph.svg.on("mousedown", function (d) {
-        GC.prototype.svgMouseDown.call(thisGraph);
+    GQ.svg.on("mousedown", function (d) {
+        GC.prototype.svgMouseDown.call(GQ);
     });
     // key down on window
     d3.select(window).on("keydown", function () {
         if (d3.event.shiftKey) {
-            thisGraph.svgKeyDown.call(thisGraph);
+            GQ.svgKeyDown.call(GQ);
         }
     });
     // drag
-    thisGraph.drag = d3.drag().on("drag", function (d) {
+    GQ.drag = d3.drag().on("drag", function (d) {
 
         var tmp_x = d.x + d3.event.dx,
             tmp_y = d.y + d3.event.dy,
-            radius = thisGraph.config.nodeRadius,
-            aspect = thisGraph.aspect,
-            nodes = thisGraph.graph.nodes,
+            radius = GQ.config.nodeRadius,
+            aspect = GQ.aspect,
+            nodes = GQ.graph.nodes,
             node = d;
 
         var can_move = utils.canDo(tmp_x, tmp_y, radius, aspect, nodes, node);
@@ -95,29 +65,28 @@ function GC(query_interface_selection, reactor) {
         if (can_move) {
             d.x += d3.event.dx;
             d.y += d3.event.dy;
-            thisGraph.updateGraph();
+            GQ.updateGraph();
         }
     });
+
+
+    GQ.reactor = reactor;
+    GQ.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
+    GQ.reactor.addEventListener('constraint_added', this.getElement.bind(this));
+    GQ.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
+    GQ.reactor.addEventListener('global_added', this.getGraph.bind(this));
+    GQ.reactor.addEventListener('matching_changed', this.changeMatching.bind(this));
 }
 
-//- Node behaviour -
-GC.prototype.addNode = function (coordinates) {
-    var thisGraph = this;
-    var node = new utils.Node(coordinates, thisGraph.idct);
-    thisGraph.graph.nodes.push(node);
-    thisGraph.idct += 1;
-    thisGraph.updateGraph();
-};
-
 GC.prototype.nodeMouseDown = function (svg_element) {
-    var thisGraph = this;
+    var GQ = this;
     d3.event.stopPropagation();
     var p_selected = d3.select(".selected").data();
 
     if (d3.event.shiftKey && p_selected.length != 0) {
         var n_selected = d3.select(svg_element).data();
 
-        var aux = thisGraph.graph.edges.filter(function (a) {
+        var aux = GQ.graph.edges.filter(function (a) {
             return ((a.source == p_selected[0].name) &&
                 (a.destination == n_selected[0].name)) ||
                 ((a.source == n_selected[0].name) &&
@@ -126,60 +95,54 @@ GC.prototype.nodeMouseDown = function (svg_element) {
 
         if (aux.length == 0 && p_selected[0].name != n_selected[0].name) {
             if (d3.event.ctrlKey) {
-                thisGraph.addEdge(p_selected[0], n_selected[0], "undirected");
+                GQ.graph.addEdge(p_selected[0], n_selected[0], "undirected");
+                GQ.updateGraph();
             }
             else {
-                thisGraph.addEdge(p_selected[0], n_selected[0], "directed");
+                GQ.graph.addEdge(p_selected[0], n_selected[0], "directed");
+                GQ.updateGraph();
             }
         }
     }
     else {
-        thisGraph.replaceSelected(svg_element);
+        GQ.replaceSelected(svg_element);
     }
 };
 
-// - Edge behaviour -
-GC.prototype.addEdge = function (src, dst, kind) {
-    var thisGraph = this;
-    var edge = new utils.Edge(src, dst, thisGraph.idct, kind);
-    thisGraph.graph.edges.push(edge);
-    thisGraph.idct += 1;
-    thisGraph.updateGraph();
-};
-
 GC.prototype.edgeMouseDown = function (svg_element) {
-    var thisGraph = this;
+    var GQ = this;
     d3.event.stopPropagation();
-    thisGraph.replaceSelected(svg_element);
+    GQ.replaceSelected(svg_element);
 };
 
 // - SVG Behaviour
 GC.prototype.svgMouseDown = function () {
-    var thisGraph = this;
+    var GQ = this;
     if (d3.event.shiftKey) {
-        var coordinates = d3.mouse(thisGraph.svg.node());
+        var coordinates = d3.mouse(GQ.svg.node());
 
         var tmp_x = coordinates[0],
             tmp_y = coordinates[1],
-            radius = thisGraph.config.nodeRadius,
-            aspect = thisGraph.aspect,
-            nodes = thisGraph.graph.nodes;
+            radius = GQ.config.nodeRadius,
+            aspect = GQ.aspect,
+            nodes = GQ.graph.nodes;
 
         var can_create = utils.canDo(tmp_x, tmp_y, radius, aspect, nodes);
 
         if (can_create) {
-            thisGraph.addNode(coordinates);
+            GQ.graph.addNode(coordinates);
+            GQ.updateGraph();
         }
     }
 };
 
 GC.prototype.svgKeyDown = function () {
-    var thisGraph = this;
-    var nodes = thisGraph.graph.nodes;
-    var edges = thisGraph.graph.edges;
+    var GQ = this;
+    var nodes = GQ.graph.nodes;
+    var edges = GQ.graph.edges;
 
     switch (d3.event.keyCode) {
-        case thisGraph.config.delete:
+        case GQ.config.delete:
             // - deletes a node/edge -
             var selected = d3.select(".selected").data();
             if (selected.length == 0) {
@@ -195,54 +158,54 @@ GC.prototype.svgKeyDown = function () {
                     (a.dst.id !== sel_id);
             });
 
-            thisGraph.graph.nodes = nodes;
-            thisGraph.graph.edges = edges;
-            thisGraph.selectedSvgID = -1;
-            thisGraph.updateGraph();
-            thisGraph.reactor.dispatchEvent("selected_node_changed", undefined);
+            GQ.graph.nodes = nodes;
+            GQ.graph.edges = edges;
+            GQ.graph.selectedSvgID = -1;
+            GQ.updateGraph();
+            GQ.reactor.dispatchEvent("selected_node_changed", undefined);
 
     }
 };
 
 // - General Behaviour
 GC.prototype.replaceSelected = function (svg_element) {
-    var thisGraph = this;
+    var GQ = this;
     var svg_d = d3.select(svg_element).data()[0];
     var svg_id = svg_d.id;
     d3.select(".selected").classed("selected", false);
     d3.select(svg_element).classed("selected", true);
-    thisGraph.selectedSvgID = svg_id;
+    GQ.selectedSvgID = svg_id;
 
-    thisGraph.reactor.dispatchEvent("selected_node_changed", svg_d);
+    GQ.reactor.dispatchEvent("selected_node_changed", svg_d);
 };
 
 GC.prototype.updateGraph = function () {
 
-    var thisGraph = this;
+    var GQ = this;
 
     // This is for debugging
-    console.log(thisGraph.graph);
+    console.log(GQ.graph);
 
     // -- Nodes --
-    var nodes = thisGraph.svg
-        .select("g." + thisGraph.config.nodesClass)
-        .selectAll("g." + thisGraph.config.nodeClass);
-    var data = thisGraph.graph.nodes;
+    var nodes = GQ.svg
+        .select("g." + GQ.config.nodesClass)
+        .selectAll("g." + GQ.config.nodeClass);
+    var data = GQ.graph.nodes;
     // - enter
     var aux = nodes.data(data, function (d) {
         return d.name;
     }).enter()
         .append("g")
-        .classed(thisGraph.config.nodeClass, true)
+        .classed(GQ.config.nodeClass, true)
         .attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
         })
         .on("mousedown", function (d) {
-            thisGraph.nodeMouseDown(this)
+            GQ.nodeMouseDown(this)
         })
-        .call(thisGraph.drag);
+        .call(GQ.drag);
     aux.append("circle")
-        .attr("r", String(thisGraph.config.nodeRadius));
+        .attr("r", String(GQ.config.nodeRadius));
 
     // - update
     nodes.data(data, function (d) {
@@ -259,10 +222,10 @@ GC.prototype.updateGraph = function () {
         .remove();
 
     // -- InText/Nodes--
-    var text = thisGraph.svg
-        .select("g." + thisGraph.config.innerTextNodeClass)
+    var text = GQ.svg
+        .select("g." + GQ.config.innerTextNodeClass)
         .selectAll("text");
-    var data = thisGraph.graph.nodes;
+    var data = GQ.graph.nodes;
     // -- enter
     var aux = text.data(data, function (d) {
         return d.name;
@@ -286,7 +249,7 @@ GC.prototype.updateGraph = function () {
         var isStart = true;
         var isEnd = true;
 
-        thisGraph.graph.edges.forEach(function (edge) {
+        GQ.graph.edges.forEach(function (edge) {
             if (d.name == edge.destination) {
                 isStart = false;
             }
@@ -297,7 +260,7 @@ GC.prototype.updateGraph = function () {
 
         if (isStart && isEnd) return ' ';
         else if (isStart) return 'start';
-        else if(isEnd) return 'end';
+        else if (isEnd) return 'end';
         else return ' ';
 
     });
@@ -308,10 +271,10 @@ GC.prototype.updateGraph = function () {
         .remove();
 
     // -- OutText/Nodes --
-    var text = thisGraph.svg
-        .select("g." + thisGraph.config.outerTextNodeClass)
+    var text = GQ.svg
+        .select("g." + GQ.config.outerTextNodeClass)
         .selectAll("text");
-    var data = thisGraph.graph.nodes;
+    var data = GQ.graph.nodes;
     // -- enter
     var aux = text.data(data, function (d) {
         return d.name;
@@ -349,18 +312,18 @@ GC.prototype.updateGraph = function () {
         .remove();
 
     // -- Edges --
-    var edges = thisGraph.svg
-        .select("g." + thisGraph.config.edgesClass)
-        .selectAll("g." + thisGraph.config.edgeClass);
-    var data = thisGraph.graph.edges;
+    var edges = GQ.svg
+        .select("g." + GQ.config.edgesClass)
+        .selectAll("g." + GQ.config.edgeClass);
+    var data = GQ.graph.edges;
     // - enter
     var aux = edges.data(data, function (d) {
         return d.name;
     }).enter()
         .append("g")
-        .classed(thisGraph.config.edgeClass, true)
+        .classed(GQ.config.edgeClass, true)
         .on("mousedown", function (d) {
-            thisGraph.edgeMouseDown(this)
+            GQ.edgeMouseDown(this)
         });
     aux.append("path")
         .style('marker-end', function (d) {
@@ -370,7 +333,7 @@ GC.prototype.updateGraph = function () {
             else return 'none';
         })
         .attr("d", function (d) {
-            return utils.calcEdgePath(d, thisGraph.config.nodeRadius);
+            return utils.calcEdgePath(d, GQ.config.nodeRadius);
         })
         .classed("link", true);
     // - update
@@ -379,7 +342,7 @@ GC.prototype.updateGraph = function () {
     })
         .selectAll("path")
         .attr("d", function (d) {
-            return utils.calcEdgePath(d, thisGraph.config.nodeRadius);
+            return utils.calcEdgePath(d, GQ.config.nodeRadius);
         });
     // - exit
     edges.data(data, function (d) {
@@ -389,10 +352,10 @@ GC.prototype.updateGraph = function () {
         .remove();
 
     // -- OutText/Edges --
-    var text = thisGraph.svg
-        .select("g." + thisGraph.config.outerTextEdgeClass)
+    var text = GQ.svg
+        .select("g." + GQ.config.outerTextEdgeClass)
         .selectAll("text");
-    var data = thisGraph.graph.edges;
+    var data = GQ.graph.edges;
     var modifier = 15;
     // -- enter
     var aux = text.data(data, function (d) {
@@ -400,10 +363,10 @@ GC.prototype.updateGraph = function () {
     }).enter()
         .append("text")
         .attr("x", function (d) {
-            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
+            return utils.calcTextEdgePath(d, GQ.config.nodeRadius, modifier)[0];
         })
         .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
+            return utils.calcTextEdgePath(d, GQ.config.nodeRadius, modifier)[1];
         })
         .attr("text-anchor", "middle");
 
@@ -411,14 +374,14 @@ GC.prototype.updateGraph = function () {
     var aux = text.data(data, function (d) {
         return d.name;
     }).attr("x", function (d) {
-        return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
+        return utils.calcTextEdgePath(d, GQ.config.nodeRadius, modifier)[0];
     })
         .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
+            return utils.calcTextEdgePath(d, GQ.config.nodeRadius, modifier)[1];
         })
         .html(function (d) {
             var string = "";
-            var x = utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0].toString();
+            var x = utils.calcTextEdgePath(d, GQ.config.nodeRadius, modifier)[0].toString();
             d.key_op_value.forEach(function (d) {
                 string += "<tspan x=" + x + " dy=\"1.2em\">" + d[0] + d[1] + d[2] + "<\/tspan>";
             });
@@ -432,8 +395,8 @@ GC.prototype.updateGraph = function () {
 };
 
 GC.prototype.getGraph = function () {
-    var thisGraph = this;
-    return thisGraph.graph;
+    var GQ = this;
+    return GQ.graph;
 };
 
 GC.prototype.getElement = function () {
@@ -441,9 +404,9 @@ GC.prototype.getElement = function () {
     return element;
 };
 
-GC.prototype.changeMatching = function (new_matching){
-    var thisGraph = this;
-    thisGraph.graph.matching = new_matching;
+GC.prototype.changeMatching = function (new_matching) {
+    var GQ = this;
+    GQ.graph.matching = new_matching;
 };
 
 module.exports = GC;

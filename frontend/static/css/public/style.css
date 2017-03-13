@@ -13,7 +13,7 @@ html, body {
   width: 100%; }
 
 /* Resets box model */
-body, div, svg, ul, h1, h2, p, text, button, .col-md-4, .col-md-8, .col-md-12 .col-xs-4, .col-xs-8, .col-xs-12 {
+body, div, svg, ul, h1, h2, p, text, button, .col-md-4, .col-md-8, .col-md-12, .col-md-2 {
   margin: 0;
   padding: 0;
   border: 0; }

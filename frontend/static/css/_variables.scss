@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css?family=Lato|Raleway|Roboto');
+
+/* Fonts */
+$title-font: 'Raleway', sans-serif;
+$title-color: #212121;
+$title-size: 60px;
+
+$subtitle-font: 'Lato', sans-serif;
+$subtitle-font-color: #00695C;
+$subtitle-font-size: 14px;
+
+$primary-font: 'Roboto', sans-serif;
+$primary-font-color: #616161;
+$primary-font-size: 11px;
+
+$node-font: 'Lato', sans-serif;
+$node-font-size: 12px;
+
+/* Colors */
+$background-color: #E3F2FD;
+$white: #FFFFFF;
+$secondary-color: rgba(3, 176, 255, 0.29);
+$neutral-color: #9E9E9E;
+
+/* Border */
+$light-border: solid rgba(232, 234, 246, 0.8) 2px;
+
+/* Node Variables */
+$node-color: rgb(63, 81, 181);
+$selected-node-color: rgb(35, 85, 129);
+$node-stroke: #00bcd4;
+$node-stroke-width: 5px;
+
+/* Link Variables */
+$stroke-link-color: #402D29;
+$stroke-link-color-selected: #413F4A;
+$stroke-link-width: 8px;
+$stroke-link-width-selected: 10px;
+
+/* Forms */
+$form-height: 40px;
+$li-width: 200px;
+$li-margin: 5px;
+$li-padding: 5px;
+$three-px: 3px 3px 3px 3px;

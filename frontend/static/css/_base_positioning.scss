@@ -1,0 +1,138 @@
+@import "variables";
+
+html, body {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+/* Resets box model */
+
+body, div, svg, ul, h1, h2, p, text, button, .col-md-4, .col-md-8, .col-md-12, .col-md-2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#loader_d {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  display: block;
+  width: 700px ;
+  margin: auto;
+  text-align: center;
+}
+
+#content_d {
+  opacity: 0;
+}
+
+//
+///* Height 100% and overflow hidden */
+//
+//#content_d, #visual-query-maker, #query-form, #method-form, #method-output {
+//  overflow: hidden;
+//  margin: 0 auto;
+//  height: 100%;
+//}
+//
+///* Content and loader placements */
+//
+//#content_d, #loader_d {
+//  transform: translateY(-50%);
+//  position: relative;
+//  top: 50%;
+//  display: block;
+//}
+//
+//#loader_d {
+//  width: 20%;
+//  text-align: center;
+//  margin: auto;
+//}
+//
+//#content_d {
+//  opacity: 0;
+//  width: 100%;
+//  height: 100%;
+//
+//}
+//
+///* Main interface placements */
+//
+//#upper-interface, #lower-interface {
+//  height: 50%;
+//  overflow: hidden;
+//
+//  #add-constraints, #visualize-cohort, #settings, #method-choice, #method-options {
+//    margin: 8px;
+//  }
+//
+//
+//  #add-constraints, #settings {
+//    text-align: center;
+//    height: 15%
+//  }
+//
+//  #visualize-cohort {
+//    text-align: center;
+//    height: 60%
+//  }
+//
+//   #query-graph-svg {
+//     margin: 8px;
+//   }
+//
+//
+//  #method-choice {
+//    text-align: center;
+//    height: 20%
+//  }
+//
+//  #method-options {
+//    height: 76%;
+//  }
+//
+//
+//}
+//
+//select, option, input {
+//  background: $white;
+//  margin: $three-px;
+//  max-height: 30px;
+//  max-width: 200px;
+//  min-height: 30px;
+//  min-width: 50px;
+//  text-align: center;
+//}
+//
+//.form {
+//  min-height: 50px;
+//}
+//
+//.current {
+//  min-height: 35px;
+//
+//  ul {
+//    list-style: none;
+//    text-align: center;
+//  }
+//
+//  li {
+//    font-size: $primary-font-size;
+//    font-family: $primary-font;
+//    display: inline-block;
+//    border: $light-border;
+//    max-width: $li-width;
+//    padding: $li-margin;
+//    margin: $li-padding;
+//    text-align: center;
+//  }
+//
+//  li:hover {
+//    background-color: $neutral-color;
+//  }
+//
+//}
+//
