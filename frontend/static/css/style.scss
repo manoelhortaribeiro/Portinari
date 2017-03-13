@@ -1,10 +1,6 @@
-/* Fonts */
-$title-font: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
-$primary-font: "Raleway", sans-serif;
-$secondary-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$p-font-size: 10px;
-$li-font-size: 10px;
-$node-font-size: 16px;
+@import "base_positioning";
+@import "base_text";
+@import "base_color";
 
 /* Colors */
 $bg-color: rgba(255, 255, 255, 0.9);
@@ -27,119 +23,22 @@ $form-height: 40px;
 $li-width: 250px;
 $li-margin: 7px;
 $li-padding: 10px;
-$header-color: #202020;
-$light-border: solid lightgrey 1px;
 $three-px: 3px 3px 3px 3px;
 
 /* -- General Website -- */
 
 /* Center the loader */
 
-#loader_d {
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  display: block;
-  width: 700px ;
-  margin: auto;
-
-}
-
-#content_d {
-  opacity: 0;
-  transition: opacity 1s;
-}
-
-html, body {
-  position: relative;
-  height: 100%;
-  width: 100%;
-}
-
-
 
 body {
-  font-family: $primary-font;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background-color: $bg-color;
 
-  p {
-    font-family: $primary-font;
-    font-size: $p-font-size;
-    margin: 0;
-    padding: 0;
-    text-rendering: optimizeLegibility;
-    color: $header-color;
-    letter-spacing: .1em;
-  }
 
-  h1 {
-    color: $header-color;
-    font-family: $title-font;
-    font-size: 62px;
-    font-weight: 800;
-    line-height: 72px;
-    margin: 0 0 0 0;
-    text-align: center;
-    text-rendering: optimizeLegibility;
-    letter-spacing: .05em;
-  }
-
-  h2 {
-    font-family: $secondary-font;
-    font-size: 14px;
-    font-weight: bolder;
-    line-height: 30%;
-    text-transform: uppercase;
-    text-rendering: optimizeLegibility;
-    padding: 0;
-    margin: 10px 0 0 10px;
-    color: $header-color;
-    letter-spacing: .1em;
-  }
 
   button {
-    margin: 0;
-    padding: 0;
     max-height: 40px;
   }
 
-  text {
-    font-family: $secondary-font;
-    font-size: $node-font-size;
-    font-weight: 800;
-    text-transform: uppercase;
-    pointer-events: none;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
 
-  svg {
-    background-color: $bg-color;
-    padding: 0;
-    margin: 0;
-  }
-
-  div {
-    padding: 0;
-    margin: 0;
-  }
-
-  ul {
-    margin: 0;
-    padding: 0;
-  }
-
-  #nav-menu {
-    li.active a {
-      background: $secondary-color;
-    }
-  }
 
   .tab-content {
     background: $secondary-color;
@@ -148,19 +47,9 @@ body {
 
 
 
-  .col-md-4 {
-    margin: 0;
-    padding: 0;
-  }
-
-  .col-md-8 {
-    margin: 0;
-    padding: 0;
-  }
 
   .form {
     min-height: $form-height;
-    background-color: $bg-color;
     border: $light-border;
     margin: $three-px;
 
@@ -196,29 +85,19 @@ body {
   }
 
   .current {
-    min-height: $form-height;
+    height: 60px;
     background-color: $bg-color;
     border: $light-border;
     margin: $three-px;
+    overflow-y: scroll;
+
 
     ul {
       list-style: none;
       text-align: center;
     }
 
-    li {
-      background-color: $secondary-color;
-      font-size: $li-font-size;
-      font-family: $primary-font;
-      display: inline-block;
-      border: $light-border;
-      color: $header-color;
-      max-width: $li-width;
-      padding: $li-margin;
-      margin: $li-padding;
-      text-align: center;
 
-    }
 
     li:hover {
       background-color: $node-color;
@@ -232,13 +111,12 @@ body {
 #query-system {
   margin: $three-px;
   padding: 0;
-  border: $light-border;
-  background-color: $secondary-color;
 
   #query-interface-graph {
 
     svg {
       display: inline;
+      background-color: rgba(255, 255, 255, 1);
       border: $light-border;
       margin: $three-px;
 
@@ -301,14 +179,10 @@ body {
   }
 
   #forms-menu {
-    height: 100%;
-    background-color: $secondary-color;
 
     p {
       line-height: $form-height;
       text-align: center;
-      opacity: 0.5;
-
     }
 
   }
