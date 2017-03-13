@@ -1,6 +1,7 @@
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
-    json_config = require("../config/config.js");
+    json_config = require("../config/config.js"),
+    Utils = require("../util/util.js");
 
 function PredictionForm(form_get_cohort,
                         nodes_info_cohort_selection,
@@ -8,6 +9,7 @@ function PredictionForm(form_get_cohort,
                         show_patterns_cohort,
                         graph,
                         reactor) {
+    // ** Config
     var thisForm = this;
     thisForm.graph = graph;
     thisForm.nodes = {};
@@ -23,14 +25,14 @@ function PredictionForm(form_get_cohort,
         thisForm.config.visualizationOptions(),
         get_outcome_cohort,
         "query-cohort",
-        ">>");
+        "Obtain new cohort");
 
     make_simple_form(thisForm,
         get_patterns_cohort,
         thisForm.config.miningAlgorithms(),
         get_patterns,
         "get-patterns-cohort",
-        ">>");
+        "Get patterns");
 
     thisForm.reactor.addEventListener('cohort_node_selected', thisForm.addNodes.bind(this));
     thisForm.reactor.addEventListener('cohort_node_unselected', thisForm.removeNodes.bind(this));
@@ -39,12 +41,15 @@ function PredictionForm(form_get_cohort,
 PredictionForm.prototype.addNodes = function (d) {
     var thisForm = this;
     thisForm.nodes[d.identifier] = d;
+    console.log(thisForm.nodes);
     thisForm.updateNodesInfo();
 };
+
 
 PredictionForm.prototype.removeNodes = function (d) {
     var thisForm = this;
     delete thisForm.nodes[d.identifier];
+    console.log(thisForm.nodes);
     thisForm.updateNodesInfo();
 };
 
@@ -52,14 +57,13 @@ PredictionForm.prototype.updateNodesInfo = function () {
     var thisForm = this;
     var formatRR = d3.format(",.2f");
     var format = d3.format(",.0f");
+
+
     var values = $.map(thisForm.nodes, function (value, key) {
         return value
     });
 
-    if (values.length == 0){
-        thisForm.node_info_cohort_selection.append("p")
-            .text("Select Sankey nodes to mine them")
-    }
+    console.log(values);
 
     var list = thisForm.node_info_cohort_selection.select("ul");
 
@@ -93,6 +97,7 @@ PredictionForm.prototype.updatePatternsDesc = function () {
                 return d;
             });
 };
+
 
 function make_simple_form(thisForm, form, options, submit_f, id_v, submit) {
 
@@ -161,9 +166,11 @@ function get_patterns(thisForm) {
         return key
     });
 
+
     var posted_data = {
         'nodes': JSON.stringify(keys)
     };
+
 
     $.ajax({
         type: 'POST',

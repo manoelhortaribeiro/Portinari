@@ -1,64 +1,93 @@
 var d3 = require("../external/d3.min.v4.js"),
-    $ = require("../external/jquery.min.js"),
     utils = require("./utils.js"),
-    json_config = require("../config/config.js"),
-    graph = require("./graph.js");
+    json_config = require("../config/config.js");
 
-function QueryGraph(query_interface_selection, reactor) {
+function GC(query_interface_selection, reactor) {
 
-    var QG = this;
+    var thisGraph = this;
 
-    QG.config = json_config.QUERY_SYSTEM;
+    // -- Config
+    thisGraph.idct = 0;
+    thisGraph.aspect = [0, 0, 1600, 900];
+    thisGraph.selectedSvgID = -1;
+    thisGraph.reactor = reactor;
+    thisGraph.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
+    thisGraph.reactor.addEventListener('constraint_added', this.getElement.bind(this));
+    thisGraph.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
+    thisGraph.reactor.addEventListener('global_added', this.getGraph.bind(this));
+    thisGraph.reactor.addEventListener('matching_changed', this.changeMatching.bind(this));
+    thisGraph.config = json_config.QUERY_SYSTEM;
 
-    QG.graph = new graph.Graph();
+    // -- Model
+    thisGraph.graph = {};
+    thisGraph.graph.nodes = [];
+    thisGraph.graph.edges = [];
+    thisGraph.graph.future_nodes = 0;
+    thisGraph.graph.prediction_attr = "None";
+    thisGraph.graph.id_attr = "None";
+    thisGraph.graph.outcome_key_op_value = [];
+    thisGraph.graph.outcome_display_value = [];
+    thisGraph.graph.global_key_op_value = [];
+    thisGraph.graph.global_display_value = [];
+    thisGraph.graph.matching = thisGraph.config.matchingDefault();
 
-    QG.graph.setMatching(QG.config.matchingDefault());
+    // -- View
+    // svg
+    thisGraph.svg = query_interface_selection.append("svg")
+        .attr("viewBox", thisGraph.aspect[0] + " " +
+            thisGraph.aspect[1] + " " +
+            thisGraph.aspect[2] + " " +
+            thisGraph.aspect[3])
+        .attr("preserveAspectRatio", "xMinYMin meet");
 
-    /* Initializes the svg */
-    QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
-    QG.svg = query_interface_selection.append("svg")
-        .attr("id", "query-graph-svg")
-        .attr("width", QG.aspect[2])
-        .attr("height", QG.aspect[3]);
-
-    $(window).resize(function () {
-        QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
-        d3.select("#query-graph-svg")
-            .attr("width", QG.aspect[2])
-            .attr("height", QG.aspect[3])
-    });
-
-    QG.svgG = QG.svg.append("g").classed(QG.config.graphClass, true);   // graph
-    QG.svgG.append("g").classed(QG.config.nodesClass, true);            // nodes
-    QG.svgG.append("g").classed(QG.config.innerTextNodeClass, true);    // node text
-    QG.svgG.append("g").classed(QG.config.outerTextNodeClass, true);    // node constraint text
-    QG.svgG.append("g").classed(QG.config.edgesClass, true);            // edges
-    QG.svgG.append("g").classed(QG.config.innerTextEdgeClass, true);    // edge text
-    QG.svgG.append("g").classed(QG.config.outerTextEdgeClass, true);    // edge constraint text
-
-
-    QG.svg.append('svg:defs').append('svg:marker').attr('id', 'end-arrow').attr('viewBox', '0 -5 10 10')
-        .attr('refX', 8.5).attr('markerWidth', 3.5).attr('markerHeight', 3.5).attr('orient', 'auto')
+    // graph
+    thisGraph.svgG = thisGraph.svg.append("g")
+        .classed(thisGraph.config.graphClass, true);
+    // nodes
+    thisGraph.vis_nodes = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.nodesClass, true);
+    // edges
+    thisGraph.vis_edges = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.edgesClass, true);
+    // node text
+    thisGraph.vis_node_text = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.innerTextNodeClass, true);
+    // edge text
+    thisGraph.vis_edge_text = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.innerTextEdgeClass, true);
+    // node constraint text
+    thisGraph.vis_node_c_text = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.outerTextNodeClass, true);
+    // edge constraint text
+    thisGraph.vis_edge_c_text = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.outerTextEdgeClass, true);
+    // marker
+    var defs = thisGraph.svg.append('svg:defs');
+    defs.append('svg:marker')
+        .attr('id', 'end-arrow').attr('viewBox', '0 -5 10 10')
+        .attr('refX', 8.5).attr('markerWidth', 3.5)
+        .attr('markerHeight', 3.5).attr('orient', 'auto')
         .append('svg:path').attr('d', 'M0,-5L10,0L0,5');
 
-    /* Effects */
-
-
+    // ** Effects
+    // mouse down on
+    thisGraph.svg.on("mousedown", function (d) {
+        GC.prototype.svgMouseDown.call(thisGraph);
+    });
+    // key down on window
     d3.select(window).on("keydown", function () {
         if (d3.event.shiftKey) {
-            QG.svgKeyDown.call(QG);
+            thisGraph.svgKeyDown.call(thisGraph);
         }
     });
-
-    QG.nodeAdder();
-
-    QG.drag = d3.drag().on("drag", function (d) {
+    // drag
+    thisGraph.drag = d3.drag().on("drag", function (d) {
 
         var tmp_x = d.x + d3.event.dx,
             tmp_y = d.y + d3.event.dy,
-            radius = QG.config.nodeRadius,
-            aspect = QG.aspect,
-            nodes = QG.graph.nodes,
+            radius = thisGraph.config.nodeRadius,
+            aspect = thisGraph.aspect,
+            nodes = thisGraph.graph.nodes,
             node = d;
 
         var can_move = utils.canDo(tmp_x, tmp_y, radius, aspect, nodes, node);
@@ -66,53 +95,29 @@ function QueryGraph(query_interface_selection, reactor) {
         if (can_move) {
             d.x += d3.event.dx;
             d.y += d3.event.dy;
-            QG.updateGraph();
+            thisGraph.updateGraph();
         }
     });
-
-    QG.graph.addNode([QG.aspect[2] / 2, QG.aspect[3] / 2]);
-    QG.updateGraph();
-
-    /* Binds events to the reactor */
-    QG.reactor = reactor;
-    QG.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
-    QG.reactor.addEventListener('matching_changed', this.graph.setMatching.bind(this.graph));
 }
 
-QueryGraph.prototype.nodeAdder = function () {
-
-    var QG = this;
-
-    QG.svg.append("circle")
-        .attr("id", "tst")
-        .attr("r", 15)
-        .attr("color", "#121212")
-        .attr("transform", "translate(20,20)")
-        .call(d3.drag()
-            .on("drag", function (d) {
-                QG.svg.select("#tst")
-                    .attr("transform", "translate(" + d3.event.x + "," + d3.event.y + ")");
-            })
-            .on("end", function (d) {
-                QG.svg.select("#tst").remove();
-                QG.nodeAdder();
-                var can_create = utils.canDo(d3.event.x, d3.event.y, QG.config.nodeRadius, QG.aspect, QG.graph.nodes);
-                if (can_create){
-                    QG.graph.addNode([d3.event.x, d3.event.y]);
-                }
-                QG.updateGraph();
-            }));
+//- Node behaviour -
+GC.prototype.addNode = function (coordinates) {
+    var thisGraph = this;
+    var node = new utils.Node(coordinates, thisGraph.idct);
+    thisGraph.graph.nodes.push(node);
+    thisGraph.idct += 1;
+    thisGraph.updateGraph();
 };
 
-QueryGraph.prototype.nodeMouseDown = function (svg_element) {
-    var QG = this;
+GC.prototype.nodeMouseDown = function (svg_element) {
+    var thisGraph = this;
     d3.event.stopPropagation();
     var p_selected = d3.select(".selected").data();
 
     if (d3.event.shiftKey && p_selected.length != 0) {
         var n_selected = d3.select(svg_element).data();
 
-        var aux = QG.graph.edges.filter(function (a) {
+        var aux = thisGraph.graph.edges.filter(function (a) {
             return ((a.source == p_selected[0].name) &&
                 (a.destination == n_selected[0].name)) ||
                 ((a.source == n_selected[0].name) &&
@@ -121,33 +126,60 @@ QueryGraph.prototype.nodeMouseDown = function (svg_element) {
 
         if (aux.length == 0 && p_selected[0].name != n_selected[0].name) {
             if (d3.event.ctrlKey) {
-                QG.graph.addEdge(p_selected[0], n_selected[0], "undirected");
+                thisGraph.addEdge(p_selected[0], n_selected[0], "undirected");
             }
             else {
-                QG.graph.addEdge(p_selected[0], n_selected[0], "directed");
+                thisGraph.addEdge(p_selected[0], n_selected[0], "directed");
             }
-            QG.updateGraph();
-
         }
     }
     else {
-        QG.replaceSelected(svg_element);
+        thisGraph.replaceSelected(svg_element);
     }
 };
 
-QueryGraph.prototype.edgeMouseDown = function (svg_element) {
-    var QG = this;
-    d3.event.stopPropagation();
-    QG.replaceSelected(svg_element);
+// - Edge behaviour -
+GC.prototype.addEdge = function (src, dst, kind) {
+    var thisGraph = this;
+    var edge = new utils.Edge(src, dst, thisGraph.idct, kind);
+    thisGraph.graph.edges.push(edge);
+    thisGraph.idct += 1;
+    thisGraph.updateGraph();
 };
 
-QueryGraph.prototype.svgKeyDown = function () {
-    var QG = this;
-    var nodes = QG.graph.nodes;
-    var edges = QG.graph.edges;
+GC.prototype.edgeMouseDown = function (svg_element) {
+    var thisGraph = this;
+    d3.event.stopPropagation();
+    thisGraph.replaceSelected(svg_element);
+};
+
+// - SVG Behaviour
+GC.prototype.svgMouseDown = function () {
+    var thisGraph = this;
+    if (d3.event.shiftKey) {
+        var coordinates = d3.mouse(thisGraph.svg.node());
+
+        var tmp_x = coordinates[0],
+            tmp_y = coordinates[1],
+            radius = thisGraph.config.nodeRadius,
+            aspect = thisGraph.aspect,
+            nodes = thisGraph.graph.nodes;
+
+        var can_create = utils.canDo(tmp_x, tmp_y, radius, aspect, nodes);
+
+        if (can_create) {
+            thisGraph.addNode(coordinates);
+        }
+    }
+};
+
+GC.prototype.svgKeyDown = function () {
+    var thisGraph = this;
+    var nodes = thisGraph.graph.nodes;
+    var edges = thisGraph.graph.edges;
 
     switch (d3.event.keyCode) {
-        case QG.config.delete:
+        case thisGraph.config.delete:
             // - deletes a node/edge -
             var selected = d3.select(".selected").data();
             if (selected.length == 0) {
@@ -163,49 +195,54 @@ QueryGraph.prototype.svgKeyDown = function () {
                     (a.dst.id !== sel_id);
             });
 
-            QG.graph.nodes = nodes;
-            QG.graph.edges = edges;
-            QG.graph.selectedSvgID = -1;
-            QG.updateGraph();
-            QG.reactor.dispatchEvent("selected_node_changed", undefined);
+            thisGraph.graph.nodes = nodes;
+            thisGraph.graph.edges = edges;
+            thisGraph.selectedSvgID = -1;
+            thisGraph.updateGraph();
+            thisGraph.reactor.dispatchEvent("selected_node_changed", undefined);
+
     }
 };
 
-QueryGraph.prototype.replaceSelected = function (svg_element) {
-    var QG = this;
+// - General Behaviour
+GC.prototype.replaceSelected = function (svg_element) {
+    var thisGraph = this;
     var svg_d = d3.select(svg_element).data()[0];
     var svg_id = svg_d.id;
     d3.select(".selected").classed("selected", false);
     d3.select(svg_element).classed("selected", true);
-    QG.graph.selectedSvgID = svg_id;
+    thisGraph.selectedSvgID = svg_id;
 
-    QG.reactor.dispatchEvent("selected_node_changed", svg_d);
+    thisGraph.reactor.dispatchEvent("selected_node_changed", svg_d);
 };
 
-QueryGraph.prototype.updateGraph = function () {
+GC.prototype.updateGraph = function () {
 
-    var QG = this;
+    var thisGraph = this;
+
+    // This is for debugging
+    console.log(thisGraph.graph);
 
     // -- Nodes --
-    var nodes = QG.svg
-        .select("g." + QG.config.nodesClass)
-        .selectAll("g." + QG.config.nodeClass);
-    var data = QG.graph.nodes;
+    var nodes = thisGraph.svg
+        .select("g." + thisGraph.config.nodesClass)
+        .selectAll("g." + thisGraph.config.nodeClass);
+    var data = thisGraph.graph.nodes;
     // - enter
     var aux = nodes.data(data, function (d) {
         return d.name;
     }).enter()
         .append("g")
-        .classed(QG.config.nodeClass, true)
+        .classed(thisGraph.config.nodeClass, true)
         .attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
         })
         .on("mousedown", function (d) {
-            QG.nodeMouseDown(this)
+            thisGraph.nodeMouseDown(this)
         })
-        .call(QG.drag);
+        .call(thisGraph.drag);
     aux.append("circle")
-        .attr("r", String(QG.config.nodeRadius));
+        .attr("r", String(thisGraph.config.nodeRadius));
 
     // - update
     nodes.data(data, function (d) {
@@ -222,10 +259,10 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 
     // -- InText/Nodes--
-    var text = QG.svg
-        .select("g." + QG.config.innerTextNodeClass)
+    var text = thisGraph.svg
+        .select("g." + thisGraph.config.innerTextNodeClass)
         .selectAll("text");
-    var data = QG.graph.nodes;
+    var data = thisGraph.graph.nodes;
     // -- enter
     var aux = text.data(data, function (d) {
         return d.name;
@@ -237,10 +274,7 @@ QueryGraph.prototype.updateGraph = function () {
         .attr("y", function (d) {
             return d.y
         })
-        .attr("text-anchor", "middle")
-        .text(function (d) {
-            return "#node" + d.id;
-        });
+        .attr("text-anchor", "middle");
     // -- update
     text.data(data, function (d) {
         return d.name;
@@ -249,7 +283,23 @@ QueryGraph.prototype.updateGraph = function () {
     }).attr("y", function (d) {
         return d.y
     }).text(function (d) {
-        return "#node" + d.id;
+        var isStart = true;
+        var isEnd = true;
+
+        thisGraph.graph.edges.forEach(function (edge) {
+            if (d.name == edge.destination) {
+                isStart = false;
+            }
+            if (d.name == edge.source) {
+                isEnd = false;
+            }
+        });
+
+        if (isStart && isEnd) return ' ';
+        else if (isStart) return 'start';
+        else if(isEnd) return 'end';
+        else return ' ';
+
     });
     // -- exit
     text.data(data, function (d) {
@@ -258,10 +308,10 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 
     // -- OutText/Nodes --
-    var text = QG.svg
-        .select("g." + QG.config.outerTextNodeClass)
+    var text = thisGraph.svg
+        .select("g." + thisGraph.config.outerTextNodeClass)
         .selectAll("text");
-    var data = QG.graph.nodes;
+    var data = thisGraph.graph.nodes;
     // -- enter
     var aux = text.data(data, function (d) {
         return d.name;
@@ -299,18 +349,18 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 
     // -- Edges --
-    var edges = QG.svg
-        .select("g." + QG.config.edgesClass)
-        .selectAll("g." + QG.config.edgeClass);
-    var data = QG.graph.edges;
+    var edges = thisGraph.svg
+        .select("g." + thisGraph.config.edgesClass)
+        .selectAll("g." + thisGraph.config.edgeClass);
+    var data = thisGraph.graph.edges;
     // - enter
     var aux = edges.data(data, function (d) {
         return d.name;
     }).enter()
         .append("g")
-        .classed(QG.config.edgeClass, true)
+        .classed(thisGraph.config.edgeClass, true)
         .on("mousedown", function (d) {
-            QG.edgeMouseDown(this)
+            thisGraph.edgeMouseDown(this)
         });
     aux.append("path")
         .style('marker-end', function (d) {
@@ -320,7 +370,7 @@ QueryGraph.prototype.updateGraph = function () {
             else return 'none';
         })
         .attr("d", function (d) {
-            return utils.calcEdgePath(d, QG.config.nodeRadius);
+            return utils.calcEdgePath(d, thisGraph.config.nodeRadius);
         })
         .classed("link", true);
     // - update
@@ -329,7 +379,7 @@ QueryGraph.prototype.updateGraph = function () {
     })
         .selectAll("path")
         .attr("d", function (d) {
-            return utils.calcEdgePath(d, QG.config.nodeRadius);
+            return utils.calcEdgePath(d, thisGraph.config.nodeRadius);
         });
     // - exit
     edges.data(data, function (d) {
@@ -339,10 +389,10 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 
     // -- OutText/Edges --
-    var text = QG.svg
-        .select("g." + QG.config.outerTextEdgeClass)
+    var text = thisGraph.svg
+        .select("g." + thisGraph.config.outerTextEdgeClass)
         .selectAll("text");
-    var data = QG.graph.edges;
+    var data = thisGraph.graph.edges;
     var modifier = 15;
     // -- enter
     var aux = text.data(data, function (d) {
@@ -350,10 +400,10 @@ QueryGraph.prototype.updateGraph = function () {
     }).enter()
         .append("text")
         .attr("x", function (d) {
-            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0];
+            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
         })
         .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[1];
+            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
         })
         .attr("text-anchor", "middle");
 
@@ -361,14 +411,14 @@ QueryGraph.prototype.updateGraph = function () {
     var aux = text.data(data, function (d) {
         return d.name;
     }).attr("x", function (d) {
-        return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0];
+        return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
     })
         .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[1];
+            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
         })
         .html(function (d) {
             var string = "";
-            var x = utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0].toString();
+            var x = utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0].toString();
             d.key_op_value.forEach(function (d) {
                 string += "<tspan x=" + x + " dy=\"1.2em\">" + d[0] + d[1] + d[2] + "<\/tspan>";
             });
@@ -381,4 +431,19 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 };
 
-module.exports = QueryGraph;
+GC.prototype.getGraph = function () {
+    var thisGraph = this;
+    return thisGraph.graph;
+};
+
+GC.prototype.getElement = function () {
+    var element = d3.select(".selected").data()[0];
+    return element;
+};
+
+GC.prototype.changeMatching = function (new_matching){
+    var thisGraph = this;
+    thisGraph.graph.matching = new_matching;
+};
+
+module.exports = GC;

@@ -26,37 +26,32 @@ DBI.prototype.changeDataSet = function (new_name) {
 DBI.prototype.getDataSet = function (callback, flg) {
     var thisDatabaseInfo = this;
     var request = {'name': thisDatabaseInfo.filename};
-    console.log("start");
-    pace.track(function () {
-        $.ajax({
-            type: 'POST',
-            url: "http://localhost:5000/config/",
-            data: request,
-            timeout: 1000,
-            success: function (data) {
+    pace.track(function(){$.ajax({
+        type: 'POST',
+        url: "http://localhost:5000/config/",
+        data: request,
+        success: function (data) {
 
-                if (flg == undefined) {
-                    thisDatabaseInfo.conf_file = JSON.parse(data);
-                    thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
-                    thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
-                    thisDatabaseInfo.getDataSet(callback, true);
-                    console.log("if");
-                }
-                else {
+            if (flg == undefined) {
+                thisDatabaseInfo.conf_file = JSON.parse(data);
+                thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
+                thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
+                thisDatabaseInfo.getDataSet(callback, true);
 
-                    thisDatabaseInfo.conf_file = JSON.parse(data);
-                    callback();
-                    console.log("else");
-                }
+            }
+            else {
 
-            },
-            error: function () {
-                console.log("error");
-                thisDatabaseInfo.getDataSet(callback, flg);
-            },
-            async: true
-        })
-    });
+                thisDatabaseInfo.conf_file = JSON.parse(data);
+                callback();
+
+            }
+
+        },
+        error: function () {
+            thisDatabaseInfo.getDataSet(callback, flg);
+        },
+        async: true
+    })});
 };
 
 DBI.prototype.outcome_attributes = function () {
@@ -97,16 +92,6 @@ DBI.prototype.visualization = function () {
 
 DBI.prototype.mining_algorithms = function () {
     return this.conf_file['mining_algorithms']
-};
-
-DBI.prototype.getWindowHeight = function () {
-    console.log(window.innerHeight, window.innerHeight*0.5);
-    return window.innerHeight*0.5- 20;
-};
-
-DBI.prototype.getWindowWidth = function () {
-    console.log(window.innerWidth, window.innerWidth*0.75);
-    return window.innerWidth*0.75 -16;
 };
 
 DBI.prototype.matchingDefault = function () {
@@ -201,20 +186,21 @@ module.exports = {
         nodesClass: "Nodes",
         edgeClass: "Edge",
         edgesClass: "Edges",
-        selectedClass: "selected",
         nodeRadius: 45,
         rectangleWidth: 40,
         delete: 68,
-        svgHeight: databaseinfo.getWindowHeight.bind(databaseinfo),
-        svgWidth: databaseinfo.getWindowWidth.bind(databaseinfo),
 
         /*Stuff adjustable in the back end*/
+        datasets: databaseinfo.datasets.bind(databaseinfo),
+        matching: databaseinfo.matching.bind(databaseinfo),
         matchingDefault: databaseinfo.matchingDefault.bind(databaseinfo),
+        changeDataset: databaseinfo.changeDataSet.bind(databaseinfo),
         outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
         globalAttributes: databaseinfo.global_attributes.bind(databaseinfo),
         nodeAttributes: databaseinfo.node_attributes.bind(databaseinfo),
         edgeAttributes: databaseinfo.edge_attributes.bind(databaseinfo),
         types: databaseinfo.types.bind(databaseinfo),
+        filename: databaseinfo.getFilename.bind(databaseinfo),
 
         /*Helpers*/
         typeValueHandling: databaseinfo.typeValueHandling,
@@ -228,12 +214,5 @@ module.exports = {
         miningAlgorithms: databaseinfo.mining_algorithms.bind(databaseinfo),
         filename: databaseinfo.getFilename.bind(databaseinfo),
         id: databaseinfo.id.bind(databaseinfo)
-    },
-
-    SETTINGS: {
-        datasets: databaseinfo.datasets.bind(databaseinfo),
-        matching: databaseinfo.matching.bind(databaseinfo),
-        changeDataset: databaseinfo.changeDataSet.bind(databaseinfo),
-        filename: databaseinfo.getFilename.bind(databaseinfo)
     }
 };

@@ -27,37 +27,32 @@ DBI.prototype.changeDataSet = function (new_name) {
 DBI.prototype.getDataSet = function (callback, flg) {
     var thisDatabaseInfo = this;
     var request = {'name': thisDatabaseInfo.filename};
-    console.log("start");
-    pace.track(function () {
-        $.ajax({
-            type: 'POST',
-            url: "http://localhost:5000/config/",
-            data: request,
-            timeout: 1000,
-            success: function (data) {
+    pace.track(function(){$.ajax({
+        type: 'POST',
+        url: "http://localhost:5000/config/",
+        data: request,
+        success: function (data) {
 
-                if (flg == undefined) {
-                    thisDatabaseInfo.conf_file = JSON.parse(data);
-                    thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
-                    thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
-                    thisDatabaseInfo.getDataSet(callback, true);
-                    console.log("if");
-                }
-                else {
+            if (flg == undefined) {
+                thisDatabaseInfo.conf_file = JSON.parse(data);
+                thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
+                thisDatabaseInfo.matching_default = thisDatabaseInfo.conf_file["default_matching"];
+                thisDatabaseInfo.getDataSet(callback, true);
 
-                    thisDatabaseInfo.conf_file = JSON.parse(data);
-                    callback();
-                    console.log("else");
-                }
+            }
+            else {
 
-            },
-            error: function () {
-                console.log("error");
-                thisDatabaseInfo.getDataSet(callback, flg);
-            },
-            async: true
-        })
-    });
+                thisDatabaseInfo.conf_file = JSON.parse(data);
+                callback();
+
+            }
+
+        },
+        error: function () {
+            thisDatabaseInfo.getDataSet(callback, flg);
+        },
+        async: true
+    })});
 };
 
 DBI.prototype.outcome_attributes = function () {
@@ -98,16 +93,6 @@ DBI.prototype.visualization = function () {
 
 DBI.prototype.mining_algorithms = function () {
     return this.conf_file['mining_algorithms']
-};
-
-DBI.prototype.getWindowHeight = function () {
-    console.log(window.innerHeight, window.innerHeight*0.5);
-    return window.innerHeight*0.5- 20;
-};
-
-DBI.prototype.getWindowWidth = function () {
-    console.log(window.innerWidth, window.innerWidth*0.75);
-    return window.innerWidth*0.75 -16;
 };
 
 DBI.prototype.matchingDefault = function () {
@@ -202,20 +187,21 @@ module.exports = {
         nodesClass: "Nodes",
         edgeClass: "Edge",
         edgesClass: "Edges",
-        selectedClass: "selected",
         nodeRadius: 45,
         rectangleWidth: 40,
         delete: 68,
-        svgHeight: databaseinfo.getWindowHeight.bind(databaseinfo),
-        svgWidth: databaseinfo.getWindowWidth.bind(databaseinfo),
 
         /*Stuff adjustable in the back end*/
+        datasets: databaseinfo.datasets.bind(databaseinfo),
+        matching: databaseinfo.matching.bind(databaseinfo),
         matchingDefault: databaseinfo.matchingDefault.bind(databaseinfo),
+        changeDataset: databaseinfo.changeDataSet.bind(databaseinfo),
         outcomeAttributes: databaseinfo.outcome_attributes.bind(databaseinfo),
         globalAttributes: databaseinfo.global_attributes.bind(databaseinfo),
         nodeAttributes: databaseinfo.node_attributes.bind(databaseinfo),
         edgeAttributes: databaseinfo.edge_attributes.bind(databaseinfo),
         types: databaseinfo.types.bind(databaseinfo),
+        filename: databaseinfo.getFilename.bind(databaseinfo),
 
         /*Helpers*/
         typeValueHandling: databaseinfo.typeValueHandling,
@@ -229,13 +215,6 @@ module.exports = {
         miningAlgorithms: databaseinfo.mining_algorithms.bind(databaseinfo),
         filename: databaseinfo.getFilename.bind(databaseinfo),
         id: databaseinfo.id.bind(databaseinfo)
-    },
-
-    SETTINGS: {
-        datasets: databaseinfo.datasets.bind(databaseinfo),
-        matching: databaseinfo.matching.bind(databaseinfo),
-        changeDataset: databaseinfo.changeDataSet.bind(databaseinfo),
-        filename: databaseinfo.getFilename.bind(databaseinfo)
     }
 };
 },{"../external/d3.min.v4.js":2,"../external/date.js":3,"../external/jquery.min.js":4,"../external/pace.js":5}],2:[function(require,module,exports){
@@ -694,30 +673,40 @@ d3.sankey = function() {
 };
 
 },{"./d3.min.v4.js":2}],8:[function(require,module,exports){
+/* ----------------------------- */
+/* ---  Initialization Stuff --- */
+/* ----------------------------- */
+
 var config = require("./config/config.js"),
     pace = require("./external/pace.js");
+
 
 config.getDataSet(buildPortinari);
 
 function buildPortinari() {
-
-    /* ----------------------------- */
-    /* ---  Initialization Stuff --- */
-    /* ----------------------------- */
 
     var d3 = require("./external/d3.min.v4.js"),
         Reactor = require("./external/reactor.js");
 
     var Utils = require("./util/util.js");
 
+    var QueryForm = require("./query_system/query_form.js"),
+        QueryGraph = require("./query_system/query_graph.js");
+
+    var PredictionForm = require("./sankey_visualization/prediction_form.js"),
+        PredictionGraph = require("./sankey_visualization/prediction_graph.js");
+
+
+// Creates reactor
     var reactor = new Reactor();
+
+    /* ------------------------ */
+    /* ---  Interface Stuff --- */
+    /* ------------------------ */
 
     /* --------------------- */
     /* ---  Query System --- */
     /* --------------------- */
-
-    var QueryForm = require("./query_system/query_form.js"),
-    QueryGraph = require("./query_system/query_graph.js");
 
     /* ---Internal Query System Events--- */
     reactor.registerEvent('selected_node_changed');
@@ -727,19 +716,24 @@ function buildPortinari() {
     reactor.registerEvent('update_graph');
     reactor.registerEvent('matching_changed');
 
-    /* ---Internal Query System Selections--- */
-    var query_graph_selection = d3.select("#query-graph"),
+    /* ---------------------------------- */
+
+// Creates needed selections
+    var query_graph_selection = d3.select("#query-interface-graph"),
         query_local_form_selection = d3.select("#query-local-interface-form"),
         query_local_current_selection = d3.select("#query-local-interface-current"),
         query_global_form_selection = d3.select("#query-global-interface-form"),
         query_global_current_selection = d3.select("#query-global-interface-current"),
         outcomes_form_selection = d3.select("#query-outcomes-form"),
-        outcomes_current_selection = d3.select("#query-outcomes-current");
+        outcomes_current_selection = d3.select("#query-outcomes-current"),
+        dataset_choice = d3.select("#dataset-choice"),
+        matching_choice = d3.select("#matching-choice");
 
-    /* ---Creates query graph interface--- */
+
+// Creates query graph interface
     var query_graph = new QueryGraph(query_graph_selection, reactor);
 
-    /* ---Creates query form interface--- */
+// Creates query form interface
     var query_form = new QueryForm(
         query_local_form_selection,
         query_local_current_selection,
@@ -747,14 +741,11 @@ function buildPortinari() {
         query_global_current_selection,
         outcomes_form_selection,
         outcomes_current_selection,
-        reactor);
+        dataset_choice, matching_choice, reactor);
 
     /* ------------------------------------ */
     /* ---  Cohort Inspection System  --- */
     /* ----------------------------------- */
-
-    var PredictionForm = require("./sankey_visualization/prediction_form.js"),
-        PredictionGraph = require("./sankey_visualization/prediction_graph.js");
 
     /* ---Internal Query System Events--- */
     reactor.registerEvent('query_successful');
@@ -762,7 +753,7 @@ function buildPortinari() {
     reactor.registerEvent('cohort_node_unselected');
     /* ---------------------------------- */
 
-    // Creates needed selections
+// Creates needed selections
     var form_get_cohort = d3.select("#form-get-cohort"),
         nodes_info_cohort_selection = d3.select("#nodes-info-cohort"),
         get_patterns_cohort = d3.select("#get-patterns-cohort"),
@@ -770,7 +761,7 @@ function buildPortinari() {
         cohort_result = d3.select("#cohort-result");
 
 
-    // Creates prediction form interface
+// Creates prediction form interface
     var prediction_form = new PredictionForm(
         form_get_cohort,
         nodes_info_cohort_selection,
@@ -778,92 +769,20 @@ function buildPortinari() {
         show_patterns_cohort,
         query_graph.graph, reactor);
 
-    // Append the svg canvas to the page
+// Append the svg canvas to the page
     var prediction_graph = new PredictionGraph(
         cohort_result,
         reactor);
 
-    /* ------------------------------------ */
-    /* ---           Settings           --- */
-    /* ----------------------------------- */
-
-    var SettingsForm = require("./settings/settings_form.js");
-
-    // Creates needed selections
-    var dataset_choice = d3.select("#dataset-choice"),
-        matching_choice = d3.select("#matching-choice");
-
-    var settings_form = new SettingsForm(matching_choice, dataset_choice, reactor);
-
-
     Utils.makeVisible("#loader_d", "#content_d");
 }
 
-},{"./config/config.js":1,"./external/d3.min.v4.js":2,"./external/pace.js":5,"./external/reactor.js":6,"./query_system/query_form.js":10,"./query_system/query_graph.js":11,"./sankey_visualization/prediction_form.js":13,"./sankey_visualization/prediction_graph.js":14,"./settings/settings_form.js":15,"./util/util.js":16}],9:[function(require,module,exports){
-var utils = require("./utils.js");
-
-function Graph(){
-    /* Graph constructor */
-    this.idct = 0; this.nodes = []; this.edges = [];
-    this.outcome_key_op_value = []; this.outcome_display_value = [];
-    this.global_key_op_value = []; this.global_display_value = [];
-    this.matching = "None"; this.selectedSvgID = -1;
-}
-
-Graph.prototype.addNode = function (coordinates) {
-    var G = this;
-    var node = new Node(coordinates, G.idct);
-    G.nodes.push(node); G.idct += 1;
-};
-
-Graph.prototype.addEdge = function (src, dst, kind) {
-    var G = this;
-    var edge = new Edge(src, dst, G.idct, kind);
-    G.edges.push(edge); G.idct += 1;
-};
-
-function Node(coor, id, node_class) {
-    /* Node constructor */
-    // Class name, id and id name
-    this.className = node_class; this.name = "n" + id; this.id = id;
-    // Constraints and display values
-    this.key_op_value = []; this.display_value = [];
-    // Coordinates of the node
-    this.x = coor[0]; this.y = coor[1];
-}
-
-function Edge(src, dst, id, kind, edge_class) {
-    /* Edge constructor */
-    // Class name, id and id name
-    this.className = edge_class; this.name = "e" + id; this.id = id;
-    // Constraints and display values
-    this.key_op_value = []; this.display_value = [];
-    // Source and destination names
-    this.source = src.name; this.destination = dst.name;
-    // Pointers to source and destination nodes
-    this.src = src; this.dst = dst;
-    // Kind of edge, directed or undirected
-    this.kind = kind;
-}
-
-
-Graph.prototype.setMatching = function(matching){
-    var G = this;
-    G.matching = matching;
-};
-
-module.exports = {
-    Node: Node,
-    Edge: Edge,
-    Graph: Graph
-};
-
-},{"./utils.js":12}],10:[function(require,module,exports){
+},{"./config/config.js":1,"./external/d3.min.v4.js":2,"./external/pace.js":5,"./external/reactor.js":6,"./query_system/query_form.js":9,"./query_system/query_graph.js":10,"./sankey_visualization/prediction_form.js":12,"./sankey_visualization/prediction_graph.js":13,"./util/util.js":14}],9:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
     json_config = require("../config/config.js");
 
-function FormHandler(qif, qic, qgif, qgic, qcf, qcc, reactor) {
+function FormHandler(qif, qic, qgif, qgic, qcf, qcc, dsc, mtc, reactor) {
 
     var thisForm = this;
 
@@ -871,6 +790,20 @@ function FormHandler(qif, qic, qgif, qgic, qcf, qcc, reactor) {
     thisForm.config = json_config.QUERY_SYSTEM;
     thisForm.reactor = reactor;
     thisForm.reactor.addEventListener('selected_node_changed', this.updateForm.bind(this));
+
+    // -- Model
+
+    // dataset choice form
+    thisForm.dsc = dsc;
+    thisForm.dataset = dsc.append("form");
+    var attributes = thisForm.config.datasets();
+    make_form_dataset(thisForm.dataset, thisForm.dsc, "dataset", attributes, thisForm);
+
+    // matching choice form
+    thisForm.mtc = mtc;
+    thisForm.matching = mtc.append("form");
+    var attributes = thisForm.config.matching();
+    make_form_matching(thisForm.matching, thisForm.mtc, "matching", attributes, thisForm);
 
     // local constraints forms
     thisForm.qif = qif;
@@ -927,12 +860,90 @@ FormHandler.prototype.updateForm = function (element) {
 
     make_form(thisForm.form, thisForm.qic, "constraints", attributes, thisForm, constraints_form_callback);
 
+
     if (thisForm.qic.select("ul").select("li").empty()) {
         console.log("-- empty ul");
         thisForm.qic.append("p").text("Select a node or edge to see its constraints");
     }
 };
 
+function make_form_matching(form, current, name, attributes, thisForm) {
+    // form
+    form.classed("query_" + name, true)
+        .attr("id", "new_" + name);
+
+    // ** FORM Pt1. attr_name **
+    var select_attr = form.append("select")
+        .classed("styled_form", true)
+        .attr("id", "attr_name_" + name)
+        .attr("name", "attribute");
+
+    attributes.forEach(function (op) {
+
+        if (thisForm.config.filename() == op.name) {
+            select_attr.append("option")
+                .attr("value", op.name)
+                .attr("selected", "selected")
+                .text(op.display);
+        }
+        else {
+            select_attr.append("option")
+                .attr("value", op.name)
+                .text(op.display);
+        }
+    });
+
+    form.append("input")
+        .classed("styled_form", true)
+        .attr("id", "submit_query_form_" + name)
+        .attr("type", "submit");
+
+    $(".query_" + name).bind("submit", function (event) {
+        event.preventDefault();
+        var data = $("#new_" + name).serializeArray();
+        thisForm.reactor.dispatchEvent("matching_changed", data[0].value );
+    });
+}
+
+
+function make_form_dataset(form, current, name, attributes, thisForm) {
+    // form
+    form.classed("query_" + name, true)
+        .attr("id", "new_" + name);
+
+    // ** FORM Pt1. attr_name **
+    var select_attr = form.append("select")
+        .classed("styled_form", true)
+        .attr("id", "attr_name_" + name)
+        .attr("name", "attribute");
+
+    attributes.forEach(function (op) {
+
+        if (thisForm.config.filename() == op.name) {
+            select_attr.append("option")
+                .attr("value", op.name)
+                .attr("selected", "selected")
+                .text(op.display);
+        }
+        else {
+            select_attr.append("option")
+                .attr("value", op.name)
+                .text(op.display);
+        }
+    });
+
+    form.append("input")
+        .classed("styled_form", true)
+        .attr("id", "submit_query_form_" + name)
+        .attr("type", "submit");
+
+    $(".query_" + name).bind("submit", function (event) {
+        event.preventDefault();
+        var data = $("#new_" + name).serializeArray();
+        json_config.QUERY_SYSTEM.changeDataset(data[0].value);
+        thisForm.updateForm(undefined)
+    });
+}
 
 function make_form(form, current, name, attributes, thisForm, callback) {
     // form
@@ -941,12 +952,15 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
     // ** FORM Pt1. attr_name **
     var select_attr = form.append("select")
+        .classed("styled_form", true)
         .attr("id", "attr_name_" + name)
         .attr("name", "attribute");
 
     select_attr.append("option")
+        .classed("styled_form", true)
         .classed("disabled", true)
         .classed("hidden", true)
+        .attr("style", true)
         .text("Select Attribute");
 
     attributes.forEach(function (op) {
@@ -970,6 +984,7 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
         // ** FORM Pt2. oper_field **
         var select_oper = form.append("select")
+            .classed("styled_form", true)
             .attr("id", "oper_field_" + name)
             .attr("name", "operator");
 
@@ -983,9 +998,10 @@ function make_form(form, current, name, attributes, thisForm, callback) {
         thisForm.config.typeFormHandling(type_name, form, name, types);
 
         form.append("input")
+            .classed("styled_form", true)
             .attr("id", "submit_query_form_" + name)
-            .attr("type", "submit")
-            .attr("value", ">>");
+            .attr("type", "submit");
+
     });
 
     $(".query_" + name).unbind();
@@ -1003,8 +1019,10 @@ function make_form(form, current, name, attributes, thisForm, callback) {
         var disp = attr_getter("#attr_name_" + name, "#oper_field_" + name, "#value_field_" + name);
 
         callback(attr, disp, current, thisForm)
+
     });
 }
+
 
 function global_form_callback(attr, disp, current, thisForm) {
 
@@ -1129,68 +1147,97 @@ function attr_getter(id, oper, val) {
 
 module.exports = FormHandler;
 
-},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4}],11:[function(require,module,exports){
+},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4}],10:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
-    $ = require("../external/jquery.min.js"),
     utils = require("./utils.js"),
-    json_config = require("../config/config.js"),
-    graph = require("./graph.js");
+    json_config = require("../config/config.js");
 
-function QueryGraph(query_interface_selection, reactor) {
+function GC(query_interface_selection, reactor) {
 
-    var QG = this;
+    var thisGraph = this;
 
-    QG.config = json_config.QUERY_SYSTEM;
+    // -- Config
+    thisGraph.idct = 0;
+    thisGraph.aspect = [0, 0, 1600, 900];
+    thisGraph.selectedSvgID = -1;
+    thisGraph.reactor = reactor;
+    thisGraph.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
+    thisGraph.reactor.addEventListener('constraint_added', this.getElement.bind(this));
+    thisGraph.reactor.addEventListener('outcome_added', this.getGraph.bind(this));
+    thisGraph.reactor.addEventListener('global_added', this.getGraph.bind(this));
+    thisGraph.reactor.addEventListener('matching_changed', this.changeMatching.bind(this));
+    thisGraph.config = json_config.QUERY_SYSTEM;
 
-    QG.graph = new graph.Graph();
+    // -- Model
+    thisGraph.graph = {};
+    thisGraph.graph.nodes = [];
+    thisGraph.graph.edges = [];
+    thisGraph.graph.future_nodes = 0;
+    thisGraph.graph.prediction_attr = "None";
+    thisGraph.graph.id_attr = "None";
+    thisGraph.graph.outcome_key_op_value = [];
+    thisGraph.graph.outcome_display_value = [];
+    thisGraph.graph.global_key_op_value = [];
+    thisGraph.graph.global_display_value = [];
+    thisGraph.graph.matching = thisGraph.config.matchingDefault();
 
-    QG.graph.setMatching(QG.config.matchingDefault());
+    // -- View
+    // svg
+    thisGraph.svg = query_interface_selection.append("svg")
+        .attr("viewBox", thisGraph.aspect[0] + " " +
+            thisGraph.aspect[1] + " " +
+            thisGraph.aspect[2] + " " +
+            thisGraph.aspect[3])
+        .attr("preserveAspectRatio", "xMinYMin meet");
 
-    /* Initializes the svg */
-    QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
-    QG.svg = query_interface_selection.append("svg")
-        .attr("id", "query-graph-svg")
-        .attr("width", QG.aspect[2])
-        .attr("height", QG.aspect[3]);
-
-    $(window).resize(function () {
-        QG.aspect = [0, 0, QG.config.svgWidth(), QG.config.svgHeight()];
-        d3.select("#query-graph-svg")
-            .attr("width", QG.aspect[2])
-            .attr("height", QG.aspect[3])
-    });
-
-    QG.svgG = QG.svg.append("g").classed(QG.config.graphClass, true);   // graph
-    QG.svgG.append("g").classed(QG.config.nodesClass, true);            // nodes
-    QG.svgG.append("g").classed(QG.config.innerTextNodeClass, true);    // node text
-    QG.svgG.append("g").classed(QG.config.outerTextNodeClass, true);    // node constraint text
-    QG.svgG.append("g").classed(QG.config.edgesClass, true);            // edges
-    QG.svgG.append("g").classed(QG.config.innerTextEdgeClass, true);    // edge text
-    QG.svgG.append("g").classed(QG.config.outerTextEdgeClass, true);    // edge constraint text
-
-
-    QG.svg.append('svg:defs').append('svg:marker').attr('id', 'end-arrow').attr('viewBox', '0 -5 10 10')
-        .attr('refX', 8.5).attr('markerWidth', 3.5).attr('markerHeight', 3.5).attr('orient', 'auto')
+    // graph
+    thisGraph.svgG = thisGraph.svg.append("g")
+        .classed(thisGraph.config.graphClass, true);
+    // nodes
+    thisGraph.vis_nodes = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.nodesClass, true);
+    // edges
+    thisGraph.vis_edges = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.edgesClass, true);
+    // node text
+    thisGraph.vis_node_text = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.innerTextNodeClass, true);
+    // edge text
+    thisGraph.vis_edge_text = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.innerTextEdgeClass, true);
+    // node constraint text
+    thisGraph.vis_node_c_text = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.outerTextNodeClass, true);
+    // edge constraint text
+    thisGraph.vis_edge_c_text = thisGraph.svgG.append("g")
+        .classed(thisGraph.config.outerTextEdgeClass, true);
+    // marker
+    var defs = thisGraph.svg.append('svg:defs');
+    defs.append('svg:marker')
+        .attr('id', 'end-arrow').attr('viewBox', '0 -5 10 10')
+        .attr('refX', 8.5).attr('markerWidth', 3.5)
+        .attr('markerHeight', 3.5).attr('orient', 'auto')
         .append('svg:path').attr('d', 'M0,-5L10,0L0,5');
 
-    /* Effects */
-
-
+    // ** Effects
+    // mouse down on
+    thisGraph.svg.on("mousedown", function (d) {
+        GC.prototype.svgMouseDown.call(thisGraph);
+    });
+    // key down on window
     d3.select(window).on("keydown", function () {
         if (d3.event.shiftKey) {
-            QG.svgKeyDown.call(QG);
+            thisGraph.svgKeyDown.call(thisGraph);
         }
     });
-
-    QG.nodeAdder();
-
-    QG.drag = d3.drag().on("drag", function (d) {
+    // drag
+    thisGraph.drag = d3.drag().on("drag", function (d) {
 
         var tmp_x = d.x + d3.event.dx,
             tmp_y = d.y + d3.event.dy,
-            radius = QG.config.nodeRadius,
-            aspect = QG.aspect,
-            nodes = QG.graph.nodes,
+            radius = thisGraph.config.nodeRadius,
+            aspect = thisGraph.aspect,
+            nodes = thisGraph.graph.nodes,
             node = d;
 
         var can_move = utils.canDo(tmp_x, tmp_y, radius, aspect, nodes, node);
@@ -1198,53 +1245,29 @@ function QueryGraph(query_interface_selection, reactor) {
         if (can_move) {
             d.x += d3.event.dx;
             d.y += d3.event.dy;
-            QG.updateGraph();
+            thisGraph.updateGraph();
         }
     });
-
-    QG.graph.addNode([QG.aspect[2] / 2, QG.aspect[3] / 2]);
-    QG.updateGraph();
-
-    /* Binds events to the reactor */
-    QG.reactor = reactor;
-    QG.reactor.addEventListener('update_graph', this.updateGraph.bind(this));
-    QG.reactor.addEventListener('matching_changed', this.graph.setMatching.bind(this.graph));
 }
 
-QueryGraph.prototype.nodeAdder = function () {
-
-    var QG = this;
-
-    QG.svg.append("circle")
-        .attr("id", "tst")
-        .attr("r", 15)
-        .attr("color", "#121212")
-        .attr("transform", "translate(20,20)")
-        .call(d3.drag()
-            .on("drag", function (d) {
-                QG.svg.select("#tst")
-                    .attr("transform", "translate(" + d3.event.x + "," + d3.event.y + ")");
-            })
-            .on("end", function (d) {
-                QG.svg.select("#tst").remove();
-                QG.nodeAdder();
-                var can_create = utils.canDo(d3.event.x, d3.event.y, QG.config.nodeRadius, QG.aspect, QG.graph.nodes);
-                if (can_create){
-                    QG.graph.addNode([d3.event.x, d3.event.y]);
-                }
-                QG.updateGraph();
-            }));
+//- Node behaviour -
+GC.prototype.addNode = function (coordinates) {
+    var thisGraph = this;
+    var node = new utils.Node(coordinates, thisGraph.idct);
+    thisGraph.graph.nodes.push(node);
+    thisGraph.idct += 1;
+    thisGraph.updateGraph();
 };
 
-QueryGraph.prototype.nodeMouseDown = function (svg_element) {
-    var QG = this;
+GC.prototype.nodeMouseDown = function (svg_element) {
+    var thisGraph = this;
     d3.event.stopPropagation();
     var p_selected = d3.select(".selected").data();
 
     if (d3.event.shiftKey && p_selected.length != 0) {
         var n_selected = d3.select(svg_element).data();
 
-        var aux = QG.graph.edges.filter(function (a) {
+        var aux = thisGraph.graph.edges.filter(function (a) {
             return ((a.source == p_selected[0].name) &&
                 (a.destination == n_selected[0].name)) ||
                 ((a.source == n_selected[0].name) &&
@@ -1253,33 +1276,60 @@ QueryGraph.prototype.nodeMouseDown = function (svg_element) {
 
         if (aux.length == 0 && p_selected[0].name != n_selected[0].name) {
             if (d3.event.ctrlKey) {
-                QG.graph.addEdge(p_selected[0], n_selected[0], "undirected");
+                thisGraph.addEdge(p_selected[0], n_selected[0], "undirected");
             }
             else {
-                QG.graph.addEdge(p_selected[0], n_selected[0], "directed");
+                thisGraph.addEdge(p_selected[0], n_selected[0], "directed");
             }
-            QG.updateGraph();
-
         }
     }
     else {
-        QG.replaceSelected(svg_element);
+        thisGraph.replaceSelected(svg_element);
     }
 };
 
-QueryGraph.prototype.edgeMouseDown = function (svg_element) {
-    var QG = this;
-    d3.event.stopPropagation();
-    QG.replaceSelected(svg_element);
+// - Edge behaviour -
+GC.prototype.addEdge = function (src, dst, kind) {
+    var thisGraph = this;
+    var edge = new utils.Edge(src, dst, thisGraph.idct, kind);
+    thisGraph.graph.edges.push(edge);
+    thisGraph.idct += 1;
+    thisGraph.updateGraph();
 };
 
-QueryGraph.prototype.svgKeyDown = function () {
-    var QG = this;
-    var nodes = QG.graph.nodes;
-    var edges = QG.graph.edges;
+GC.prototype.edgeMouseDown = function (svg_element) {
+    var thisGraph = this;
+    d3.event.stopPropagation();
+    thisGraph.replaceSelected(svg_element);
+};
+
+// - SVG Behaviour
+GC.prototype.svgMouseDown = function () {
+    var thisGraph = this;
+    if (d3.event.shiftKey) {
+        var coordinates = d3.mouse(thisGraph.svg.node());
+
+        var tmp_x = coordinates[0],
+            tmp_y = coordinates[1],
+            radius = thisGraph.config.nodeRadius,
+            aspect = thisGraph.aspect,
+            nodes = thisGraph.graph.nodes;
+
+        var can_create = utils.canDo(tmp_x, tmp_y, radius, aspect, nodes);
+
+        if (can_create) {
+            thisGraph.addNode(coordinates);
+        }
+    }
+};
+
+GC.prototype.svgKeyDown = function () {
+    var thisGraph = this;
+    var nodes = thisGraph.graph.nodes;
+    var edges = thisGraph.graph.edges;
 
     switch (d3.event.keyCode) {
-        case QG.config.delete:
+        case thisGraph.config.delete:
             // - deletes a node/edge -
             var selected = d3.select(".selected").data();
             if (selected.length == 0) {
@@ -1295,49 +1345,54 @@ QueryGraph.prototype.svgKeyDown = function () {
                     (a.dst.id !== sel_id);
             });
 
-            QG.graph.nodes = nodes;
-            QG.graph.edges = edges;
-            QG.graph.selectedSvgID = -1;
-            QG.updateGraph();
-            QG.reactor.dispatchEvent("selected_node_changed", undefined);
+            thisGraph.graph.nodes = nodes;
+            thisGraph.graph.edges = edges;
+            thisGraph.selectedSvgID = -1;
+            thisGraph.updateGraph();
+            thisGraph.reactor.dispatchEvent("selected_node_changed", undefined);
+
     }
 };
 
-QueryGraph.prototype.replaceSelected = function (svg_element) {
-    var QG = this;
+// - General Behaviour
+GC.prototype.replaceSelected = function (svg_element) {
+    var thisGraph = this;
     var svg_d = d3.select(svg_element).data()[0];
     var svg_id = svg_d.id;
     d3.select(".selected").classed("selected", false);
     d3.select(svg_element).classed("selected", true);
-    QG.graph.selectedSvgID = svg_id;
+    thisGraph.selectedSvgID = svg_id;
 
-    QG.reactor.dispatchEvent("selected_node_changed", svg_d);
+    thisGraph.reactor.dispatchEvent("selected_node_changed", svg_d);
 };
 
-QueryGraph.prototype.updateGraph = function () {
+GC.prototype.updateGraph = function () {
 
-    var QG = this;
+    var thisGraph = this;
+
+    // This is for debugging
+    console.log(thisGraph.graph);
 
     // -- Nodes --
-    var nodes = QG.svg
-        .select("g." + QG.config.nodesClass)
-        .selectAll("g." + QG.config.nodeClass);
-    var data = QG.graph.nodes;
+    var nodes = thisGraph.svg
+        .select("g." + thisGraph.config.nodesClass)
+        .selectAll("g." + thisGraph.config.nodeClass);
+    var data = thisGraph.graph.nodes;
     // - enter
     var aux = nodes.data(data, function (d) {
         return d.name;
     }).enter()
         .append("g")
-        .classed(QG.config.nodeClass, true)
+        .classed(thisGraph.config.nodeClass, true)
         .attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
         })
         .on("mousedown", function (d) {
-            QG.nodeMouseDown(this)
+            thisGraph.nodeMouseDown(this)
         })
-        .call(QG.drag);
+        .call(thisGraph.drag);
     aux.append("circle")
-        .attr("r", String(QG.config.nodeRadius));
+        .attr("r", String(thisGraph.config.nodeRadius));
 
     // - update
     nodes.data(data, function (d) {
@@ -1354,10 +1409,10 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 
     // -- InText/Nodes--
-    var text = QG.svg
-        .select("g." + QG.config.innerTextNodeClass)
+    var text = thisGraph.svg
+        .select("g." + thisGraph.config.innerTextNodeClass)
         .selectAll("text");
-    var data = QG.graph.nodes;
+    var data = thisGraph.graph.nodes;
     // -- enter
     var aux = text.data(data, function (d) {
         return d.name;
@@ -1369,10 +1424,7 @@ QueryGraph.prototype.updateGraph = function () {
         .attr("y", function (d) {
             return d.y
         })
-        .attr("text-anchor", "middle")
-        .text(function (d) {
-            return "#node" + d.id;
-        });
+        .attr("text-anchor", "middle");
     // -- update
     text.data(data, function (d) {
         return d.name;
@@ -1381,7 +1433,23 @@ QueryGraph.prototype.updateGraph = function () {
     }).attr("y", function (d) {
         return d.y
     }).text(function (d) {
-        return "#node" + d.id;
+        var isStart = true;
+        var isEnd = true;
+
+        thisGraph.graph.edges.forEach(function (edge) {
+            if (d.name == edge.destination) {
+                isStart = false;
+            }
+            if (d.name == edge.source) {
+                isEnd = false;
+            }
+        });
+
+        if (isStart && isEnd) return ' ';
+        else if (isStart) return 'start';
+        else if(isEnd) return 'end';
+        else return ' ';
+
     });
     // -- exit
     text.data(data, function (d) {
@@ -1390,10 +1458,10 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 
     // -- OutText/Nodes --
-    var text = QG.svg
-        .select("g." + QG.config.outerTextNodeClass)
+    var text = thisGraph.svg
+        .select("g." + thisGraph.config.outerTextNodeClass)
         .selectAll("text");
-    var data = QG.graph.nodes;
+    var data = thisGraph.graph.nodes;
     // -- enter
     var aux = text.data(data, function (d) {
         return d.name;
@@ -1431,18 +1499,18 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 
     // -- Edges --
-    var edges = QG.svg
-        .select("g." + QG.config.edgesClass)
-        .selectAll("g." + QG.config.edgeClass);
-    var data = QG.graph.edges;
+    var edges = thisGraph.svg
+        .select("g." + thisGraph.config.edgesClass)
+        .selectAll("g." + thisGraph.config.edgeClass);
+    var data = thisGraph.graph.edges;
     // - enter
     var aux = edges.data(data, function (d) {
         return d.name;
     }).enter()
         .append("g")
-        .classed(QG.config.edgeClass, true)
+        .classed(thisGraph.config.edgeClass, true)
         .on("mousedown", function (d) {
-            QG.edgeMouseDown(this)
+            thisGraph.edgeMouseDown(this)
         });
     aux.append("path")
         .style('marker-end', function (d) {
@@ -1452,7 +1520,7 @@ QueryGraph.prototype.updateGraph = function () {
             else return 'none';
         })
         .attr("d", function (d) {
-            return utils.calcEdgePath(d, QG.config.nodeRadius);
+            return utils.calcEdgePath(d, thisGraph.config.nodeRadius);
         })
         .classed("link", true);
     // - update
@@ -1461,7 +1529,7 @@ QueryGraph.prototype.updateGraph = function () {
     })
         .selectAll("path")
         .attr("d", function (d) {
-            return utils.calcEdgePath(d, QG.config.nodeRadius);
+            return utils.calcEdgePath(d, thisGraph.config.nodeRadius);
         });
     // - exit
     edges.data(data, function (d) {
@@ -1471,10 +1539,10 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 
     // -- OutText/Edges --
-    var text = QG.svg
-        .select("g." + QG.config.outerTextEdgeClass)
+    var text = thisGraph.svg
+        .select("g." + thisGraph.config.outerTextEdgeClass)
         .selectAll("text");
-    var data = QG.graph.edges;
+    var data = thisGraph.graph.edges;
     var modifier = 15;
     // -- enter
     var aux = text.data(data, function (d) {
@@ -1482,10 +1550,10 @@ QueryGraph.prototype.updateGraph = function () {
     }).enter()
         .append("text")
         .attr("x", function (d) {
-            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0];
+            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
         })
         .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[1];
+            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
         })
         .attr("text-anchor", "middle");
 
@@ -1493,14 +1561,14 @@ QueryGraph.prototype.updateGraph = function () {
     var aux = text.data(data, function (d) {
         return d.name;
     }).attr("x", function (d) {
-        return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0];
+        return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0];
     })
         .attr("y", function (d) {
-            return utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[1];
+            return utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[1];
         })
         .html(function (d) {
             var string = "";
-            var x = utils.calcTextEdgePath(d, QG.config.nodeRadius, modifier)[0].toString();
+            var x = utils.calcTextEdgePath(d, thisGraph.config.nodeRadius, modifier)[0].toString();
             d.key_op_value.forEach(function (d) {
                 string += "<tspan x=" + x + " dy=\"1.2em\">" + d[0] + d[1] + d[2] + "<\/tspan>";
             });
@@ -1513,9 +1581,24 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 };
 
-module.exports = QueryGraph;
+GC.prototype.getGraph = function () {
+    var thisGraph = this;
+    return thisGraph.graph;
+};
 
-},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4,"./graph.js":9,"./utils.js":12}],12:[function(require,module,exports){
+GC.prototype.getElement = function () {
+    var element = d3.select(".selected").data()[0];
+    return element;
+};
+
+GC.prototype.changeMatching = function (new_matching){
+    var thisGraph = this;
+    thisGraph.graph.matching = new_matching;
+};
+
+module.exports = GC;
+
+},{"../config/config.js":1,"../external/d3.min.v4.js":2,"./utils.js":11}],11:[function(require,module,exports){
 var conf = require("../config/config.js");
 
 function canDo(tmp_x, tmp_y, r, aspect, nodes, node) {
@@ -1562,18 +1645,43 @@ function calcEdgePath(d, consts) {
     return "M" + result[1] + " " + result[3] + " L" + result[0] + " " + result[2];
 }
 
+function Node(coor, id) {
+    /* Node constructor */
+    // Class name, id and id name
+    this.className = conf.QUERY_SYSTEM.nodeClass; this.name = "n" + id; this.id = id;
+    // Constraints and display values
+    this.key_op_value = []; this.display_value = [];
+    // Coordinates of the node
+    this.x = coor[0]; this.y = coor[1];
+}
 
+function Edge(src, dst, id, kind) {
+    /* Edge constructor */
+    // Class name, id and id name
+    this.className = conf.QUERY_SYSTEM.edgeClass; this.name = "e" + id; this.id = id;
+    // Constraints and display values
+    this.key_op_value = []; this.display_value = [];
+    // Source and destination names
+    this.source = src.name; this.destination = dst.name;
+    // Pointers to source and destination nodes
+    this.src = src; this.dst = dst;
+    // Kind of edge, directed or undirected
+    this.kind = kind;
+}
 
 module.exports = {
+    Node: Node,
+    Edge: Edge,
     calcEdgePath: calcEdgePath,
     calcTextEdgePath : calcTextEdgePath,
     canDo: canDo
 };
 
-},{"../config/config.js":1}],13:[function(require,module,exports){
+},{"../config/config.js":1}],12:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
-    json_config = require("../config/config.js");
+    json_config = require("../config/config.js"),
+    Utils = require("../util/util.js");
 
 function PredictionForm(form_get_cohort,
                         nodes_info_cohort_selection,
@@ -1581,6 +1689,7 @@ function PredictionForm(form_get_cohort,
                         show_patterns_cohort,
                         graph,
                         reactor) {
+    // ** Config
     var thisForm = this;
     thisForm.graph = graph;
     thisForm.nodes = {};
@@ -1596,14 +1705,14 @@ function PredictionForm(form_get_cohort,
         thisForm.config.visualizationOptions(),
         get_outcome_cohort,
         "query-cohort",
-        ">>");
+        "Obtain new cohort");
 
     make_simple_form(thisForm,
         get_patterns_cohort,
         thisForm.config.miningAlgorithms(),
         get_patterns,
         "get-patterns-cohort",
-        ">>");
+        "Get patterns");
 
     thisForm.reactor.addEventListener('cohort_node_selected', thisForm.addNodes.bind(this));
     thisForm.reactor.addEventListener('cohort_node_unselected', thisForm.removeNodes.bind(this));
@@ -1612,12 +1721,15 @@ function PredictionForm(form_get_cohort,
 PredictionForm.prototype.addNodes = function (d) {
     var thisForm = this;
     thisForm.nodes[d.identifier] = d;
+    console.log(thisForm.nodes);
     thisForm.updateNodesInfo();
 };
+
 
 PredictionForm.prototype.removeNodes = function (d) {
     var thisForm = this;
     delete thisForm.nodes[d.identifier];
+    console.log(thisForm.nodes);
     thisForm.updateNodesInfo();
 };
 
@@ -1625,14 +1737,13 @@ PredictionForm.prototype.updateNodesInfo = function () {
     var thisForm = this;
     var formatRR = d3.format(",.2f");
     var format = d3.format(",.0f");
+
+
     var values = $.map(thisForm.nodes, function (value, key) {
         return value
     });
 
-    if (values.length == 0){
-        thisForm.node_info_cohort_selection.append("p")
-            .text("Select Sankey nodes to mine them")
-    }
+    console.log(values);
 
     var list = thisForm.node_info_cohort_selection.select("ul");
 
@@ -1666,6 +1777,7 @@ PredictionForm.prototype.updatePatternsDesc = function () {
                 return d;
             });
 };
+
 
 function make_simple_form(thisForm, form, options, submit_f, id_v, submit) {
 
@@ -1734,9 +1846,11 @@ function get_patterns(thisForm) {
         return key
     });
 
+
     var posted_data = {
         'nodes': JSON.stringify(keys)
     };
+
 
     $.ajax({
         type: 'POST',
@@ -1755,7 +1869,7 @@ function get_patterns(thisForm) {
 
 module.exports = PredictionForm;
 
-},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4}],14:[function(require,module,exports){
+},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4,"../util/util.js":14}],13:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     json_config = require("../config/config.js");
 
@@ -1929,130 +2043,28 @@ PredictionGraph.prototype.updateResult = function (graph) {
 };
 
 module.exports = PredictionGraph;
-},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/sankey.js":7}],15:[function(require,module,exports){
-
-var d3 = require("../external/d3.min.v4.js"),
-    $ = require("../external/jquery.min.js"),
-    json_config = require("../config/config.js");
-
-function SettingsForm(matching, dataset, reactor) {
-
-    var thisForm = this;
-
-    thisForm.config = json_config.SETTINGS;
-    thisForm.reactor = reactor;
-
-     thisForm.dsc = dataset;
-     thisForm.dataset = dataset.append("form");
-     var attributes = thisForm.config.datasets();
-     make_form_dataset(thisForm.dataset, thisForm.dsc, "dataset", attributes, thisForm);
+},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/sankey.js":7}],14:[function(require,module,exports){
+var $ = require("../external/jquery.min.js");
 
 
-     thisForm.mtc = matching;
-     thisForm.matching = matching.append("form");
-     var attributes = thisForm.config.matching();
-     make_form_matching(thisForm.matching, thisForm.mtc, "matching", attributes, thisForm);
-
+function toggle_if_visible(b_id, div_id) {
+    /* Toggles button if the section is visible! */
+    var display = $(div_id).css("display");
+    if (display == "block") {
+        $(b_id).click();
+    }
 }
-
-function make_form_matching(form, current, name, attributes, thisForm) {
-    // form
-    form.classed("query_" + name, true)
-        .attr("id", "new_" + name);
-
-    // ** FORM Pt1. attr_name **
-    var select_attr = form.append("select")
-        .attr("id", "attr_name_" + name)
-        .attr("name", "attribute");
-
-    attributes.forEach(function (op) {
-
-        if (thisForm.config.filename() == op.name) {
-            select_attr.append("option")
-                .attr("value", op.name)
-                .attr("selected", "selected")
-                .text(op.display);
-        }
-        else {
-            select_attr.append("option")
-                .attr("value", op.name)
-                .text(op.display);
-        }
-    });
-
-    form.append("input")
-        .attr("id", "submit_query_form_" + name)
-        .attr("type", "submit")
-        .attr("value", ">>");
-
-    $(".query_" + name).bind("submit", function (event) {
-        event.preventDefault();
-        var data = $("#new_" + name).serializeArray();
-        thisForm.reactor.dispatchEvent("matching_changed", data[0].value );
-    });
-}
-
-function make_form_dataset(form, current, name, attributes, thisForm) {
-    // form
-    form.classed("query_" + name, true)
-        .attr("id", "new_" + name);
-
-    // ** FORM Pt1. attr_name **
-    var select_attr = form.append("select")
-        .attr("id", "attr_name_" + name)
-        .attr("name", "attribute");
-
-    attributes.forEach(function (op) {
-
-        if (thisForm.config.filename() == op.name) {
-            select_attr.append("option")
-                .attr("value", op.name)
-                .attr("selected", "selected")
-                .text(op.display);
-        }
-        else {
-            select_attr.append("option")
-                .attr("value", op.name)
-                .text(op.display);
-        }
-    });
-
-    form.append("input")
-        .attr("id", "submit_query_form_" + name)
-        .attr("type", "submit")
-        .attr("value", ">>");
-
-    $(".query_" + name).bind("submit", function (event) {
-        event.preventDefault();
-        var data = $("#new_" + name).serializeArray();
-        json_config.QUERY_SYSTEM.changeDataset(data[0].value);
-        thisForm.updateForm(undefined)
-    });
-}
-
-module.exports = SettingsForm;
-},{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4}],16:[function(require,module,exports){
-var d3 = require("../external/d3.min.v4.js");
-
 
 function make_visible(loader_d, content_d) {
-
-    d3.select(loader_d)
-        .transition()
-        .delay(1000)
-        .style("display", "none");
-
-    d3.select(content_d)
-        .classed("active", true)
-        .transition()
-        .delay(1000)
-        .duration(1000)
-        .style("opacity", 1);
+    $(loader_d).css("display", "none");
+    $(content_d).css("opacity", 1);
+    $(content_d).addClass("active");
 }
 
 
 module.exports = {
+    toggleIfVisible: toggle_if_visible,
     makeVisible: make_visible
 };
 
-},{"../external/d3.min.v4.js":2}]},{},[8]);
+},{"../external/jquery.min.js":4}]},{},[8]);
