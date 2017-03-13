@@ -803,28 +803,61 @@ function buildPortinari() {
 var utils = require("./utils.js");
 
 function Graph(){
-    var G = this;
-    
-    G.nodes = [];
-    G.edges = [];
-    G.selectedSvgID = -1;
-    G.outcome_key_op_value = [];
-    G.outcome_display_value = [];
-    G.global_key_op_value = [];
-    G.global_display_value = [];
-    G.matching = "None";
-
-    return G;
+    /* Graph constructor */
+    this.idct = 0; this.nodes = []; this.edges = [];
+    this.outcome_key_op_value = []; this.outcome_display_value = [];
+    this.global_key_op_value = []; this.global_display_value = [];
+    this.matching = "None"; this.selectedSvgID = -1;
 }
+
+Graph.prototype.addNode = function (coordinates) {
+    var G = this;
+    var node = new Node(coordinates, G.idct);
+    G.nodes.push(node); G.idct += 1;
+};
+
+Graph.prototype.addEdge = function (src, dst, kind) {
+    var G = this;
+    var edge = new Edge(src, dst, G.idct, kind);
+    G.edges.push(edge); G.idct += 1;
+};
+
+function Node(coor, id, node_class) {
+    /* Node constructor */
+    // Class name, id and id name
+    this.className = node_class; this.name = "n" + id; this.id = id;
+    // Constraints and display values
+    this.key_op_value = []; this.display_value = [];
+    // Coordinates of the node
+    this.x = coor[0]; this.y = coor[1];
+}
+
+function Edge(src, dst, id, kind, edge_class) {
+    /* Edge constructor */
+    // Class name, id and id name
+    this.className = edge_class; this.name = "e" + id; this.id = id;
+    // Constraints and display values
+    this.key_op_value = []; this.display_value = [];
+    // Source and destination names
+    this.source = src.name; this.destination = dst.name;
+    // Pointers to source and destination nodes
+    this.src = src; this.dst = dst;
+    // Kind of edge, directed or undirected
+    this.kind = kind;
+}
+
 
 Graph.prototype.setMatching = function(matching){
     var G = this;
     G.matching = matching;
 };
 
+module.exports = {
+    Node: Node,
+    Edge: Edge,
+    Graph: Graph
+};
 
-
-module.exports = Graph;
 },{"./utils.js":12}],10:[function(require,module,exports){
 var d3 = require("../external/d3.min.v4.js"),
     $ = require("../external/jquery.min.js"),
@@ -1108,15 +1141,9 @@ function QueryGraph(query_interface_selection, reactor) {
     var QG = this;
 
     QG.config = json_config.QUERY_SYSTEM;
-    /* Loads the config file */
 
+    QG.graph = new graph.Graph();
 
-    QG.idct = 0;
-    /* Initializes the query graph model */
-
-
-    QG.graph = new graph();
-    console.log(QG.graph);
     QG.graph.setMatching(QG.config.matchingDefault());
 
     /* Initializes the svg */
@@ -1142,16 +1169,12 @@ function QueryGraph(query_interface_selection, reactor) {
     QG.svgG.append("g").classed(QG.config.outerTextEdgeClass, true);    // edge constraint text
 
 
-
     QG.svg.append('svg:defs').append('svg:marker').attr('id', 'end-arrow').attr('viewBox', '0 -5 10 10')
         .attr('refX', 8.5).attr('markerWidth', 3.5).attr('markerHeight', 3.5).attr('orient', 'auto')
         .append('svg:path').attr('d', 'M0,-5L10,0L0,5');
 
     /* Effects */
 
-    QG.svg.on("mousedown", function (d) {
-        QueryGraph.prototype.svgMouseDown.call(QG);
-    });
 
     d3.select(window).on("keydown", function () {
         if (d3.event.shiftKey) {
@@ -1179,7 +1202,8 @@ function QueryGraph(query_interface_selection, reactor) {
         }
     });
 
-    QG.addNode([QG.aspect[2] / 2, QG.aspect[3] / 2]);
+    QG.graph.addNode([QG.aspect[2] / 2, QG.aspect[3] / 2]);
+    QG.updateGraph();
 
     /* Binds events to the reactor */
     QG.reactor = reactor;
@@ -1187,7 +1211,7 @@ function QueryGraph(query_interface_selection, reactor) {
     QG.reactor.addEventListener('matching_changed', this.graph.setMatching.bind(this.graph));
 }
 
-QueryGraph.prototype.nodeAdder = function (){
+QueryGraph.prototype.nodeAdder = function () {
 
     var QG = this;
 
@@ -1203,17 +1227,13 @@ QueryGraph.prototype.nodeAdder = function (){
             })
             .on("end", function (d) {
                 QG.svg.select("#tst").remove();
-                QG.nodeAdder()
-                QG.addNode([d3.event.x, d3.event.y]);
+                QG.nodeAdder();
+                var can_create = utils.canDo(d3.event.x, d3.event.y, QG.config.nodeRadius, QG.aspect, QG.graph.nodes);
+                if (can_create){
+                    QG.graph.addNode([d3.event.x, d3.event.y]);
+                }
+                QG.updateGraph();
             }));
-};
-
-QueryGraph.prototype.addNode = function (coordinates) {
-    var QG = this;
-    var node = new utils.Node(coordinates, QG.idct);
-    QG.graph.nodes.push(node);
-    QG.idct += 1;
-    QG.updateGraph();
 };
 
 QueryGraph.prototype.nodeMouseDown = function (svg_element) {
@@ -1233,11 +1253,13 @@ QueryGraph.prototype.nodeMouseDown = function (svg_element) {
 
         if (aux.length == 0 && p_selected[0].name != n_selected[0].name) {
             if (d3.event.ctrlKey) {
-                QG.addEdge(p_selected[0], n_selected[0], "undirected");
+                QG.graph.addEdge(p_selected[0], n_selected[0], "undirected");
             }
             else {
-                QG.addEdge(p_selected[0], n_selected[0], "directed");
+                QG.graph.addEdge(p_selected[0], n_selected[0], "directed");
             }
+            QG.updateGraph();
+
         }
     }
     else {
@@ -1245,37 +1267,10 @@ QueryGraph.prototype.nodeMouseDown = function (svg_element) {
     }
 };
 
-QueryGraph.prototype.addEdge = function (src, dst, kind) {
-    var QG = this;
-    var edge = new utils.Edge(src, dst, QG.idct, kind);
-    QG.graph.edges.push(edge);
-    QG.idct += 1;
-    QG.updateGraph();
-};
-
 QueryGraph.prototype.edgeMouseDown = function (svg_element) {
     var QG = this;
     d3.event.stopPropagation();
     QG.replaceSelected(svg_element);
-};
-
-QueryGraph.prototype.svgMouseDown = function () {
-    var QG = this;
-    if (d3.event.shiftKey) {
-        var coordinates = d3.mouse(QG.svg.node());
-
-        var tmp_x = coordinates[0],
-            tmp_y = coordinates[1],
-            radius = QG.config.nodeRadius,
-            aspect = QG.aspect,
-            nodes = QG.graph.nodes;
-
-        var can_create = utils.canDo(tmp_x, tmp_y, radius, aspect, nodes);
-
-        if (can_create) {
-            QG.addNode(coordinates);
-        }
-    }
 };
 
 QueryGraph.prototype.svgKeyDown = function () {
@@ -1302,7 +1297,7 @@ QueryGraph.prototype.svgKeyDown = function () {
 
             QG.graph.nodes = nodes;
             QG.graph.edges = edges;
-            QG.selectedSvgID = -1;
+            QG.graph.selectedSvgID = -1;
             QG.updateGraph();
             QG.reactor.dispatchEvent("selected_node_changed", undefined);
     }
@@ -1314,7 +1309,7 @@ QueryGraph.prototype.replaceSelected = function (svg_element) {
     var svg_id = svg_d.id;
     d3.select(".selected").classed("selected", false);
     d3.select(svg_element).classed("selected", true);
-    QG.selectedSvgID = svg_id;
+    QG.graph.selectedSvgID = svg_id;
 
     QG.reactor.dispatchEvent("selected_node_changed", svg_d);
 };
@@ -1518,7 +1513,6 @@ QueryGraph.prototype.updateGraph = function () {
         .remove();
 };
 
-
 module.exports = QueryGraph;
 
 },{"../config/config.js":1,"../external/d3.min.v4.js":2,"../external/jquery.min.js":4,"./graph.js":9,"./utils.js":12}],12:[function(require,module,exports){
@@ -1568,35 +1562,9 @@ function calcEdgePath(d, consts) {
     return "M" + result[1] + " " + result[3] + " L" + result[0] + " " + result[2];
 }
 
-function Node(coor, id) {
-    /* Node constructor */
-    // Class name, id and id name
-    this.className = conf.QUERY_SYSTEM.nodeClass; this.name = "n" + id; this.id = id;
-    // Constraints and display values
-    this.key_op_value = []; this.display_value = [];
-    // Coordinates of the node
-    this.x = coor[0]; this.y = coor[1];
-}
-
-function Edge(src, dst, id, kind) {
-    /* Edge constructor */
-    // Class name, id and id name
-    this.className = conf.QUERY_SYSTEM.edgeClass; this.name = "e" + id; this.id = id;
-    // Constraints and display values
-    this.key_op_value = []; this.display_value = [];
-    // Source and destination names
-    this.source = src.name; this.destination = dst.name;
-    // Pointers to source and destination nodes
-    this.src = src; this.dst = dst;
-    // Kind of edge, directed or undirected
-    this.kind = kind;
-}
-
 
 
 module.exports = {
-    Node: Node,
-    Edge: Edge,
     calcEdgePath: calcEdgePath,
     calcTextEdgePath : calcTextEdgePath,
     canDo: canDo

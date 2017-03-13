@@ -44,35 +44,9 @@ function calcEdgePath(d, consts) {
     return "M" + result[1] + " " + result[3] + " L" + result[0] + " " + result[2];
 }
 
-function Node(coor, id) {
-    /* Node constructor */
-    // Class name, id and id name
-    this.className = conf.QUERY_SYSTEM.nodeClass; this.name = "n" + id; this.id = id;
-    // Constraints and display values
-    this.key_op_value = []; this.display_value = [];
-    // Coordinates of the node
-    this.x = coor[0]; this.y = coor[1];
-}
-
-function Edge(src, dst, id, kind) {
-    /* Edge constructor */
-    // Class name, id and id name
-    this.className = conf.QUERY_SYSTEM.edgeClass; this.name = "e" + id; this.id = id;
-    // Constraints and display values
-    this.key_op_value = []; this.display_value = [];
-    // Source and destination names
-    this.source = src.name; this.destination = dst.name;
-    // Pointers to source and destination nodes
-    this.src = src; this.dst = dst;
-    // Kind of edge, directed or undirected
-    this.kind = kind;
-}
-
 
 
 module.exports = {
-    Node: Node,
-    Edge: Edge,
     calcEdgePath: calcEdgePath,
     calcTextEdgePath : calcTextEdgePath,
     canDo: canDo
