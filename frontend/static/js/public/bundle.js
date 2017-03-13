@@ -31,8 +31,8 @@ DBI.prototype.getDataSet = function (callback, flg) {
         type: 'POST',
         url: "http://localhost:5000/config/",
         data: request,
+        timeout: 3000,
         success: function (data) {
-
             if (flg == undefined) {
                 thisDatabaseInfo.conf_file = JSON.parse(data);
                 thisDatabaseInfo.filename = thisDatabaseInfo.conf_file["default_dataset"];
