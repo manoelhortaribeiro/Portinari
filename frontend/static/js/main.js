@@ -25,10 +25,6 @@ function buildPortinari() {
 // Creates reactor
     var reactor = new Reactor();
 
-    /* ------------------------ */
-    /* ---  Interface Stuff --- */
-    /* ------------------------ */
-
     /* --------------------- */
     /* ---  Query System --- */
     /* --------------------- */

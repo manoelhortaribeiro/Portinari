@@ -10,11 +10,9 @@ function GC(query_interface_selection, reactor) {
     // -- Config
     GQ.config = json_config.QUERY_SYSTEM;
 
-    // -- Model
     GQ.graph = new graph.Graph();
     GQ.graph.setMatching(GQ.config.matchingDefault());
 
-    // -- View
 
     GQ.aspect = [0, 0, screen.width * 0.7, screen.height * 0.6];
 

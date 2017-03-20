@@ -700,10 +700,6 @@ function buildPortinari() {
 // Creates reactor
     var reactor = new Reactor();
 
-    /* ------------------------ */
-    /* ---  Interface Stuff --- */
-    /* ------------------------ */
-
     /* --------------------- */
     /* ---  Query System --- */
     /* --------------------- */
@@ -837,9 +833,9 @@ module.exports = {
 };
 
 },{"./utils.js":12}],10:[function(require,module,exports){
-var d3 = require("../external/d3.min.v4.js"),
-    $ = require("../external/jquery.min.js"),
-    json_config = require("../config/config.js");
+var json_config = require("../config/config.js"),
+    d3 = require("../external/d3.min.v4.js"),
+    $ = require("../external/jquery.min.js");
 
 function FormHandler(qif, qic, qgif, qgic, qcf, qcc, dsc, mtc, reactor) {
 
@@ -964,7 +960,6 @@ function make_form_matching(form, current, name, attributes, thisForm) {
     });
 }
 
-
 function make_form_dataset(form, current, name, attributes, thisForm) {
     // form
     form.classed("query_" + name, true)
@@ -1081,7 +1076,6 @@ function make_form(form, current, name, attributes, thisForm, callback) {
 
     });
 }
-
 
 function global_form_callback(attr, disp, current, thisForm) {
 
@@ -1219,11 +1213,9 @@ function GC(query_interface_selection, reactor) {
     // -- Config
     GQ.config = json_config.QUERY_SYSTEM;
 
-    // -- Model
     GQ.graph = new graph.Graph();
     GQ.graph.setMatching(GQ.config.matchingDefault());
 
-    // -- View
 
     GQ.aspect = [0, 0, screen.width * 0.7, screen.height * 0.6];
 
