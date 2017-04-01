@@ -23,7 +23,7 @@
 .Node:hover {
     stroke: #413F4A;
     stroke-width: 2px;
-    stroke-dasharray: 5, 5;
+    stroke-dasharray: 20, 20;
 }
 
 .Node.selected {

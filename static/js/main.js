@@ -10,9 +10,6 @@ $("#expand-button").click(function() {
     $(".content").slideToggle(200);
 });
 
-
-
-
 // Creates reactor pattern and register events
 var reactor = new Reactor();
 reactor.registerEvent('selected_node_changed');
