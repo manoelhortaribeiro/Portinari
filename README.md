@@ -1,4 +1,4 @@
-## Portinari v1.0
+## Portinari v0.1
 
 Prototypical version of a screening data visualization tool for knowledge discovery. 
 
