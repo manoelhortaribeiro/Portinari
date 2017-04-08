@@ -848,14 +848,14 @@ function PredictionGraph(svg1, svg2, reactor) {
     thisResult.svg1 = svg1.append("svg")
         .classed("shadow-box", true)
         .classed("grid-svg", true)
-        .attr("width", "500px")
+        .attr("width", "650px")
         .attr("height", "825px")
         .attr("visibility", "hidden");
 
     thisResult.svg2 = svg2.append("svg")
         .classed("shadow-box", true)
         .classed("grid-svg", true)
-        .attr("width", "500px")
+        .attr("width", "650px")
         .attr("height", "825px")
         .attr("visibility", "hidden");
 
@@ -1749,9 +1749,6 @@ var d3 = require("./external/d3.min.v4.js"),
 $("#expand-button").click(function() {
     $(".content").slideToggle(200);
 });
-
-
-
 
 // Creates reactor pattern and register events
 var reactor = new Reactor();

@@ -3,11 +3,8 @@ import csv
 
 def write_nodes_and_rels(path, nodes, edges, node_values, edge_values):
 
-    nodes_writer = csv.writer(open(path + 'events.csv', 'w'))
-    edges_writer = csv.writer(open(path + 'nexts.csv', 'w'))
-
-    node_values_names = []
-    edge_values_names = []
+    nodes_writer, edges_writer = csv.writer(open(path + 'events.csv', 'w')), csv.writer(open(path + 'nexts.csv', 'w'))
+    node_values_names, edge_values_names = [], []
 
     for i1, i2, i3 in node_values:
         node_values_names.append(i1 + i2)
@@ -21,12 +18,10 @@ def write_nodes_and_rels(path, nodes, edges, node_values, edge_values):
 
     for patient, links in zip(nodes, edges):
 
-        tmp = []
+        tmp, flag = [], True
 
-        flag = True
 
         for event in patient:
-
 
             labels = "Event"
 
@@ -49,32 +44,15 @@ def write_nodes_and_rels(path, nodes, edges, node_values, edge_values):
                 edges_writer.writerow([tmp[i], tmp[j], "Next"+str(j-i), acc])
 
 
-def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_date, node_values, edge_values):
+def parse_opencrab(path_src, path_out, id_value, node_values, edge_values):
 
     # Open the file
-    file = open(path_src, 'r')
-    csvfile = csv.DictReader(file)
-
-    # Initialize auxiliary values
-    f_nodes = []
-    f_edges = []
-    id_v = None
-
-    count = 0
+    csvfile = csv.DictReader(open(path_src, 'r'))
+    f_nodes, f_edges, id_v, count = [], [], None, 0
 
     for row in csvfile:
 
-        if event_date is not None:
-            if int(row[event_date]) < start_date or int(row[event_date]) > end_date:
-                continue
-
-        count += 1
-
-        if id_v is not None and count % 50000 == 0:
-                print(id_v)
-
-        tmp_nodes = []
-        tmp_edges = []
+        tmp_nodes, tmp_edges, count = [], [], count + 1
 
         if id_v is not None and id_v != int(row[id_value]):
             f_nodes.append(nodes)
@@ -83,20 +61,16 @@ def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_dat
         # First case: id_v not initialized
         if id_v is None or id_v != int(row[id_value]):
 
-            nodes = []
-            edges = []
-            id_v = int(row[id_value])
+            nodes, edges, id_v = [], [], int(row[id_value])
 
             for i in node_values:
                 if len(row[i[0]]) != 0:
-
                     tmp_nodes.append(i[2](row[i[0]]))
                 else:
                     tmp_nodes.append(row[i[0]])
             nodes.append(tmp_nodes)
         else:
             for i in node_values:
-                # print('node', i[2], row[i[0]])
                 if len(row[i[0]]) != 0:
                     tmp_nodes.append(i[2](row[i[0]]))
                 else:
@@ -104,41 +78,25 @@ def parse_opencrab(path_src, path_out, id_value, event_date, start_date, end_dat
             nodes.append(tmp_nodes)
 
             for i in edge_values:
-                # print('edge', i[2], row[i[0]])
                 if len(row[i[0]]) != 0:
                     tmp_edges.append(i[2](row[i[0]]))
                 else:
                     tmp_edges.append(row[i[0]])
             edges.append(tmp_edges)
 
-
     write_nodes_and_rels(path_out, f_nodes, f_edges, node_values, edge_values)
-
 
 
 def treat_float(a):
     tmp = a.find('.')
-    if tmp == -1:
-        return int(a)
-    else:
-        return int(a[:tmp])
+    return int(a) if tmp == -1 else int(a[:tmp])
 
-f = lambda a: int(a[:-2])
-parse_opencrab("../processed_data/opencrab_final.csv",
+parse_opencrab("../raw_data/sample.csv",
                "../output/",
                id_value="ID",
-               event_date="diagnosisdate",
-               start_date=0,
-               end_date=100000000000,
                node_values=[("ID", ":int", treat_float),
                             ("birthdate", ":int", treat_float),
-                            ("diagnosisnumber", ":int", treat_float),
-                            ("censordate", ":int", treat_float),
-                            ("type", "", str),
                             ("diagnosis1", ":long", treat_float),
-                            ("diagnosis2", ":int", treat_float),
-                            ("stage", ":int", treat_float),
-                            ("lab_nr", ":int", treat_float),
                             ("diagnosisdate", ":int", treat_float),
                             ("age", ":int", treat_float)],
                edge_values=[("sincelast", ":int", treat_float)])

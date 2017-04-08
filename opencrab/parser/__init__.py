@@ -1,6 +1,5 @@
 """
-This package contains a preprocessor that changes minor things in the data, such as making the timestamp
-become a unix time integer (actually in days). It changes the raw data from
+This package contains a preprocessor that changes minor things in the data from
 
 | opencrab
     | data

@@ -2,8 +2,6 @@
 neo4jdb/__pycache__/
 opencrab/data/output
 opencrab/data/processed_data
-opencrab/output/events.csv
-opencrab/output/nexts.csv
 opencrab/processed_data/opencrabunix_d.csv
 opencrab/processed_data/opencrab_final.csv
 opencrab/raw_data/opencrab.csv
