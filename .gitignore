@@ -1,6 +1,6 @@
 .idea/
 neo4jdb/__pycache__/
-opencrab/data/output
+opencrab/data/output/*.neo4j
 opencrab/data/processed_data
 opencrab/processed_data/opencrabunix_d.csv
 opencrab/processed_data/opencrab_final.csv
