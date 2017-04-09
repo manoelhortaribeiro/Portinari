@@ -3,12 +3,7 @@ var d3 = require("./external/d3.min.v4.js"),
     QueryGraph = require("./graph_creator/query_graph.js"),
     PredictionForm = require("./graph_creator/prediction_form.js"),
     PredictionGraph = require("./graph_creator/prediction_graph.js"),
-    Reactor = require("./external/reactor.js"),
-    $ = require("./external/jquery.min.js");
-
-$("#expand-button").click(function() {
-    $(".content").slideToggle(200);
-});
+    Reactor = require("./external/reactor.js");
 
 // Creates reactor pattern and register events
 var reactor = new Reactor();

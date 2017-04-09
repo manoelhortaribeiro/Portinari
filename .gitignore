@@ -8,3 +8,4 @@ opencrab/raw_data/opencrab.csv
 opencrab/raw_data/opencrab_d.csv
 parser/__init__.pyc
 parser/__pycache__/
+watchers.sh

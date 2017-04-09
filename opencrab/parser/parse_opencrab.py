@@ -91,12 +91,15 @@ def treat_float(a):
     tmp = a.find('.')
     return int(a) if tmp == -1 else int(a[:tmp])
 
-parse_opencrab("../raw_data/sample.csv",
-               "../output/",
-               id_value="ID",
-               node_values=[("ID", ":int", treat_float),
-                            ("birthdate", ":int", treat_float),
-                            ("diagnosis1", ":long", treat_float),
-                            ("diagnosisdate", ":int", treat_float),
-                            ("age", ":int", treat_float)],
-               edge_values=[("sincelast", ":int", treat_float)])
+
+if __name__ == "__main__":
+
+    parse_opencrab("../raw_data/sample.csv",
+                   "../output/",
+                   id_value="ID",
+                   node_values=[("ID", ":int", treat_float),
+                                ("birthdate", ":int", treat_float),
+                                ("diagnosis1", ":int", treat_float),
+                                ("diagnosisdate", ":int", treat_float),
+                                ("age", ":int", treat_float)],
+                   edge_values=[("sincelast", ":int", treat_float)])

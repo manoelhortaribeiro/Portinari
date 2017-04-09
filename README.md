@@ -34,4 +34,10 @@ Where *treat_float* could be any function to make the value an integer, or to ch
       birthdate = -5.2                birthdate = -5.2               birthdate = -5.2
          age = 27.9                     age = 29.0                     age = 29.2
         
-  
+ 
+You then have to use neo4j importer, which is made easier by our *bashmagic* script:
+
+    ./bashmagic name_of_folder
+    
+You then have to access the database using neo4j. This has only been tested with version 2.3.2. If you change the password of the dataset, you have to change it in `./portinari_paths.py`, where the default is `db = db_access.Neo4jDatabase("admin")`.
+

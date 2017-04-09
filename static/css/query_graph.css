@@ -3,47 +3,46 @@
 #query-interface-graph {
     text-align: center;
     margin: 5px 0 5px 0;
-
 }
 
 #query-interface-graph svg {
     width: 900px;
-    height: 500px;
+    height: 350px;
 }
 
 /* nodes */
 
 .Node {
-    fill: #ABB8D8;
-    -webkit-box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.10);
-    -moz-box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.10);
-    box-shadow: 0 0 67px 8px rgba(0, 0, 0, 0.10);
+    fill: rgba(0, 0, 0, 0.3);
 }
 
 .Node:hover {
-    stroke: #413F4A;
-    stroke-width: 2px;
-    stroke-dasharray: 20, 20;
+    fill: rgba(0, 0, 0, 0.5);
+
 }
 
 .Node.selected {
-    fill: #98869C;
-    stroke-width: 2px;
-    stroke: #413F4A;
-
+    fill: rgba(0, 0, 0, 0.7);
 }
 
 /* edges */
 
 .link {
-    stroke: #402D29;
-    stroke-width: 4px;
+    stroke: rgba(0, 0, 0, 0.3);
+    fill: rgba(0, 0, 0, 0.1);;
+    stroke-width: 6px;
+}
+
+.link:hover {
+    stroke: rgba(0, 0, 0, 0.5);
+    fill: rgba(0, 0, 0, 0.3);;
+    stroke-width: 7px;
 }
 
 .selected path.link {
-    stroke: #413F4A;
-    fill: #413F4A;
-    stroke-width: 6px;
+    stroke: rgba(0, 0, 0, 0.5);
+    fill: rgba(0, 0, 0, 0.3);;
+    stroke-width: 8px;
 }
 
 #end-arrow {
@@ -54,17 +53,17 @@
 /* text */
 
 .InTextN text {
-    fill: rgba(255, 255, 255, 1);
+    fill: rgba(255, 255, 255, 0.7);
 }
 
 .OuTextN text {
-    fill: rgba(12, 12, 14, 0.9);
+    fill: rgba(12, 12, 14, 0.8);
 }
 
 .InTextE text {
-    fill: rgba(12, 12, 14, 0.9);
+    fill: rgba(12, 12, 14, 0.8);
 }
 
 .OuTextE text {
-    fill: rgba(12, 12, 14, 0.9);
+    fill: rgba(12, 12, 14, 0.8);
 }

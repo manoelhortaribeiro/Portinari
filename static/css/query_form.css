@@ -29,14 +29,19 @@ li {
     background-color: #ffffff;
     margin: 5px;
     font-size: 14px;
-    color: #6c5c70;
-    border-style: solid;
-    border-width: 1px;
-    border-color: rgba(43, 102, 154, 0.38);
+    color: rgba(0, 0, 0, 0.8);
+    border: 1px solid #d3d3d3;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
 }
 
 li:hover {
-    background-color: #aaa;
+    background-color: #d3d3d3;
 }
 
 
