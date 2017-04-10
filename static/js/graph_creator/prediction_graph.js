@@ -15,15 +15,15 @@ function PredictionGraph(svg1, svg2, reactor) {
     thisResult.svg1 = svg1.append("svg")
         .classed("shadow-box", true)
         .classed("grid-svg", true)
-        .attr("width", "650px")
-        .attr("height", "825px")
+        .attr("width", "900px")
+        .attr("height", "600px")
         .attr("visibility", "hidden");
 
     thisResult.svg2 = svg2.append("svg")
         .classed("shadow-box", true)
         .classed("grid-svg", true)
-        .attr("width", "650px")
-        .attr("height", "825px")
+        .attr("width", "900px")
+        .attr("height", "600px")
         .attr("visibility", "hidden");
 
     thisResult.svg = null;

@@ -13,7 +13,6 @@ function PredictionForm(future_form_selection, graph, reactor) {
     // ** Model
     thisForm.futureNodes = [1, 2, 3, 4, 5];
 
-
     var values = [];
     thisForm.config["Node"].forEach(function (attr) {
         values.push([attr.name, attr.display]);
@@ -76,9 +75,6 @@ function PredictionForm(future_form_selection, graph, reactor) {
             'id': JSON.stringify(json_config.ID)
         };
 
-        $(".content").slideToggle(200);
-        $("#spinner").show();
-
         $.post("/", posted_data, function (data) {
 
             var graph = JSON.parse(data);
@@ -87,14 +83,12 @@ function PredictionForm(future_form_selection, graph, reactor) {
             graph.future_nodes = attr[1];
             graph.begin_date = attr[2];
             graph.end_date = attr[3];
-            $("#spinner").hide();
 
             thisForm.reactor.dispatchEvent("query_successful", graph);
         });
 
         event.preventDefault();
     });
-
 }
 
 module.exports = PredictionForm;

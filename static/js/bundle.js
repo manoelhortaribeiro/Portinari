@@ -448,7 +448,6 @@ function PredictionForm(future_form_selection, graph, reactor) {
     // ** Model
     thisForm.futureNodes = [1, 2, 3, 4, 5];
 
-
     var values = [];
     thisForm.config["Node"].forEach(function (attr) {
         values.push([attr.name, attr.display]);
@@ -511,9 +510,6 @@ function PredictionForm(future_form_selection, graph, reactor) {
             'id': JSON.stringify(json_config.ID)
         };
 
-        $(".content").slideToggle(200);
-        $("#spinner").show();
-
         $.post("/", posted_data, function (data) {
 
             var graph = JSON.parse(data);
@@ -522,14 +518,12 @@ function PredictionForm(future_form_selection, graph, reactor) {
             graph.future_nodes = attr[1];
             graph.begin_date = attr[2];
             graph.end_date = attr[3];
-            $("#spinner").hide();
 
             thisForm.reactor.dispatchEvent("query_successful", graph);
         });
 
         event.preventDefault();
     });
-
 }
 
 module.exports = PredictionForm;
@@ -552,15 +546,15 @@ function PredictionGraph(svg1, svg2, reactor) {
     thisResult.svg1 = svg1.append("svg")
         .classed("shadow-box", true)
         .classed("grid-svg", true)
-        .attr("width", "650px")
-        .attr("height", "825px")
+        .attr("width", "900px")
+        .attr("height", "600px")
         .attr("visibility", "hidden");
 
     thisResult.svg2 = svg2.append("svg")
         .classed("shadow-box", true)
         .classed("grid-svg", true)
-        .attr("width", "650px")
-        .attr("height", "825px")
+        .attr("width", "900px")
+        .attr("height", "600px")
         .attr("visibility", "hidden");
 
     thisResult.svg = null;
@@ -1064,7 +1058,7 @@ GC.prototype.nodeMouseDown = function (svg_element) {
     var p_selected = d3.select(".selected").data();
 
     if (d3.event.shiftKey && p_selected.length != 0) {
-        var n_selected = d3.select(svg_element).data()
+        var n_selected = d3.select(svg_element).data();
 
         var aux = thisGraph.graph.edges.filter(function (a) {
             return ((a.source == p_selected[0].name) &&
@@ -1111,7 +1105,7 @@ GC.prototype.svgKeyDown = function () {
     var nodes = thisGraph.graph.nodes;
     var edges = thisGraph.graph.edges;
 
-    console.log(d3.event.keyCode)
+    console.log(d3.event.keyCode);
 
     switch (d3.event.keyCode) {
         case thisGraph.config.delete:

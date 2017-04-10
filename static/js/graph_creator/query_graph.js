@@ -92,7 +92,7 @@ GC.prototype.nodeMouseDown = function (svg_element) {
     var p_selected = d3.select(".selected").data();
 
     if (d3.event.shiftKey && p_selected.length != 0) {
-        var n_selected = d3.select(svg_element).data()
+        var n_selected = d3.select(svg_element).data();
 
         var aux = thisGraph.graph.edges.filter(function (a) {
             return ((a.source == p_selected[0].name) &&
@@ -139,7 +139,7 @@ GC.prototype.svgKeyDown = function () {
     var nodes = thisGraph.graph.nodes;
     var edges = thisGraph.graph.edges;
 
-    console.log(d3.event.keyCode)
+    console.log(d3.event.keyCode);
 
     switch (d3.event.keyCode) {
         case thisGraph.config.delete:
