@@ -1,6 +1,13 @@
 ## Portinari v0.1
 
-Prototypical version of a screening data visualization tool for knowledge discovery. 
+Prototypical version of a screening data visualization tool for knowledge discovery. As published in:
+
+- *Portinari: a data exploration tool to personalize cervical cancer screening*
+
+Presented at:
+
+- *2017 39th International Conference on Software Engineering: Software Engineering in Society Track*
+
 
 It uses Flask for the front-end and *Neo4j* as its database. The data from the cancer registry and its exportation tools are unfortunately not public, however a small sample of fake data is provided. To import the data, you first need to produce a dataset with only integers and floats:
 
